@@ -607,11 +607,49 @@
             min-height: 30px;
         }
 
+        .product-price-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 2px;
+        }
         .product-price {
             font-size: 22px;
-            color: var(--primary-cyan);
+            color: var(--text-light);
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
+        }
+        .product-price-discount {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .product-price-discount .disc-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #e07000;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+        .product-price-discount .disc-label i {
+            font-size: 13px;
+        }
+        .product-price-discount .disc-value {
+            font-size: 20px;
+            font-weight: 400;
+            color: var(--text-light);
+        }
+        .product-price-discount .disc-badge {
+            background: #e07000;
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            padding: 2px 7px;
         }
 
         .product-category {
@@ -1585,51 +1623,51 @@
         // BASE DE DADOS DE PRODUTOS — Produtos Reais CãoTelli
         const products = [
             // ─── RAÇÃO ───
-            { id:1,  name:"PRIMOGATO PREMIUM ORIGINAL 10,1KG",                  category:"racao",     price:89.90,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/61KPn8S6NBL._AC_SX679_.jpg", description:"Ração premium para gatos adultos 10,1kg" },
-            { id:2,  name:"Monello Cães Adulto Tradicional Frango 17kg",          category:"racao",     price:115.00, emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/1636563542196.jpg", description:"Ração para cães adultos com frango 17kg" },
-            { id:3,  name:"GOLDEN SPECIAL ADULTO 15KG",                          category:"racao",     price:98.90,  emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/10002310000076_1775762750885.jpg", description:"Golden Special para cães adultos 15kg" },
-            { id:4,  name:"Birbo Tradicional Frango 15kg",                        category:"racao",     price:79.90,  emoji:"🐕", imgUrl:"https://images.tcdn.com.br/img/img_prod/1122713/birrbo_tradicional_caes_frango_15kg_1_5kg_gratis_5993_1_d1f5f89788622ad6408030506a64eb69.png", description:"Ração Birbo sabor frango 15kg" },
-            { id:5,  name:"GOLDEN FORM CÃES ADULTO FRANGO MINI BITS 15KG",       category:"racao",     price:105.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/51K1+gru-3L._AC_SL1000_.jpg", description:"Golden Form para cães adultos mini bits 15kg" },
-            { id:6,  name:"APOLO CÃO ORIGINAL AMARELO 20KG",                     category:"racao",     price:89.90,  emoji:"🐕", imgUrl:"https://petzone.com.py/v1/wp-content/uploads/2021/06/5bb7b5018be8a-apolo-original.png", description:"Ração Apolo para cães 20kg" },
-            { id:7,  name:"FINOTRATO SELECT 20KG",                               category:"racao",     price:85.00,  emoji:"🐕", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_693285-MLA97125490936_112025-F.webp", description:"Finotrato Select para cães 20kg" },
-            { id:8,  name:"BESSER NATURAL ADULTOS 25kg",                         category:"racao",     price:130.00, emoji:"🐕", imgUrl:"https://petmixsilva.com.br/wp-content/uploads/2024/09/Design-sem-nome-64.png", description:"Besser Natural para cães adultos 25kg" },
-            { id:9,  name:"PINUS 15KG",                                          category:"racao",     price:72.00,  emoji:"🐕", imgUrl:"https://ninovet.com.br/wp-content/uploads/2024/03/15138032501_Granulado20Higienico20Sanithy20Prime20Pinus20-2015kg.jpg", description:"Ração Pinus para cães 15kg" },
-            { id:10, name:"GP CÃO CHOICE 20KG",                                  category:"racao",     price:88.00,  emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/61PqodEPfxL._AC_SX679_.jpg", description:"GP Cão Choice para cães 20kg" },
-            { id:11, name:"GOLDEN SENIOR ADULTO 15KG",                           category:"racao",     price:108.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/51qK45q4SZL._AC_SX679_.jpg", description:"Golden Senior para cães idosos 15kg" },
-            { id:12, name:"GOLDEN FORM GATOS ADULTO CASTRADO FRANGO 10,1KG",    category:"racao",     price:95.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/513eYmdR0CL._AC_SX679_.jpg", description:"Golden Form para gatos castrados sabor frango 10,1kg" },
-            { id:13, name:"GOLDEN SPECIAL GATOS CASTRADOS 10,1KG",               category:"racao",     price:92.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/51kbDmM3FuL._AC_SY879_.jpg", description:"Golden Special para gatos castrados 10,1kg" },
-            { id:14, name:"PREMIER NUTR CLIN CÃES OBESIDADE PEQ. PORTE 10,1KG", category:"racao",     price:115.00, emoji:"⚖️", imgUrl:"https://m.media-amazon.com/images/I/51kgcOXulML._AC_SL1000_.jpg", description:"Premier Nutrição Clínica cães obesidade pequeno porte 10,1kg" },
-            { id:15, name:"GOLDEN SENIOR ADULTO MINI BITS 10,1KG",               category:"racao",     price:99.00,  emoji:"🐕", imgUrl:"https://down-br.img.susercontent.com/file/br-11134207-7r98o-ma4fex5qyz9jff", description:"Golden Senior Mini Bits para cães idosos 10,1kg" },
-            { id:16, name:"ROYAL CANIN MINI ADULT 7,5KG",                        category:"racao",     price:148.00, emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/10001320000127_1763123301904_mini.jpg", description:"Royal Canin para cães adultos raças pequenas 7,5kg" },
-            { id:17, name:"GOLDEN POWER TRAINING ADULTO 15KG",                   category:"racao",     price:100.00, emoji:"🐕", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_606258-MLA99823786541_112025-F.webp", description:"Golden Power Training para cães ativos 15kg" },
-            { id:18, name:"GOLDEN FORM GATOS ADULTO CASTRADO CARNE 10,1KG",     category:"racao",     price:95.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/51IVMoSqxsL._AC_SX679_.jpg", description:"Golden Form gatos castrados sabor carne 10,1kg" },
-            { id:19, name:"GOLDEN SPECIAL ADULTO 20KG",                          category:"racao",     price:125.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/61VkUgdhFkL._AC_SX679_.jpg", description:"Golden Special para cães adultos 20kg" },
-            { id:20, name:"AMBIENTES INTERNOS CÃES ADULTO 12KG",                 category:"racao",     price:98.00,  emoji:"🏠", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_747261-MLA99449833850_112025-F.webp", description:"Ração para cães de ambientes internos 12kg" },
-            { id:21, name:"ROYAL CANIN STERILISED 10,1KG",                       category:"racao",     price:152.00, emoji:"🐱", imgUrl:"https://vidamascota.pe/wp-content/uploads/2023/11/Royal-Canin-Sterilised-10kg.png", description:"Royal Canin para gatos castrados 10,1kg" },
-            { id:22, name:"FINOTRATO BIO-LITTER 10KG",                           category:"racao",     price:69.00,  emoji:"🐱", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_760554-MLA97433279931_112025-F.webp", description:"Finotrato Bio-Litter para gatos 10kg" },
-            { id:23, name:"GOLDEN FORM GATOS ADULTO CASTRADO SALMÃO 10,1KG",    category:"racao",     price:95.00,  emoji:"🐱", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_602233-MLB93371090893_092025-F.webp", description:"Golden Form gatos castrados sabor salmão 10,1kg" },
-            { id:24, name:"ROYAL CANIN MAXI ADULT 12KG",                         category:"racao",     price:162.00, emoji:"🐕", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_641237-MLB92696946220_092025-F.webp", description:"Royal Canin para cães adultos raças grandes 12kg" },
-            { id:25, name:"BESSER NATURAL ADULTOS RPM 15kg",                     category:"racao",     price:118.00, emoji:"🐕", imgUrl:"https://cdn.awsli.com.br/300x300/1777/1777119/produto/242901479/whatsapp-image-2023-11-24-at-11-20-02--1--w1yttah9bx.jpeg", description:"Besser Natural RPM para cães adultos 15kg" },
-            { id:26, name:"ATACAMA ALL BREEDS 20KG",                             category:"racao",     price:92.00,  emoji:"🐕", imgUrl:"https://tse4.mm.bing.net/th/id/OIP.Q01QgivRonVRk607kVxVXgHaD4?rs=1&pid=ImgDetMain&o=7&rm=3", description:"Atacama All Breeds para todas as raças 20kg" },
-            { id:27, name:"ATACAMA ALL BREEDS 14KG",                             category:"racao",     price:72.00,  emoji:"🐕", imgUrl:"https://m.magazineluiza.com.br/a-static/420x420/atacama-all-breeds-14kg-supra/petsonagacomercioderacoes2/14291/2b3fcb0a4303b65a136d2d94a2d91a4f.jpeg", description:"Atacama All Breeds para todas as raças 14kg" },
+            { id:1,  name:"PRIMOGATO PREMIUM ORIGINAL 10,1KG",                  category:"racao",     price:89.90,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/61KPn8S6NBL._AC_SX679_.jpg", description:"Ração super premium com alto teor de proteína animal, vitaminas e minerais. Formulada para gatos adultos exigentes que merecem o melhor." },
+            { id:2,  name:"Monello Cães Adulto Tradicional Frango 17kg",          category:"racao",     price:115.00, emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/1636563542196.jpg", description:"Sabor irresistível de frango que os cães adoram! Nutrição completa para cães adultos de todas as raças, com ingredientes selecionados." },
+            { id:3,  name:"GOLDEN SPECIAL ADULTO 15KG",                          category:"racao",     price:98.90,  emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/10002310000076_1775762750885.jpg", description:"Fórmula balanceada com proteínas nobres, Ômega 3 e 6 para pelagem brilhante e saúde óssea. Ideal para cães adultos ativos." },
+            { id:4,  name:"Birbo Tradicional Frango 15kg",                        category:"racao",     price:79.90,  emoji:"🐕", imgUrl:"https://images.tcdn.com.br/img/img_prod/1122713/birrbo_tradicional_caes_frango_15kg_1_5kg_gratis_5993_1_d1f5f89788622ad6408030506a64eb69.png", description:"Ração econômica de alta qualidade com sabor frango. Ótimo custo-benefício para cães adultos com muito apetite!" },
+            { id:5,  name:"GOLDEN FORM CÃES ADULTO FRANGO MINI BITS 15KG",       category:"racao",     price:105.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/51K1+gru-3L._AC_SL1000_.jpg", description:"Grãos pequenos, nutrição gigante! Ideal para cães de porte pequeno e médio. Rico em frango, promove energia, pelagem e imunidade." },
+            { id:6,  name:"APOLO CÃO ORIGINAL AMARELO 20KG",                     category:"racao",     price:89.90,  emoji:"🐕", imgUrl:"https://petzone.com.py/v1/wp-content/uploads/2021/06/5bb7b5018be8a-apolo-original.png", description:"Clássico e confiável! Ração Apolo com vitaminas A, D e E para cães saudáveis e bem nutridos. Embalagem econômica de 20kg." },
+            { id:7,  name:"FINOTRATO SELECT 20KG",                               category:"racao",     price:85.00,  emoji:"🐕", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_693285-MLA97125490936_112025-F.webp", description:"Alta palatabilidade e digestibilidade. Com prebióticos para saúde intestinal e antioxidantes para fortalecer o sistema imune." },
+            { id:8,  name:"BESSER NATURAL ADULTOS 25kg",                         category:"racao",     price:130.00, emoji:"🐕", imgUrl:"https://petmixsilva.com.br/wp-content/uploads/2024/09/Design-sem-nome-64.png", description:"Ração natural sem corantes artificiais, com frango desidratado, arroz e vegetais. Nutrição próxima à alimentação natural — 25kg." },
+            { id:9,  name:"PINUS 15KG",                                          category:"racao",     price:72.00,  emoji:"🐕", imgUrl:"https://ninovet.com.br/wp-content/uploads/2024/03/15138032501_Granulado20Higienico20Sanithy20Prime20Pinus20-2015kg.jpg", description:"Granulado higiênico de pinus de alta absorção para gatos. Controla odores com eficiência e facilita a limpeza da caixa." },
+            { id:10, name:"GP CÃO CHOICE 20KG",                                  category:"racao",     price:88.00,  emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/61PqodEPfxL._AC_SX679_.jpg", description:"Fórmula especial com mix de carnes selecionadas. Excelente custo-benefício para donos que buscam qualidade e quantidade." },
+            { id:11, name:"GOLDEN SENIOR ADULTO 15KG",                           category:"racao",     price:108.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/51qK45q4SZL._AC_SX679_.jpg", description:"Desenvolvida para cães a partir de 7 anos. Menor teor de fósforo, glucosamina e condroitina para articulações saudáveis na terceira idade." },
+            { id:12, name:"GOLDEN FORM GATOS ADULTO CASTRADO FRANGO 10,1KG",    category:"racao",     price:95.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/513eYmdR0CL._AC_SX679_.jpg", description:"Formulada para gatos castrados com controle de peso. Baixo teor de gordura, sabor frango irresistível e suporte ao trato urinário." },
+            { id:13, name:"GOLDEN SPECIAL GATOS CASTRADOS 10,1KG",               category:"racao",     price:92.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/51kbDmM3FuL._AC_SY879_.jpg", description:"Equilíbrio nutricional perfeito para gatos castrados. Controla calorias, cuida dos rins e mantém o pelo macio e brilhante." },
+            { id:14, name:"PREMIER NUTR CLIN CÃES OBESIDADE PEQ. PORTE 10,1KG", category:"racao",     price:115.00, emoji:"⚖️", imgUrl:"https://m.media-amazon.com/images/I/51kgcOXulML._AC_SL1000_.jpg", description:"Dieta clínica para cães de pequeno porte com sobrepeso. Alta fibra, baixa caloria e L-carnitina para queima de gordura saudável." },
+            { id:15, name:"GOLDEN SENIOR ADULTO MINI BITS 10,1KG",               category:"racao",     price:99.00,  emoji:"🐕", imgUrl:"https://down-br.img.susercontent.com/file/br-11134207-7r98o-ma4fex5qyz9jff", description:"Grãos mini ideais para cães idosos de pequeno porte. Glucosamina e condroitina para articulações, com alto teor de proteína." },
+            { id:16, name:"ROYAL CANIN MINI ADULT 7,5KG",                        category:"racao",     price:148.00, emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/10001320000127_1763123301904_mini.jpg", description:"Nutrição de alta precisão para cães adultos de raças pequenas. Grãos exclusivos desenvolvidos para o tamanho da boca de cães mini." },
+            { id:17, name:"GOLDEN POWER TRAINING ADULTO 15KG",                   category:"racao",     price:100.00, emoji:"🐕", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_606258-MLA99823786541_112025-F.webp", description:"Alta energia para cães ativos e atletas! Rico em proteínas e aminoácidos essenciais para massa muscular e performance." },
+            { id:18, name:"GOLDEN FORM GATOS ADULTO CASTRADO CARNE 10,1KG",     category:"racao",     price:95.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/51IVMoSqxsL._AC_SX679_.jpg", description:"Sabor carne bovina que os gatos amam! Formulada para castrados com controle calórico, saúde urinária e pelagem deslumbrante." },
+            { id:19, name:"GOLDEN SPECIAL ADULTO 20KG",                          category:"racao",     price:125.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/61VkUgdhFkL._AC_SX679_.jpg", description:"Embalagem família! Nutrição completa com Ômega 6, mandioca e vitaminas para cães adultos cheios de energia e saúde." },
+            { id:20, name:"AMBIENTES INTERNOS CÃES ADULTO 12KG",                 category:"racao",     price:98.00,  emoji:"🏠", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_747261-MLA99449833850_112025-F.webp", description:"Perfeita para cães que vivem em apartamentos. Controla odor das fezes, apoia a saúde articular e mantém o peso ideal." },
+            { id:21, name:"ROYAL CANIN STERILISED 10,1KG",                       category:"racao",     price:152.00, emoji:"🐱", imgUrl:"https://vidamascota.pe/wp-content/uploads/2023/11/Royal-Canin-Sterilised-10kg.png", description:"Nutrição exclusiva para gatos castrados. Controla o ganho de peso após a castração com proteínas de alta qualidade e fibras especiais." },
+            { id:22, name:"FINOTRATO BIO-LITTER 10KG",                           category:"racao",     price:69.00,  emoji:"🐱", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_760554-MLA97433279931_112025-F.webp", description:"Areia biodegradável de alta absorção para gatos. Controle de odor superior, fácil de limpar e amigável ao meio ambiente." },
+            { id:23, name:"GOLDEN FORM GATOS ADULTO CASTRADO SALMÃO 10,1KG",    category:"racao",     price:95.00,  emoji:"🐱", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_602233-MLB93371090893_092025-F.webp", description:"Salmão rico em Ômega 3 para pelo brilhante e sistema imune forte. Formulada para gatos castrados com baixo teor calórico." },
+            { id:24, name:"ROYAL CANIN MAXI ADULT 12KG",                         category:"racao",     price:162.00, emoji:"🐕", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_641237-MLB92696946220_092025-F.webp", description:"Nutrição de elite para cães grandes de 26 a 44kg. Suporte articular com glucosamina, condroitina e proteínas de alto valor biológico." },
+            { id:25, name:"BESSER NATURAL ADULTOS RPM 15kg",                     category:"racao",     price:118.00, emoji:"🐕", imgUrl:"https://cdn.awsli.com.br/300x300/1777/1777119/produto/242901479/whatsapp-image-2023-11-24-at-11-20-02--1--w1yttah9bx.jpeg", description:"Linha premium natural RPM com frango fresco, batata-doce e alecrim. Sem corantes artificiais. Máxima energia, saúde e vitalidade." },
+            { id:26, name:"ATACAMA ALL BREEDS 20KG",                             category:"racao",     price:92.00,  emoji:"🐕", imgUrl:"https://tse4.mm.bing.net/th/id/OIP.Q01QgivRonVRk607kVxVXgHaD4?rs=1&pid=ImgDetMain&o=7&rm=3", description:"Para todas as raças e tamanhos! Fórmula completa com proteínas selecionadas, vitaminas e minerais. Custo-benefício imbatível." },
+            { id:27, name:"ATACAMA ALL BREEDS 14KG",                             category:"racao",     price:72.00,  emoji:"🐕", imgUrl:"https://m.magazineluiza.com.br/a-static/420x420/atacama-all-breeds-14kg-supra/petsonagacomercioderacoes2/14291/2b3fcb0a4303b65a136d2d94a2d91a4f.jpeg", description:"Versão econômica para todas as raças. Mesmo sabor e qualidade da linha Atacama em embalagem menor, perfeita para famílias menores." },
             // ─── MEDICAMENTOS ───
-            { id:28, name:"SIMPARIC 40MG 10,1–20KG COMBO C/3",                  category:"remedios",  price:145.00, emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_615483-MLB85975230434_062025-F.webp", description:"Antipulgas e carrapatos para cães 10,1 a 20kg — combo 3 unid." },
-            { id:29, name:"SERESTO COLEIRA GRANDE",                              category:"remedios",  price:198.00, emoji:"🦮", imgUrl:"https://m.media-amazon.com/images/I/51GIVh3gXAL._AC_SL1000_.jpg", description:"Coleira antiparasitária para cães grandes — proteção 8 meses" },
-            { id:30, name:"SIMPARIC 80MG 20,1–40KG COMBO C/3",                  category:"remedios",  price:165.00, emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1116836/simparic_20_a_40kg_80mg_3_comprimidos_mastigaveis_palataveis_zoetis_251_1_f3ba12201edc1fd5680bc54d4c9da7a1.jpg", description:"Antipulgas e carrapatos para cães 20,1 a 40kg — combo 3 unid." },
-            { id:31, name:"SIMPARIC 20MG 5,1–10KG 1 COMP",                      category:"remedios",  price:52.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_770123-MLA95705741252_102025-F.webp", description:"Antipulgas e carrapatos para cães 5,1 a 10kg — 1 comprimido" },
-            { id:32, name:"SIMPARIC 40MG 10,1–20KG 1 COMP",                     category:"remedios",  price:55.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_893443-MLB104455859844_012026-F.webp", description:"Antipulgas e carrapatos para cães 10,1 a 20kg — 1 comprimido" },
-            { id:33, name:"SIMPARIC 20MG 5,1–10KG COMBO C/3",                   category:"remedios",  price:145.00, emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1122713/antipulgas_simparic_5_1_ate_10kg_20mg_3_comprimidos_2701_1_74695711855516fef2c1d343c5a98a73.png", description:"Antipulgas e carrapatos para cães 5,1 a 10kg — combo 3 unid." },
-            { id:34, name:"AGEMOXI CL 250MG",                                    category:"remedios",  price:38.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_983362-MLB83210885335_032025-F.webp", description:"Antibiótico amoxicilina 250mg para cães e gatos" },
-            { id:35, name:"AGEMOXI CL 50MG",                                     category:"remedios",  price:28.00,  emoji:"💊", imgUrl:"https://tse1.mm.bing.net/th/id/OIP.mrBBQDp7mK2GWFg8iR5QVAHaI4?w=600&h=720&rs=1&pid=ImgDetMain&o=7&rm=3", description:"Antibiótico amoxicilina 50mg para cães e gatos" },
-            { id:36, name:"SIMPARIC 80MG 20,1–40KG 1 COMP",                     category:"remedios",  price:58.00,  emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1116836/simparic_20_a_40kg_80mg_3_comprimidos_mastigaveis_palataveis_zoetis_251_1_f3ba12201edc1fd5680bc54d4c9da7a1.jpg", description:"Antipulgas e carrapatos para cães 20,1 a 40kg — 1 comprimido" },
-            { id:37, name:"SIMPARIC 10MG 2,6–5KG 1 COMP",                       category:"remedios",  price:45.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_860240-MLB91991165754_092025-F.webp", description:"Antipulgas e carrapatos para cães 2,6 a 5kg — 1 comprimido" },
-            { id:38, name:"SIMPARIC 10MG 2,6–5KG COMBO C/3",                    category:"remedios",  price:128.00, emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_660151-MLB53901392150_022023-F.webp", description:"Antipulgas e carrapatos para cães 2,6 a 5kg — combo 3 unid." },
-            { id:39, name:"SIMPARIC 120MG 40,1–60KG COMBO C/3",                 category:"remedios",  price:175.00, emoji:"💊", imgUrl:"https://th.bing.com/th/id/OIP.xKU0vYFVBlkQOS-PM7r8SwAAAA?w=168&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", description:"Antipulgas e carrapatos para cães 40,1 a 60kg — combo 3 unid." },
+            { id:28, name:"SIMPARIC 40MG 10,1–20KG COMBO C/3",                  category:"remedios",  price:145.00, emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_615483-MLB85975230434_062025-F.webp", description:"Proteção mensal contra pulgas, carrapatos e ácaros para cães de 10,1 a 20kg. Combo com 3 comprimidos mastigáveis palatáveis." },
+            { id:29, name:"SERESTO COLEIRA GRANDE",                              category:"remedios",  price:198.00, emoji:"🦮", imgUrl:"https://m.media-amazon.com/images/I/51GIVh3gXAL._AC_SL1000_.jpg", description:"Proteção contínua por até 8 meses contra pulgas e carrapatos. Coleira antiparasitária resistente à água para cães acima de 8kg." },
+            { id:30, name:"SIMPARIC 80MG 20,1–40KG COMBO C/3",                  category:"remedios",  price:165.00, emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1116836/simparic_20_a_40kg_80mg_3_comprimidos_mastigaveis_palataveis_zoetis_251_1_f3ba12201edc1fd5680bc54d4c9da7a1.jpg", description:"Eliminação rápida de pulgas e carrapatos em cães de 20,1 a 40kg. Combo 3 comprimidos — protege por 3 meses sem estresse." },
+            { id:31, name:"SIMPARIC 20MG 5,1–10KG 1 COMP",                      category:"remedios",  price:52.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_770123-MLA95705741252_102025-F.webp", description:"Comprimido mastigável de fácil administração para cães de 5,1 a 10kg. Age em 3 horas contra pulgas e elimina carrapatos em 8 horas." },
+            { id:32, name:"SIMPARIC 40MG 10,1–20KG 1 COMP",                     category:"remedios",  price:55.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_893443-MLB104455859844_012026-F.webp", description:"Proteção mensal eficaz contra pulgas e carrapatos para cães de 10,1 a 20kg. Um comprimido com sabor que os cães adoram." },
+            { id:33, name:"SIMPARIC 20MG 5,1–10KG COMBO C/3",                   category:"remedios",  price:145.00, emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1122713/antipulgas_simparic_5_1_ate_10kg_20mg_3_comprimidos_2701_1_74695711855516fef2c1d343c5a98a73.png", description:"Economize comprando o combo! Proteção de 3 meses para cães de 5,1 a 10kg. Sabor palatável para facilitar a administração." },
+            { id:34, name:"AGEMOXI CL 250MG",                                    category:"remedios",  price:38.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_983362-MLB83210885335_032025-F.webp", description:"Antibiótico de amplo espectro com amoxicilina 250mg e ácido clavulânico. Tratamento de infecções em cães e gatos — com receita veterinária." },
+            { id:35, name:"AGEMOXI CL 50MG",                                     category:"remedios",  price:28.00,  emoji:"💊", imgUrl:"https://tse1.mm.bing.net/th/id/OIP.mrBBQDp7mK2GWFg8iR5QVAHaI4?w=600&h=720&rs=1&pid=ImgDetMain&o=7&rm=3", description:"Versão 50mg do antibiótico Agemoxi com amoxicilina e clavulanato. Indicado para animais de menor porte — com receita veterinária." },
+            { id:36, name:"SIMPARIC 80MG 20,1–40KG 1 COMP",                     category:"remedios",  price:58.00,  emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1116836/simparic_20_a_40kg_80mg_3_comprimidos_mastigaveis_palataveis_zoetis_251_1_f3ba12201edc1fd5680bc54d4c9da7a1.jpg", description:"Um comprimido de proteção completa para cães de 20,1 a 40kg. Sabor palatável e ação rápida contra pulgas, carrapatos e ácaros." },
+            { id:37, name:"SIMPARIC 10MG 2,6–5KG 1 COMP",                       category:"remedios",  price:45.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_860240-MLB91991165754_092025-F.webp", description:"Ideal para cães pequenos de 2,6 a 5kg. Comprimido mastigável com ação rápida e eficaz contra pulgas e carrapatos por 30 dias." },
+            { id:38, name:"SIMPARIC 10MG 2,6–5KG COMBO C/3",                    category:"remedios",  price:128.00, emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_660151-MLB53901392150_022023-F.webp", description:"Combo econômico de 3 meses para cães de 2,6 a 5kg. Protege contra pulgas, carrapatos e previte infestações no ambiente." },
+            { id:39, name:"SIMPARIC 120MG 40,1–60KG COMBO C/3",                 category:"remedios",  price:175.00, emoji:"💊", imgUrl:"https://th.bing.com/th/id/OIP.xKU0vYFVBlkQOS-PM7r8SwAAAA?w=168&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", description:"Para cães grandes de 40,1 a 60kg. Combo 3 meses de proteção total contra pulgas, carrapatos e sarna. Comprimido mastigável palatável." },
             // ─── AREIA ───
-            { id:40, name:"PIPICAT MULTICAT 12KG",                               category:"acessorios", price:62.00, emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/61TfMzlowYL._AC_SL1000_.jpg", description:"Areia higiênica para gatos multicat 12kg" },
-            { id:41, name:"PIPICAT CLASSIC 12KG",                                category:"acessorios", price:55.00, emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/814N+4Q89KL._AC_SL1500_.jpg", description:"Areia higiênica clássica para gatos 12kg" },
-            { id:42, name:"AREIA V.VERDE GRÃOS FINOS 10KG",                      category:"acessorios", price:48.00, emoji:"🏖️", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_837093-MLA99507650368_112025-F.webp", description:"Areia higiênica grãos finos para gatos 10kg" },
-            { id:43, name:"AREIA V.VERDE GRÃOS MISTOS 10KG",                     category:"acessorios", price:48.00, emoji:"🏖️", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_631849-MLB98766271283_112025-F.webp", description:"Areia higiênica grãos mistos para gatos 10kg" }
+            { id:40, name:"PIPICAT MULTICAT 12KG",                               category:"acessorios", price:62.00, emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/61TfMzlowYL._AC_SL1000_.jpg", description:"Areia de alta absorção para lares com vários gatos. Grãos que formam grumos compactos e facilitam a limpeza. Controle de odor por mais tempo." },
+            { id:41, name:"PIPICAT CLASSIC 12KG",                                category:"acessorios", price:55.00, emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/814N+4Q89KL._AC_SL1500_.jpg", description:"A areia clássica e confiável que os gatos adoram! Alta absorção, grãos que aglomeram com facilidade e eliminação eficaz de odores." },
+            { id:42, name:"AREIA V.VERDE GRÃOS FINOS 10KG",                      category:"acessorios", price:48.00, emoji:"🏖️", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_837093-MLA99507650368_112025-F.webp", description:"Areia de grãos finos para gatos mais exigentes. Alta absorção e textura suave nas patinhas. Biodegradável e produzida com matéria-prima natural." },
+            { id:43, name:"AREIA V.VERDE GRÃOS MISTOS 10KG",                     category:"acessorios", price:48.00, emoji:"🏖️", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_631849-MLB98766271283_112025-F.webp", description:"Combinação de grãos finos e médios para absorção máxima. Controle de odor prolongado, fácil de limpar e ecologicamente correta." }
         ];
 
         // CUPONS
@@ -1703,7 +1741,13 @@
                     <h3 class="product-name">${product.name}</h3>
                     <p class="product-description">${product.description}</p>
                     <div class="product-category">${product.category.toUpperCase()}</div>
+                    <p class="product-price-label">À vista por</p>
                     <p class="product-price">R$ ${product.price.toFixed(2)}</p>
+                    <div class="product-price-discount">
+                        <span class="disc-label"><i class="fa-solid fa-tag"></i> 1ª Compra pelo App</span>
+                        <span class="disc-value">R$ ${(product.price * 0.9).toFixed(2)}</span>
+                        <span class="disc-badge">-10%</span>
+                    </div>
                     <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
                 </div>
             `).join('');
@@ -1913,6 +1957,7 @@
             document.getElementById('lightboxName').textContent = product.name;
             document.getElementById('lightboxDesc').textContent = product.description;
             document.getElementById('lightboxPrice').textContent = 'R$ ' + product.price.toFixed(2);
+            document.getElementById('lightboxDiscValue').textContent = 'R$ ' + (product.price * 0.9).toFixed(2);
             document.getElementById('lightboxAddBtn').onclick = () => { addToCart(id); closeLightbox(); };
             document.getElementById('lightboxOverlay').classList.add('active');
             document.querySelector('.floating-cart').style.display = 'none';
@@ -1993,7 +2038,13 @@
                     <h3 class="product-name">${product.name}</h3>
                     <p class="product-description">${product.description}</p>
                     <div class="product-category">${product.category.toUpperCase()}</div>
+                    <p class="product-price-label">À vista por</p>
                     <p class="product-price">R$ ${product.price.toFixed(2)}</p>
+                    <div class="product-price-discount">
+                        <span class="disc-label"><i class="fa-solid fa-tag"></i> 1ª Compra pelo App</span>
+                        <span class="disc-value">R$ ${(product.price * 0.9).toFixed(2)}</span>
+                        <span class="disc-badge">-10%</span>
+                    </div>
                     <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
                 </div>
             `).join('');
@@ -2187,7 +2238,13 @@
         <img class="lightbox-img" id="lightboxImg" src="" alt="">
         <div class="lightbox-name" id="lightboxName"></div>
         <div class="lightbox-desc" id="lightboxDesc"></div>
+        <p style="font-size:12px;color:#888;margin-bottom:2px">À vista por</p>
         <div class="lightbox-price" id="lightboxPrice"></div>
+        <div class="product-price-discount" style="flex-wrap:wrap">
+            <span class="disc-label"><i class="fa-solid fa-tag"></i> 1ª Compra pelo App</span>
+            <span class="disc-value" id="lightboxDiscValue"></span>
+            <span class="disc-badge">-10%</span>
+        </div>
         <button class="lightbox-add-btn" id="lightboxAddBtn">🛒 Adicionar ao Carrinho</button>
     </div>
 </div>
