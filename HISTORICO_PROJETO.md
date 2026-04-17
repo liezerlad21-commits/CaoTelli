@@ -224,6 +224,40 @@ ae05318 Atualizacao do site CaoTelli
 
 **Próxima ação sugerida:** commitar as alterações (SEO + sitemap + robots.txt + imagens brinquedos) e depois escolher o próximo item do backlog (sugestão: validação real dos formulários ou autenticação de usuários).
 
+---
+
+## 10. SESSÃO 17/04/2026 — CONTINUAÇÃO
+
+### O que foi feito:
+- **Todas as 12 imagens dos brinquedos corrigidas** com links fornecidos pelo Liézer (URLs reais de produtos).
+- **Logo clicável** adicionada no header — ao clicar na logo, fecha qualquer seção aberta e volta ao topo da página inicial.
+- Commits e push feitos pelo GitHub Desktop com sucesso.
+
+### Próximos passos combinados:
+1. **Firebase** — implementar login/cadastro real com autenticação
+2. **Mercado Pago** — integrar Pix + cartão de crédito real
+3. **Domínio .com.br** — registrar em registro.br (~R$40/ano)
+
+### Contas que o cliente (CãoTelli) precisa criar:
+- **Firebase:** [firebase.google.com](https://firebase.google.com) — gratuito (pode criar com e-mail do cliente)
+- **Mercado Pago:** [mercadopago.com.br](https://mercadopago.com.br) — gratuito (precisa de CPF/CNPJ)
+- **Registro.br:** [registro.br](https://registro.br) — R$40/ano (precisa de CPF/CNPJ)
+- Liézer vai criar as contas pelo cliente assim que tiver os dados.
+
+### Limites Firebase gratuito (Spark Plan):
+- Usuários: ilimitado
+- Leituras: 50.000/dia (~1.500 a 3.000 visitas/dia — suficiente para petshop local)
+- Escrituras: 20.000/dia
+- Se crescer muito: plano pago ~U$25/mês
+
+### Custo fixo do projeto completo:
+| Item | Custo |
+|---|---|
+| Domínio .com.br | R$40/ano |
+| Hospedagem + banco + login (Firebase) | R$0 |
+| Pagamento online (Mercado Pago) | R$0 (taxa ~3-5% por venda) |
+| **Total fixo** | **R$40/ano** |
+
 ### Comandos úteis de Git para voltar no tempo
 
 ```bash
