@@ -1,0 +1,238 @@
+# HISTÓRICO DO PROJETO — Site CãoTelli PetShop
+
+> **Leia este arquivo primeiro.** Ele contém todo o contexto do projeto: o que foi feito, como está organizado, decisões de design e onde paramos. Atualizar sempre antes de encerrar uma sessão.
+
+---
+
+## 1. VISÃO GERAL
+
+**Cliente:** CãoTelli — Rações e Acessórios
+**Endereço:** Av. Santos Ferreira, 997 — Bairro Mal. Rondon, Canoas/RS
+**WhatsApp:** (51) 99765-5755 — `https://wa.me/5551997655755`
+**Instagram:** @caotelli
+**Horário:** Segunda a Sábado, 9h às 19h
+**Entrega:** até 3h ou agendada (sempre antes de 24h)
+
+**Desenvolvedor:** Liézer
+**Contexto:** TCC de 200 horas (e-commerce real para PetShop).
+**Hospedagem:** Netlify (CDN global).
+**Versionamento:** Git + GitHub (repositório privado).
+
+---
+
+## 2. ESTRUTURA DE ARQUIVOS
+
+```
+CaoTelli/
+├── index.html                          ← site inteiro (SPA em arquivo único)
+├── logo_caotelli.png                   ← logo principal
+├── Logo pet shop com co.png            ← versão alternativa da logo
+├── PushCaoTelli.bat                    ← script para commit/push rápido
+├── README.md                           ← descrição curta do projeto
+├── HISTORICO_PROJETO.md                ← este arquivo
+├── Documentacao_Projeto_CaoTelli.docx  ← documentação acadêmica do TCC
+├── Carta_de_Apresentacao_CaoTelli.docx
+├── Ficha_de_Frequencia_CaoTelli.docx
+└── .git/                               ← repositório
+```
+
+**Filosofia:** tudo (HTML + CSS + JS) mora em um único `index.html` (SPA puro). Sem build, sem framework. É só abrir no navegador.
+
+---
+
+## 3. IDENTIDADE VISUAL
+
+**Paleta (variáveis CSS em `:root`):**
+- `--primary-cyan: #0088C2` — cor principal (azul)
+- `--primary-purple: #D6324A` — cor de destaque (vermelho/magenta)
+- `--dark-bg: #f4f7fb` — fundo geral (tema claro)
+- `--dark-secondary: #ffffff` — fundo de cards
+- `--dark-tertiary: #e4eaf3` — fundo auxiliar
+- `--text-light: #1a2340` — texto principal
+- `--text-gray: #5a6a85` — texto secundário
+
+**Tipografia:**
+- Corpo: Segoe UI, Tahoma, Geneva, Verdana, sans-serif
+- Decorativa (marca): `Dancing Script` (Google Fonts)
+- Ícones: Font Awesome 6.5.0
+
+**Animações já definidas:** `glow`, `slide`, `pulse`, `fadeIn`, `float`.
+
+---
+
+## 4. ESTRUTURA DO index.html (mapa de linhas aproximado)
+
+| Linhas | Conteúdo |
+|---|---|
+| 1–9 | `<head>` + imports (fonts, Font Awesome) |
+| 9–1276 | `<style>` interno (todo o CSS) |
+| 1278–1302 | `<header>` (logo, busca, ícones carrinho/perfil/contato) |
+| 1303–1315 | `<nav>` (oculto por padrão) |
+| 1316–1357 | Hero section |
+| 1358–1364 | Seção de produtos (`#produtosSection`) |
+| 1365–1384 | Seção principal (cupons, `#couponsGrid`) |
+| 1385–1439 | Agendamento (`#agendamento`, oculta) |
+| 1440–1502 | Vacinas (`#vacinas`, oculta) |
+| 1503–1551 | Perfil / cadastro (`#profile`, oculta) |
+| 1552–1591 | Contato (`#contact`, oculta) |
+| 1592–1634 | Footer |
+| 1636– | `<script>` (lógica JS) |
+| ~2191 | Modal do carrinho (`#cartModal`) |
+| ~2240 | Modal Pix (`#pixModal`) |
+| ~2297 | Lightbox de produto (`#lightboxOverlay`) |
+
+> **Padrão:** seções extras usam a classe `hidden-section` e são exibidas via `openSection(id)`.
+
+---
+
+## 5. FUNCIONALIDADES JÁ IMPLEMENTADAS
+
+### 5.1 Catálogo (55 produtos)
+- Categorias: `racao`, `remedios`, `acessorios` (areia), `brinquedos` (inclui casinhas e arranhadores).
+- Array `products` com campos: `id`, `name`, `category`, `price`, `emoji`, `imgUrl`, `description`.
+- Alguns produtos de brinquedos ainda estão com `imgUrl:""` (precisam de imagem).
+
+### 5.2 Cupons (4 ativos)
+| Código | Desconto | Descrição |
+|---|---|---|
+| `BEMPET15` | 15% | Primeira compra |
+| `VERÃO20` | 20% | Toda a loja |
+| `FRETE10` | 10% | Frete |
+| `PREMIUM25` | 25% | Produtos selecionados |
+
+### 5.3 Carrinho de compras
+- Estado em memória: `let cart = []`, `let appliedCoupon = null`.
+- Funções: `addToCart`, `increaseQty`, `decreaseQty`, `removeFromCart`, `updateCart`, `renderCartItems`, `calculateTotal`.
+- Frete: **grátis acima de R$ 59,90**, senão **R$ 15,00**.
+- Modal lateral (`#cartModal`) com resumo, cupom, subtotal, desconto, frete e total.
+
+### 5.4 Checkout + Pagamento PIX
+- `checkout()` → abre `#pixModal`.
+- Chave Pix (simulada): `caotelli@pagamento.com`.
+- Botão copiar chave (`copiarChavePix`).
+- Botão enviar comprovante por WhatsApp (`enviarComprovante`) já monta mensagem com itens do carrinho.
+- Botão cancelar melhorado (último commit: `9579aab`).
+
+### 5.5 Busca
+- `searchProducts()` filtra por nome, descrição ou categoria e atualiza `#productsGrid`.
+
+### 5.6 Lightbox de produto
+- `openLightbox(id)` / `closeLightbox(e)` mostra imagem grande + nome + descrição.
+
+### 5.7 Navegação entre seções
+- `openSection('agendamento' | 'vacinas' | 'profile' | 'contact')` alterna a exibição.
+- `showCategory('racao' | 'remedios' | ...)` filtra o grid.
+
+### 5.8 Formulários
+- **Agendamento** (`submitAgendamento`) — data, horário, tipo de entrega.
+- **Vacinas** (`submitVacina`) — espécie, raça, próxima dose.
+- **Perfil/Cadastro** (`salvarCadastro`) — nome, e-mail, telefone, CPF, endereço, pet, raça.
+  - Salva em `localStorage.caotelli_clientes` (array JSON).
+- **Contato** (`submitContato`).
+- Todas usam `showNotification(msg, type)` para feedback (verde/vermelho).
+
+### 5.9 Footer
+- Links: Sobre, Privacidade, Termos, Trocas/Devoluções, Frete.
+- Atendimento: Central de Ajuda, Rastrear Pedido, Fale Conosco, Trabalhe Conosco, FAQ.
+- Contato real (WhatsApp, Instagram, horário, endereço).
+
+---
+
+## 6. DECISÕES DE DESIGN E PADRÕES
+
+- **Responsivo:** desktop, tablet e celular (breakpoints dentro do `<style>`).
+- **Tema claro** em todo o site.
+- **Sem dependências pesadas:** só Google Fonts e Font Awesome via CDN.
+- **Persistência:** `localStorage` para cadastro de clientes (chave `caotelli_clientes`). Carrinho ainda é apenas em memória.
+- **Notificações:** injetadas dinamicamente via JS com estilo próprio.
+- **Acessibilidade:** alguns ícones têm `title` para tooltips; ainda falta revisar `aria-*`.
+
+---
+
+## 7. PRÓXIMOS PASSOS (backlog priorizado)
+
+1. **Autenticação de usuários** — login/senha, sessão via `localStorage` ou back-end.
+2. **Integração de pagamento real** — PIX via Mercado Pago (API), cartão de crédito.
+3. **Persistir o carrinho** em `localStorage` (para não perder ao recarregar).
+4. **Painel administrativo** — gerenciar produtos, preços, pedidos.
+5. **Histórico de pedidos por cliente.**
+6. **Notificações** por WhatsApp/e-mail (confirmação de pedido).
+7. **Atualizar imagens** dos brinquedos que ainda estão com `imgUrl:""`.
+8. **SEO** — meta tags (description, og:*, twitter:*), `alt` nas imagens, sitemap.xml, robots.txt.
+9. **PWA** — manifest.json + service worker para funcionar offline e instalar no celular.
+10. **Validação real** dos formulários (CPF, telefone, e-mail, data futura no agendamento).
+
+---
+
+## 8. HISTÓRICO DE COMMITS (últimos 20)
+
+```
+a5ec855 Atualizacao do site CaoTelli
+522f5b0 Atualizacao do site CaoTelli
+b2d20bd Atualizacao do site CaoTelli
+fd0cac7 Atualizacao do site CaoTelli
+188082d Atualizacao do site CaoTelli
+64af40d Atualizacao do site CaoTelli
+5e34579 Atualizacao do site CaoTelli
+27bdd53 Atualizacao do site CaoTelli
+f132b8b Atualizacao do site CaoTelli
+2411c75 Atualizacao do site CaoTelli
+c59c695 Atualizacao do site CaoTelli
+f64938a Atualizacao do site CaoTelli
+21c9df6 Atualizacao do site CaoTelli
+fe14587 Atualizacao do site CaoTelli
+20fb551 Atualizacao do site CaoTelli
+eb4115f Atualizacao do site CaoTelli
+279cab4 Atualizacao do site CaoTelli
+6c5b5d5 Atualizacao do site CaoTelli
+ae05318 Atualizacao do site CaoTelli
+9579aab Melhora botao cancelar no modal Pix   ← última alteração pontual
+```
+
+**Sugestão futura:** usar mensagens de commit descritivas (ex.: `feat: adiciona login por e-mail`, `fix: corrige cálculo de frete quando subtotal = 59.90`).
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ATUAL
+
+**Data:** 16/04/2026
+
+- Criamos este arquivo `HISTORICO_PROJETO.md` para servir de "memória" do projeto.
+- Criamos o `CHANGELOG.md` como índice legível das alterações (cada entrada aponta pro commit Git).
+- **Estratégia de histórico acordada:** Git + CHANGELOG.md. Nada de pasta `/backups` (desperdício de espaço). Git guarda tudo com mínima pegada.
+- Ainda há alterações não commitadas em `index.html` (aparentemente só mudanças de modo/permissão de arquivo).
+- Arquivos novos na pasta mas ainda fora do Git: `Carta_de_Apresentacao_CaoTelli.docx`, `Ficha_de_Frequencia_CaoTelli.docx`.
+- **Foco acordado com o Liézer:** trabalhar apenas no site (deixar TaskForge e documentação de lado).
+
+**Próxima ação sugerida:** decidir qual dos 10 itens do backlog atacar primeiro (sugestão técnica: começar por *persistir o carrinho no localStorage*, que é curto e elimina um incômodo antes de mexer em autenticação/pagamento).
+
+### Comandos úteis de Git para voltar no tempo
+
+```bash
+# Ver últimos commits
+git log --oneline -10
+
+# Ver o index.html de um commit antigo (sem mudar nada)
+git show COMMIT_HASH:index.html > index_antigo.html
+
+# Restaurar o index.html de um commit antigo (substitui o atual)
+git checkout COMMIT_HASH -- index.html
+
+# Desfazer a restauração e voltar ao estado atual
+git checkout HEAD -- index.html
+
+# Comparar duas versões
+git diff HASH1 HASH2 -- index.html
+```
+
+---
+
+## 10. COMO USAR ESTE ARQUIVO NA PRÓXIMA SESSÃO
+
+**No início de cada sessão, diga:**
+> "Lê o `HISTORICO_PROJETO.md` da pasta do site."
+
+**Ao final de cada sessão, diga:**
+> "Atualiza o histórico com o que fizemos hoje."
+
+Assim a seção **9. ONDE PARAMOS** fica sempre viva e eu não perco o fio da meada entre uma conversa e outra.
