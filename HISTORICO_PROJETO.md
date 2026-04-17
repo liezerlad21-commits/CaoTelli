@@ -15,7 +15,7 @@
 
 **Desenvolvedor:** Liézer
 **Contexto:** TCC de 200 horas (e-commerce real para PetShop).
-**Hospedagem:** Netlify (CDN global).
+**Hospedagem:** GitHub Pages — `https://liezerlad21-commits.github.io/CaoTelli/`.
 **Versionamento:** Git + GitHub (repositório privado).
 
 ---
@@ -195,16 +195,21 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 16/04/2026
+**Data:** 17/04/2026
 
-- Criamos este arquivo `HISTORICO_PROJETO.md` para servir de "memória" do projeto.
-- Criamos o `CHANGELOG.md` como índice legível das alterações (cada entrada aponta pro commit Git).
-- **Estratégia de histórico acordada:** Git + CHANGELOG.md. Nada de pasta `/backups` (desperdício de espaço). Git guarda tudo com mínima pegada.
-- Ainda há alterações não commitadas em `index.html` (aparentemente só mudanças de modo/permissão de arquivo).
-- Arquivos novos na pasta mas ainda fora do Git: `Carta_de_Apresentacao_CaoTelli.docx`, `Ficha_de_Frequencia_CaoTelli.docx`.
-- **Foco acordado com o Liézer:** trabalhar apenas no site (deixar TaskForge e documentação de lado).
+- Confirmado que o carrinho já estava persistido no localStorage (feito em sessão anterior). Item 3 do backlog concluído.
+- **SEO implementado** no `index.html`:
+  - `<title>` atualizado com palavras-chave locais.
+  - `<meta name="description">` com texto otimizado para Canoas/RS.
+  - `<meta name="keywords">` com termos relevantes.
+  - `<meta name="robots">` e `<link rel="canonical">`.
+  - Tags Open Graph completas (og:title, og:description, og:image, og:url, og:type, og:locale, og:site_name) — link bonito no WhatsApp/Facebook.
+  - Twitter Card configurado.
+  - Favicon e apple-touch-icon apontando para `logo_caotelli.png`.
+- Criados `sitemap.xml` e `robots.txt` na raiz do projeto.
+- **Atenção:** as URLs nos arquivos de SEO usam `https://liezerlad21-commits.github.io/CaoTelli/` como placeholder. Atualizar se o domínio real for diferente.
 
-**Próxima ação sugerida:** decidir qual dos 10 itens do backlog atacar primeiro (sugestão técnica: começar por *persistir o carrinho no localStorage*, que é curto e elimina um incômodo antes de mexer em autenticação/pagamento).
+**Próxima ação sugerida:** commitar as alterações (SEO + sitemap + robots.txt) e depois escolher o próximo item do backlog (sugestão: validação real dos formulários ou atualizar imagens dos brinquedos).
 
 ### Comandos úteis de Git para voltar no tempo
 

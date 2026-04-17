@@ -13,6 +13,19 @@
 
 ---
 
+## 17/04/2026 — SEO
+
+- Atualizado `<title>` com palavras-chave locais (Canoas/RS).
+- Adicionadas meta tags: `description`, `keywords`, `robots`, `canonical`.
+- Adicionadas tags Open Graph completas para link bonito no WhatsApp/Facebook.
+- Adicionado Twitter Card.
+- Adicionados favicon e apple-touch-icon.
+- Criado `sitemap.xml` na raiz.
+- Criado `robots.txt` na raiz.
+- Confirmado: carrinho já estava persistido no localStorage (item 3 do backlog concluído).
+
+---
+
 ## 16/04/2026 — Sessão de organização
 
 - Criado `HISTORICO_PROJETO.md` com contexto completo do projeto (visão geral, estrutura, funcionalidades, backlog).

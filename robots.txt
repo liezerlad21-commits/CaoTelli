@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://liezerlad21-commits.github.io/CaoTelli/sitemap.xml

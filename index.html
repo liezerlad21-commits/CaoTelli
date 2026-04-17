@@ -3,7 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CãoTelli - PetShop em Canoas/RS</title>
+    <title>CãoTelli — Pet Shop em Canoas/RS | Rações e Acessórios</title>
+
+    <!-- SEO Básico -->
+    <meta name="description" content="CãoTelli Pet Shop em Canoas/RS — Rações, remédios, brinquedos e acessórios para cães e gatos. Entrega em até 3h. Atendimento de seg. a sáb., 9h às 19h. Fale pelo WhatsApp (51) 99765-5755.">
+    <meta name="keywords" content="pet shop canoas, ração cachorro canoas, ração gato canoas, acessórios pet canoas, veterinário canoas, caotelli, cão telli, pet shop rs">
+    <meta name="author" content="CãoTelli Rações e Acessórios">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://liezerlad21-commits.github.io/CaoTelli/">
+
+    <!-- Open Graph (WhatsApp, Facebook, etc.) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://liezerlad21-commits.github.io/CaoTelli/">
+    <meta property="og:title" content="CãoTelli — Pet Shop em Canoas/RS | Rações e Acessórios">
+    <meta property="og:description" content="Rações, remédios, brinquedos e acessórios para seu pet. Entrega em até 3h em Canoas/RS. Atendimento seg. a sáb., 9h às 19h.">
+    <meta property="og:image" content="https://liezerlad21-commits.github.io/CaoTelli/logo_caotelli.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="CãoTelli Pet Shop">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CãoTelli — Pet Shop em Canoas/RS">
+    <meta name="twitter:description" content="Rações, remédios, brinquedos e acessórios para seu pet. Entrega em até 3h em Canoas/RS.">
+    <meta name="twitter:image" content="https://liezerlad21-commits.github.io/CaoTelli/logo_caotelli.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo_caotelli.png">
+    <link rel="apple-touch-icon" href="logo_caotelli.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
@@ -1390,17 +1419,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Nome Completo *</label>
-                        <input type="text" required placeholder="Seu nome">
+                        <input type="text" id="agNome" required placeholder="Seu nome">
                     </div>
                     <div class="form-group">
                         <label>Telefone/WhatsApp *</label>
-                        <input type="tel" required placeholder="(51) 99999-9999">
+                        <input type="tel" id="agTelefone" required placeholder="(51) 99999-9999" maxlength="15" oninput="mascaraTelefone(this)">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Data Desejada *</label>
-                        <input type="date" required>
+                        <input type="date" id="agData" required>
                     </div>
                     <div class="form-group">
                         <label>Horário *</label>
@@ -1519,28 +1548,25 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Telefone / WhatsApp</label>
-                        <input type="tel" id="cadTelefone" placeholder="(51) 99999-9999">
+                        <label>Telefone / WhatsApp *</label>
+                        <input type="tel" id="cadTelefone" placeholder="(51) 99999-9999" required maxlength="15" oninput="mascaraTelefone(this)">
                     </div>
                     <div class="form-group">
                         <label>CPF</label>
-                        <input type="text" id="cadCpf" placeholder="000.000.000-00">
+                        <input type="text" id="cadCpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Endereço de Entrega</label>
                     <input type="text" id="cadEndereco" placeholder="Rua, número, bairro, cidade">
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nome do Pet</label>
-                        <input type="text" id="cadPet" placeholder="Ex: Rex, Mia...">
-                    </div>
-                    <div class="form-group">
-                        <label>Espécie / Raça</label>
-                        <input type="text" id="cadRaca" placeholder="Ex: Golden Retriever, Persa...">
-                    </div>
-                </div>
+
+                <!-- PETS -->
+                <div id="petsContainer"></div>
+                <button type="button" onclick="adicionarPet()" style="display:flex;align-items:center;gap:8px;background:none;border:2px dashed #0088C2;color:#0088C2;font-weight:600;font-size:0.95rem;padding:10px 20px;border-radius:10px;cursor:pointer;margin-top:4px;margin-bottom:12px;width:100%;justify-content:center">
+                    🐾 Adicionar outro pet
+                </button>
+
                 <button type="submit" class="btn-primary" style="padding:13px 32px;background:linear-gradient(135deg,#3AABDC,#E8445A);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:1rem;width:100%;margin-top:8px">
                     📋 Enviar Cadastro
                 </button>
@@ -1589,11 +1615,22 @@
         </div>
     </section>
 
+    <!-- MODAL DE INFORMAÇÕES DO FOOTER -->
+    <div id="infoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px">
+        <div style="background:#fff;border-radius:16px;max-width:540px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18)">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 0">
+                <h3 id="infoModalTitle" style="color:#0088C2;font-size:1.15rem;font-weight:700"></h3>
+                <button onclick="fecharInfoModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#5a6a85;line-height:1">✕</button>
+            </div>
+            <div id="infoModalBody" style="padding:16px 24px 24px;color:#1a2340;font-size:0.97rem;line-height:1.7"></div>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-container">
             <div class="footer-section">
                 <h3>🐾 Sobre Nós</h3>
-                <p>CãoTelli é sua loja de confiança em Canoas/RS! Produtos de qualidade para seus pets adorados. Ração, brinquedos, remédios e acessórios com atendimento personalizado.</p>
+                <p>A CãoTelli é uma pet shop apaixonada por cuidar do seu melhor amigo! Rações, acessórios, medicamentos e cuidados com atendimento personalizado e teleentrega rápida em Canoas/RS.</p>
                 <div class="social-links">
                     <div class="social-link" onclick="window.open('https://instagram.com/caotelli','_blank')" style="cursor:pointer" title="Instagram"><i class="fa-brands fa-instagram" style="color:#E1306C;font-size:1.4rem"></i></div>
                     <div class="social-link" onclick="window.open('https://wa.me/5551997655755?text=Vim%20pelo%20site%2C%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20%F0%9F%90%BE','_blank')" style="cursor:pointer" title="WhatsApp"><i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.4rem"></i></div>
@@ -1602,34 +1639,34 @@
             <div class="footer-section">
                 <h3>Informações</h3>
                 <ul>
-                    <li>Sobre a Loja</li>
-                    <li>Política de Privacidade</li>
-                    <li>Termos de Uso</li>
-                    <li>Trocas e Devoluções</li>
-                    <li>Frete e Entrega</li>
+                    <li onclick="abrirInfoModal('sobre')">Sobre a Loja</li>
+                    <li onclick="abrirInfoModal('privacidade')">Política de Privacidade</li>
+                    <li onclick="abrirInfoModal('termos')">Termos de Uso</li>
+                    <li onclick="abrirInfoModal('trocas')">Trocas e Devoluções</li>
+                    <li onclick="abrirInfoModal('frete')">Frete e Entrega</li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Atendimento</h3>
                 <ul>
-                    <li>Central de Ajuda</li>
-                    <li>Rastrear Pedido</li>
-                    <li>Fale Conosco</li>
-                    <li>Trabalhe Conosco</li>
-                    <li>Dúvidas Frequentes</li>
+                    <li onclick="abrirInfoModal('ajuda')">Central de Ajuda</li>
+                    <li onclick="abrirInfoModal('faleconosco')">Fale Conosco</li>
+                    <li onclick="abrirInfoModal('trabalhe')">Trabalhe Conosco</li>
+                    <li onclick="abrirInfoModal('faq')">Dúvidas Frequentes</li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Contato</h3>
                 <p><i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.1rem;vertical-align:middle;margin-right:4px"></i> <a href="https://wa.me/5551997655755" target="_blank" style="color:#0077aa;text-decoration:none">(51) 99765-5755</a></p>
                 <p><i class="fa-brands fa-instagram" style="color:#E1306C;font-size:1.1rem;vertical-align:middle;margin-right:4px"></i> <a href="https://instagram.com/caotelli" target="_blank" style="color:#0077aa;text-decoration:none">@caotelli</a></p>
+                <p>✉️ <a href="mailto:caotelli@gmail.com" style="color:#0077aa;text-decoration:none">caotelli@gmail.com</a></p>
                 <p>🕐 Segunda a Sábado: 9h às 19h</p>
-                <p>🚚 Entrega em até 3h ou em horários agendados, sempre antes de 24h</p>
+                <p>🚚 Teleentrega gratuita acima de R$59,90</p>
                 <p>📍 Av. Santos Ferreira, 997 - Mal. Rondon, Canoas/RS</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 CãoTelli PetShop - Canoas/RS. Todos os direitos reservados.</p>
+            <p>&copy; 2026 CãoTelli PetShop - Canoas/RS. Todos os direitos reservados.</p>
         </div>
     </footer>
 
@@ -1760,16 +1797,118 @@
         }
 
         // CADASTRO DO CLIENTE
+        // RAÇAS POR TIPO DE PET
+        const racasPorTipo = {
+            cao: [
+                'Beagle','Border Collie','Boxer','Buldogue Inglês','Bulldog Francês',
+                'Chow Chow','Dachshund','Dobermann','Golden Retriever','Husky Siberiano',
+                'Labrador','Lhasa Apso','Maltês','Pinscher','Poodle','Rottweiler',
+                'Shih Tzu','Spitz Alemão','Yorkshire Terrier','Pastor Alemão',
+                'Sem Raça Definida (SRD)','Outro'
+            ],
+            gato: [
+                'Abissínio','Angorá','Bengal','British Shorthair','Maine Coon',
+                'Persa','Ragdoll','Scottish Fold','Siamês','Sphynx',
+                'Sem Raça Definida (SRD)','Outro'
+            ],
+            outros: ['Coelho','Hamster','Pássaro','Peixe','Réptil','Outro']
+        };
+
+        let petCount = 0;
+
+        function criarBlocoPet(numero) {
+            const div = document.createElement('div');
+            div.id = 'petBloco_' + numero;
+            div.style.cssText = 'background:#f4f7fb;border:1px solid #dde3ef;border-radius:12px;padding:16px;margin-bottom:12px;position:relative';
+            div.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <strong style="color:#0088C2;font-size:0.95rem">🐾 Pet ${numero}</strong>
+                    ${numero > 1 ? `<button type="button" onclick="removerPet(${numero})" style="background:none;border:none;color:#D6324A;cursor:pointer;font-size:1.1rem;padding:2px 6px" title="Remover pet">✕</button>` : ''}
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Pet ${numero}</label>
+                        <input type="text" id="petNome_${numero}" placeholder="Ex: Rex, Mia..." style="width:100%">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="petTipo_${numero}" onchange="atualizarRacas(${numero})" style="width:100%;padding:10px 12px;border:1px solid #cdd5e0;border-radius:8px;font-size:0.95rem;background:#fff;color:#1a2340">
+                            <option value="">Selecione...</option>
+                            <option value="cao">🐕 Cão</option>
+                            <option value="gato">🐱 Gato</option>
+                            <option value="outros">🐾 Outros</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Espécie / Raça</label>
+                    <select id="petRaca_${numero}" style="width:100%;padding:10px 12px;border:1px solid #cdd5e0;border-radius:8px;font-size:0.95rem;background:#fff;color:#1a2340" disabled>
+                        <option value="">Selecione o tipo primeiro</option>
+                    </select>
+                </div>
+            `;
+            return div;
+        }
+
+        function adicionarPet() {
+            petCount++;
+            const container = document.getElementById('petsContainer');
+            container.appendChild(criarBlocoPet(petCount));
+        }
+
+        function removerPet(numero) {
+            const bloco = document.getElementById('petBloco_' + numero);
+            if (bloco) bloco.remove();
+        }
+
+        function atualizarRacas(numero) {
+            const tipo = document.getElementById('petTipo_' + numero).value;
+            const selectRaca = document.getElementById('petRaca_' + numero);
+            if (!tipo) {
+                selectRaca.innerHTML = '<option value="">Selecione o tipo primeiro</option>';
+                selectRaca.disabled = true;
+                return;
+            }
+            const racas = racasPorTipo[tipo] || [];
+            selectRaca.innerHTML = '<option value="">Selecione a raça...</option>' +
+                racas.map(r => `<option value="${r}">${r}</option>`).join('');
+            selectRaca.disabled = false;
+        }
+
+        function coletarPets() {
+            const pets = [];
+            const blocos = document.querySelectorAll('[id^="petBloco_"]');
+            blocos.forEach(bloco => {
+                const num = bloco.id.split('_')[1];
+                const nome = (document.getElementById('petNome_' + num) || {}).value?.trim() || '';
+                const tipo = (document.getElementById('petTipo_' + num) || {}).value || '';
+                const raca = (document.getElementById('petRaca_' + num) || {}).value || '';
+                if (nome || tipo || raca) pets.push({ nome, tipo, raca });
+            });
+            return pets;
+        }
+
         function salvarCadastro(e) {
             e.preventDefault();
+            const tel = document.getElementById('cadTelefone').value.trim();
+            const cpf = document.getElementById('cadCpf').value.trim();
+
+            if (!validarTelefone(tel)) {
+                showNotification('Informe um telefone válido com DDD. Ex: (51) 99999-9999', 'error');
+                return;
+            }
+            if (!validarCPF(cpf)) {
+                showNotification('CPF inválido. Use o formato 000.000.000-00', 'error');
+                return;
+            }
+
             const dados = {
                 nome:     document.getElementById('cadNome').value.trim(),
                 email:    document.getElementById('cadEmail').value.trim(),
-                telefone: document.getElementById('cadTelefone').value.trim(),
-                cpf:      document.getElementById('cadCpf').value.trim(),
+                telefone: tel,
+                cpf:      cpf,
                 endereco: document.getElementById('cadEndereco').value.trim(),
-                pet:      document.getElementById('cadPet').value.trim(),
-                raca:     document.getElementById('cadRaca').value.trim(),
+                pets:     coletarPets(),
                 data:     new Date().toLocaleDateString('pt-BR')
             };
             const lista = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
@@ -1777,6 +1916,9 @@
             localStorage.setItem('caotelli_clientes', JSON.stringify(lista));
 
             document.getElementById('cadastroSuccess').style.display = 'block';
+            document.getElementById('petsContainer').innerHTML = '';
+            petCount = 0;
+            adicionarPet();
             e.target.reset();
             setTimeout(() => { document.getElementById('cadastroSuccess').style.display = 'none'; }, 5000);
             showNotification('Cadastro realizado! Obrigado, ' + dados.nome.split(' ')[0] + '! 🐾');
@@ -1786,6 +1928,13 @@
         function init() {
             renderProducts('todos');
             renderCoupons();
+            adicionarPet();
+            // Define data mínima do agendamento como hoje
+            const inputData = document.getElementById('agData');
+            if (inputData) {
+                const hoje = new Date().toISOString().split('T')[0];
+                inputData.min = hoje;
+            }
         }
 
         // RENDERIZAR PRODUTOS
@@ -2133,8 +2282,58 @@
         }
 
         // SUBMIT FORMULÁRIOS
+        // ── MÁSCARAS DE INPUT ─────────────────────────────────────────
+        function mascaraTelefone(input) {
+            let v = input.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length <= 10) {
+                v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else {
+                v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            }
+            input.value = v;
+        }
+
+        function mascaraCPF(input) {
+            let v = input.value.replace(/\D/g, '').slice(0, 11);
+            v = v.replace(/^(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+            v = v.replace(/\.(\d{3})(\d)/, '.$1-$2');
+            input.value = v;
+        }
+
+        function validarTelefone(tel) {
+            return tel.replace(/\D/g, '').length >= 10;
+        }
+
+        function validarCPF(cpf) {
+            // Aceita vazio (campo opcional) ou formato correto
+            if (!cpf) return true;
+            return /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf);
+        }
+
+        function dataEFutura(dataStr) {
+            if (!dataStr) return false;
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const data = new Date(dataStr + 'T00:00:00');
+            return data >= hoje;
+        }
+        // ─────────────────────────────────────────────────────────────
+
         function submitAgendamento(event) {
             event.preventDefault();
+            const tel = document.getElementById('agTelefone').value;
+            const data = document.getElementById('agData').value;
+
+            if (!validarTelefone(tel)) {
+                showNotification('Informe um telefone válido com DDD. Ex: (51) 99999-9999', 'error');
+                return;
+            }
+            if (!dataEFutura(data)) {
+                showNotification('A data do agendamento deve ser hoje ou uma data futura.', 'error');
+                return;
+            }
+
             document.getElementById('agendamentoSuccess').classList.add('show');
             event.target.reset();
             setTimeout(() => {
@@ -2170,6 +2369,198 @@
         }
 
         // NOTIFICAÇÃO
+        // ── MODAIS DO FOOTER ──────────────────────────────────────────
+        const infoModalConteudo = {
+            sobre: {
+                titulo: '🐾 Sobre a CãoTelli',
+                corpo: `
+                    <p>A <strong>CãoTelli</strong> é uma pet shop apaixonada por cuidar do seu melhor amigo! Com uma seleção completa de rações, acessórios, medicamentos e cuidados, oferecemos produtos de qualidade e atendimento personalizado.</p>
+                    <br>
+                    <p><strong>Nosso objetivo:</strong> proporcionar bem-estar aos pets, atendimento 5 estrelas aos clientes e ser referência em teleentrega em Canoas/RS.</p>
+                    <br>
+                    <p>📍 Av. Santos Ferreira, 997 — Bairro Mal. Rondon, Canoas/RS<br>
+                    🕐 Segunda a Sábado, 9h às 19h<br>
+                    📱 (51) 99765-5755<br>
+                    📸 @caotelli</p>
+                `
+            },
+            privacidade: {
+                titulo: '🔒 Política de Privacidade',
+                corpo: `
+                    <p>A sua privacidade é nossa prioridade. Todos os dados fornecidos em nosso site são protegidos e utilizados apenas para melhorar sua experiência de compra e oferecer serviços personalizados.</p>
+                    <br>
+                    <p><strong>Coleta de dados:</strong> coletamos apenas as informações necessárias para processar seus pedidos e oferecer um atendimento de qualidade, como nome, e-mail, telefone e endereço de entrega.</p>
+                    <br>
+                    <p><strong>Uso dos dados:</strong> suas informações nunca serão vendidas ou compartilhadas com terceiros sem sua autorização, exceto quando necessário para a entrega dos produtos.</p>
+                    <br>
+                    <p><strong>Segurança:</strong> utilizamos medidas de segurança adequadas para proteger seus dados contra acesso não autorizado.</p>
+                    <br>
+                    <p>Dúvidas? Fale conosco pelo WhatsApp: <a href="https://wa.me/5551997655755" target="_blank" style="color:#0088C2">(51) 99765-5755</a></p>
+                `
+            },
+            termos: {
+                titulo: '📋 Termos de Uso — CãoTelli',
+                corpo: `
+                    <p style="color:#5a6a85;font-size:0.88rem">Última atualização: 16/04/2026</p>
+                    <p>Bem-vindo(a) ao site da CãoTelli! Ao acessar ou utilizar nosso site, você concorda com os presentes Termos de Uso. Leia atentamente antes de realizar qualquer compra ou utilizar nossos serviços.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">1. Definições</strong><br>
+                    <strong>CãoTelli:</strong> empresa responsável pelo site e pelos produtos e serviços nele oferecidos.<br>
+                    <strong>Usuário/Cliente:</strong> pessoa física ou jurídica que acessa o site ou realiza compras.<br>
+                    <strong>Produtos:</strong> Rações, Acessórios, Medicamentos e demais itens comercializados pela CãoTelli.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">2. Aceitação dos Termos</strong><br>
+                    Ao utilizar este site, você concorda integralmente com estes Termos de Uso, com nossa Política de Privacidade e com demais políticas aplicáveis. Caso não concorde com algum item, solicitamos que não utilize o site.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">3. Uso do Site</strong><br>
+                    O site é destinado apenas a pessoas com capacidade legal para contratar. É proibido utilizar o site para fins ilícitos, tentar acessar áreas restritas sem autorização ou distribuir vírus e códigos maliciosos. Reservamo-nos o direito de suspender ou bloquear qualquer usuário que viole estes termos.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">4. Cadastro e Conta</strong><br>
+                    Algumas funcionalidades do site podem exigir cadastro. O usuário é responsável por manter a confidencialidade de sua senha e dados pessoais, e concorda em fornecer informações verdadeiras e atualizadas.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">5. Compras e Pagamentos</strong><br>
+                    Todos os pedidos estão sujeitos à disponibilidade de estoque. Os preços estão sujeitos a alterações sem aviso prévio, mas respeitando pedidos já confirmados. Aceitamos os métodos de pagamento indicados no site, garantindo transações seguras.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">6. Entrega e Frete</strong><br>
+                    Oferecemos teleentrega gratuita em compras acima de R$59,90 e outras modalidades conforme disponibilidade. O prazo de entrega é estimativo e pode sofrer alterações por motivos externos. O usuário deve fornecer informações corretas e completas para garantir a entrega.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">7. Trocas e Devoluções</strong><br>
+                    Trocas e devoluções seguem as regras do Código de Defesa do Consumidor. Produtos devem ser devolvidos em perfeitas condições, com embalagem original e nota fiscal. Itens personalizados ou perecíveis podem ter restrições específicas.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">8. Responsabilidade</strong><br>
+                    A CãoTelli não se responsabiliza por danos indiretos ou consequenciais decorrentes do uso do site. A responsabilidade por informações fornecidas incorretas ou incompletas pelo usuário é exclusiva do mesmo.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">9. Propriedade Intelectual</strong><br>
+                    Todo conteúdo do site (textos, imagens, logotipo, vídeos, etc.) é de propriedade da CãoTelli ou de terceiros licenciantes. É proibida a reprodução, distribuição ou uso comercial sem autorização prévia.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">10. Privacidade</strong><br>
+                    Nossos procedimentos de coleta, uso e proteção de dados pessoais estão descritos na Política de Privacidade do site. Ao utilizar o site, você concorda com o tratamento de seus dados conforme descrito nessa política.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">11. Modificações nos Termos</strong><br>
+                    A CãoTelli pode alterar estes Termos de Uso a qualquer momento, mediante publicação no site. Recomendamos que você revise periodicamente este documento.</p>
+                    <br>
+                    <p><strong style="color:#0088C2">12. Legislação Aplicável e Foro</strong><br>
+                    Estes Termos de Uso são regidos pela legislação brasileira. Quaisquer disputas serão resolvidas no foro da comarca onde a CãoTelli estiver localizada.</p>
+                `
+            },
+            trocas: {
+                titulo: '🔄 Trocas e Devoluções',
+                corpo: `
+                    <p>Queremos que você e seu pet fiquem <strong>100% satisfeitos!</strong> Aceitamos trocas e devoluções dentro do prazo legal, seguindo regras claras e simples para facilitar sua experiência.</p>
+                    <br>
+                    <p><strong>Como funciona:</strong></p>
+                    <p>• O produto deve estar em perfeitas condições, com embalagem original e nota fiscal.<br>
+                    • Trocas e devoluções seguem as regras do Código de Defesa do Consumidor.<br>
+                    • Itens perecíveis ou personalizados podem ter restrições específicas.</p>
+                    <br>
+                    <p>Entre em contato pelo WhatsApp para iniciar o processo:</p>
+                    <br>
+                    <a href="https://wa.me/5551997655755?text=Ol%C3%A1%2C%20vim%20do%20site%2C%20gostaria%20de%20fazer%20uma%20troca" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:700;padding:10px 22px;border-radius:50px;text-decoration:none;font-size:0.95rem">
+                        <i class="fa-brands fa-whatsapp"></i> Solicitar Troca pelo WhatsApp
+                    </a>
+                `
+            },
+            frete: {
+                titulo: '🚚 Frete e Entrega',
+                corpo: `
+                    <p>Oferecemos <strong>teleentrega gratuita</strong> em compras acima de R$59,90 e opções de entrega rápida e segura em até <strong>30 minutos</strong> para sua conveniência. Receba seu pedido no conforto do seu lar!</p>
+                    <br>
+                    <p><strong>Resumo:</strong></p>
+                    <p>🚚 Frete grátis em compras acima de R$59,90<br>
+                    ⚡ Entrega expressa em até 30 minutos<br>
+                    📅 Entregas agendadas disponíveis<br>
+                    📍 Atendemos Canoas/RS e região</p>
+                    <br>
+                    <p style="color:#5a6a85;font-size:0.9rem">O prazo de entrega é estimativo e pode sofrer alterações por motivos externos. Certifique-se de fornecer o endereço completo e correto ao finalizar o pedido.</p>
+                `
+            },
+            ajuda: {
+                titulo: '💬 Central de Ajuda',
+                corpo: `
+                    <p>Estamos aqui para ajudar! Nossa central de ajuda responde dúvidas sobre produtos, pedidos e cuidados com seu pet, garantindo um atendimento rápido e acolhedor.</p>
+                    <br>
+                    <p>Fale diretamente com nossa equipe pelo WhatsApp:</p>
+                    <br>
+                    <a href="https://wa.me/5551997655755?text=Ol%C3%A1%2C%20vim%20do%20site%2C%20gostaria%20de%20ajuda%20no%20site" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:700;padding:10px 22px;border-radius:50px;text-decoration:none;font-size:0.95rem">
+                        <i class="fa-brands fa-whatsapp"></i> Falar com a Central de Ajuda
+                    </a>
+                    <br><br>
+                    <p>🕐 Atendimento: Segunda a Sábado, 9h às 19h</p>
+                `
+            },
+            faleconosco: {
+                titulo: '📞 Fale Conosco',
+                corpo: `
+                    <p>Entre em contato com nossa equipe via WhatsApp, e-mail ou telefone. Respondemos com carinho e atenção para esclarecer qualquer dúvida.</p>
+                    <br>
+                    <a href="https://wa.me/5551997655755" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:700;padding:10px 22px;border-radius:50px;text-decoration:none;font-size:0.95rem;margin-bottom:12px">
+                        <i class="fa-brands fa-whatsapp"></i> (51) 99765-5755
+                    </a>
+                    <br>
+                    <a href="mailto:caotelli@gmail.com" style="display:inline-flex;align-items:center;gap:8px;background:#0088C2;color:#fff;font-weight:700;padding:10px 22px;border-radius:50px;text-decoration:none;font-size:0.95rem;margin-bottom:12px">
+                        ✉️ caotelli@gmail.com
+                    </a>
+                    <br>
+                    <a href="tel:+5551997655755" style="display:inline-flex;align-items:center;gap:8px;background:#5a6a85;color:#fff;font-weight:700;padding:10px 22px;border-radius:50px;text-decoration:none;font-size:0.95rem">
+                        📞 (51) 99765-5755
+                    </a>
+                    <br><br>
+                    <p>🕐 Segunda a Sábado, 9h às 19h</p>
+                `
+            },
+            trabalhe: {
+                titulo: '💼 Trabalhe Conosco',
+                corpo: `
+                    <p>Quer fazer parte da família CãoTelli? Estamos sempre em busca de pessoas apaixonadas por pets e comprometidas com um atendimento de excelência!</p>
+                    <br>
+                    <p>Envie seu currículo para:</p>
+                    <br>
+                    <a href="mailto:caotelli@gmail.com?subject=Currículo — Vaga CãoTelli" style="display:inline-flex;align-items:center;gap:8px;background:#0088C2;color:#fff;font-weight:700;padding:10px 22px;border-radius:50px;text-decoration:none;font-size:0.95rem">
+                        ✉️ caotelli@gmail.com
+                    </a>
+                    <br><br>
+                    <p style="color:#5a6a85;font-size:0.9rem">No assunto do e-mail escreva "Currículo" e nos conte um pouco sobre você e seu amor pelos animais! 🐾</p>
+                `
+            },
+            faq: {
+                titulo: '❓ Dúvidas Frequentes',
+                corpo: `
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                        <div><strong style="color:#0088C2">🚚 Vocês entregam em Canoas?</strong><br>Sim! Fazemos teleentrega em Canoas/RS e região. Frete grátis em compras acima de R$59,90. Abaixo disso, o frete é R$15,00.</div>
+                        <div><strong style="color:#0088C2">⏱️ Qual o prazo de entrega?</strong><br>Nossa entrega expressa chega em até 30 minutos. Também temos opções de agendamento conforme sua preferência.</div>
+                        <div><strong style="color:#0088C2">💳 Quais formas de pagamento vocês aceitam?</strong><br>Aceitamos pagamento via PIX. Ao finalizar o pedido, você recebe a chave PIX e pode enviar o comprovante pelo WhatsApp.</div>
+                        <div><strong style="color:#0088C2">🐕 Vocês têm ração para cães de todas as raças?</strong><br>Sim! Trabalhamos com diversas marcas e tamanhos, como Golden Special, Monello, Primogato e outras. Veja o catálogo completo na seção de produtos.</div>
+                        <div><strong style="color:#0088C2">🐱 Têm produtos para gatos também?</strong><br>Claro! Temos rações, areia higiênica, brinquedos e acessórios especialmente para gatos.</div>
+                        <div><strong style="color:#0088C2">💊 Vocês vendem medicamentos e antiparasitários?</strong><br>Sim, temos uma seleção de remédios, antiparasitários e suplementos para cães e gatos. Confira na aba "Remédios".</div>
+                        <div><strong style="color:#0088C2">🔄 Posso trocar um produto?</strong><br>Sim! Aceitamos trocas e devoluções dentro do prazo legal. O produto deve estar em perfeitas condições e com embalagem original. Entre em contato pelo WhatsApp.</div>
+                        <div><strong style="color:#0088C2">📅 Posso agendar a entrega?</strong><br>Sim! Na seção de Agendamento você pode escolher data e horário. Agendamentos devem ser feitos com pelo menos 24h de antecedência.</div>
+                        <div><strong style="color:#0088C2">📍 Qual o endereço da loja?</strong><br>Av. Santos Ferreira, 997 — Bairro Mal. Rondon, Canoas/RS. Atendemos de Segunda a Sábado, das 9h às 19h.</div>
+                    </div>
+                `
+            }
+        };
+
+        function abrirInfoModal(tipo) {
+            const conteudo = infoModalConteudo[tipo];
+            if (!conteudo) return;
+            document.getElementById('infoModalTitle').textContent = conteudo.titulo;
+            document.getElementById('infoModalBody').innerHTML = conteudo.corpo;
+            const modal = document.getElementById('infoModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharInfoModal() {
+            document.getElementById('infoModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // Fecha modal clicando fora
+        document.getElementById('infoModal').addEventListener('click', function(e) {
+            if (e.target === this) fecharInfoModal();
+        });
+        // ────────────────────────────────────────────────────────────
+
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
             notification.style.cssText = `
