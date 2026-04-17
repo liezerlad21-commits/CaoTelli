@@ -13,6 +13,21 @@
 
 ---
 
+## 17/04/2026 — SEO, Footer, Validações e Cadastro de Pets — commit `bfeff66`
+
+- SEO completo no `index.html`: meta description, keywords, Open Graph, Twitter Card, favicon, canonical URL com domínio correto (`liezerlad21-commits.github.io/CaoTelli`)
+- Criados `sitemap.xml` e `robots.txt`
+- Footer reformulado com textos reais da loja e modais funcionais para: Sobre, Privacidade, Termos de Uso, Trocas, Frete, Central de Ajuda, Fale Conosco, Trabalhe Conosco e FAQ
+- Termos de Uso completos (12 artigos do PDF) integrados no modal
+- "Rastrear Pedido" removido do footer
+- Links de WhatsApp com mensagens pré-preenchidas em Trocas e Central de Ajuda
+- Cadastro de clientes: telefone agora obrigatório, seção de pets reformulada com suporte a múltiplos pets, tipo (Cão/Gato/Outros) e lista de raças por tipo
+- Validações: máscara automática de telefone `(51) 99999-9999`, máscara de CPF `000.000.000-00`, bloqueio de datas passadas no agendamento
+- Hospedagem corrigida no histórico: GitHub Pages (não mais Netlify)
+- Copyright atualizado para 2026
+
+---
+
 ## 17/04/2026 — SEO
 
 - Atualizado `<title>` com palavras-chave locais (Canoas/RS).
