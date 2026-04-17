@@ -208,8 +208,21 @@ ae05318 Atualizacao do site CaoTelli
   - Favicon e apple-touch-icon apontando para `logo_caotelli.png`.
 - Criados `sitemap.xml` e `robots.txt` na raiz do projeto.
 - **Atenção:** as URLs nos arquivos de SEO usam `https://liezerlad21-commits.github.io/CaoTelli/` como placeholder. Atualizar se o domínio real for diferente.
+- **Imagens dos brinquedos corrigidas** (item 7 do backlog ✅): As 12 URLs do Mercado Livre (mlstatic.com) que estavam quebradas/mostrando produtos errados foram substituídas por fotos do Pexels (CDN estável, gratuito). Cada produto agora tem imagem correspondente ao tipo correto:
+  - id:44 Bola Interativa → cão jogando bola
+  - id:45 Corda de Brincar → cães no cabo de guerra
+  - id:46 Mordedor Kong → cão mordendo brinquedo
+  - id:47 Ratinho Catnip → gatinho com brinquedo ratinho
+  - id:48 Varinha com Penas → gato com penas
+  - id:49 Bolinha com Guizo → gato brincando com bolinha
+  - id:50 Casinha Madeira → cão em estrutura de madeira
+  - id:51 Casinha Plástica → cão brincando ao ar livre
+  - id:52 Casinha Pelúcia Gatos → gato confortável em casa
+  - id:53 Arranhador Sisal → gato brincando com cordinha
+  - id:54 Arranhador Papelão → gato bengal em superfície
+  - id:55 Torre Arranhador 3 Andares → gato em torre
 
-**Próxima ação sugerida:** commitar as alterações (SEO + sitemap + robots.txt) e depois escolher o próximo item do backlog (sugestão: validação real dos formulários ou atualizar imagens dos brinquedos).
+**Próxima ação sugerida:** commitar as alterações (SEO + sitemap + robots.txt + imagens brinquedos) e depois escolher o próximo item do backlog (sugestão: validação real dos formulários ou autenticação de usuários).
 
 ### Comandos úteis de Git para voltar no tempo
 
