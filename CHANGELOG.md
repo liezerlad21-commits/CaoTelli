@@ -17,7 +17,8 @@
 
 - Criado `HISTORICO_PROJETO.md` com contexto completo do projeto (visão geral, estrutura, funcionalidades, backlog).
 - Criado este `CHANGELOG.md` como índice legível de alterações.
-- Commit checkpoint do estado atual do `index.html` antes de começar novas features.
+- Commit checkpoint com todos os arquivos novos: **commit `c2f03f0`**.
+- Também subiram nesse mesmo commit: `Carta_de_Apresentacao_CaoTelli.docx` e `Ficha_de_Frequencia_CaoTelli.docx`.
 - **Foco acordado:** trabalhar apenas no site (deixar TaskForge e documentação de lado).
 - **Próxima ação:** escolher item do backlog para atacar.
 
