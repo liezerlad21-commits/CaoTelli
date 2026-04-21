@@ -412,7 +412,7 @@
         /* HERO SECTION */
         .hero {
             background: linear-gradient(135deg, #b8e4f9 0%, #d6f0fc 45%, #fad4dc 100%);
-            padding: 42px 20px 28px 20px;
+            padding: 6px 20px 4px 20px;
             text-align: center;
             border-bottom: 3px solid var(--primary-purple);
             animation: fadeIn 1s ease-in;
@@ -434,7 +434,7 @@
 
         .hero h1 {
             font-size: 48px;
-            margin-bottom: 20px;
+            margin-bottom: 2px;
             animation: glow 3s ease-in-out infinite;
             color: #ffffff;
             text-shadow: 0 2px 6px rgba(0,0,0,0.55), 0 0 20px rgba(0,60,120,0.45);
@@ -444,7 +444,7 @@
         .hero p {
             font-size: 18px;
             color: #ffffff;
-            margin-bottom: 30px;
+            margin-bottom: 8px;
             font-weight: 600;
             text-shadow: 0 1px 6px rgba(0,0,0,0.5), 0 0 12px rgba(0,60,120,0.35);
         }
@@ -1304,6 +1304,51 @@
         .product-description, .product-category { color: #5a6a85 !important; }
         .promo-text { color: #ffffff !important; }
 
+        /* ===== SUBMENU CATEGORIAS ===== */
+        .cat-dropdown {
+            display: none;
+            position: fixed;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+            padding: 6px 0;
+            min-width: 185px;
+            z-index: 99999;
+            border: 1px solid #e4eaf3;
+            animation: fadeIn 0.15s ease;
+        }
+        .cat-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1a2340;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            border-left: 3px solid transparent;
+        }
+        .cat-dropdown a:hover {
+            background: #f0f7fc;
+            color: #0088C2;
+            border-left-color: #0088C2;
+        }
+        .cat-dropdown-header {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #5a6a85;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 6px 16px 4px;
+        }
+        .cat-dropdown hr {
+            border: none;
+            border-top: 1px solid #e4eaf3;
+            margin: 4px 0;
+        }
+
         /* ===== NOSSA EQUIPE ===== */
         .equipe-section {
             background: linear-gradient(135deg, #f0f7fc 0%, #fff 50%, #fdf0f3 100%);
@@ -1605,7 +1650,7 @@
                     Ração · Remédios · Acessórios · Canoas/RS
                 </p>
                 <button class="hero-btn" onclick="showCategory('todos')" style="position:relative;z-index:2;font-size:1.1rem;padding:14px 36px">Ver Produtos →</button>
-                <div style="margin-top:22px;z-index:2;position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+                <div style="margin-top:6px;z-index:2;position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
                     <div style="display:flex;gap:16px;width:max-content;padding:4px 16px 4px;margin:0 auto;">
 
                         <div onclick="showCategory('todos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:82px">
@@ -1669,6 +1714,13 @@
                                 <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=200&h=200&fit=crop&auto=format" alt="Vacinas" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='#D6324A';this.parentElement.innerHTML='<span style=font-size:1.8rem>💉</span>'">
                             </div>
                             <span style="font-size:0.78rem;font-weight:700;color:#0088C2;text-align:center;white-space:nowrap">Vacinas</span>
+                        </div>
+
+                        <div onclick="document.querySelector('.equipe-section').scrollIntoView({behavior:'smooth'})" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:82px">
+                            <div class="cat-circle-border" style="width:78px;height:78px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(255,255,255,0.4);box-shadow:0 2px 8px rgba(0,0,0,0.15)">
+                                <img src="equipe_caotelli.jpg" alt="Nossa Equipe" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='#0088C2';this.parentElement.innerHTML='<span style=font-size:1.8rem>🐾</span>'">
+                            </div>
+                            <span style="font-size:0.78rem;font-weight:700;color:#0088C2;text-align:center;white-space:nowrap">Nossa Equipe</span>
                         </div>
 
                     </div>
@@ -3033,6 +3085,215 @@
             // Inicializar
             init();
         });
+
+        // ===== SUBMENUS EM CASCATA DAS CATEGORIAS =====
+        (function() {
+            const scroll = () => document.getElementById('produtosSection').scrollIntoView({ behavior: 'smooth' });
+
+            const submenus = {
+                'Todos': {
+                    titulo: 'Filtrar por pet',
+                    itens: [
+                        { label: '🐕 Para Cães',  fn: () => { renderProducts('todos','cao');  scroll(); } },
+                        { label: '🐱 Para Gatos', fn: () => { renderProducts('todos','gato'); scroll(); } },
+                        { label: '📦 Ver Tudo',   fn: () => { renderProducts('todos');        scroll(); } }
+                    ]
+                },
+                'Cães': {
+                    titulo: 'Categoria',
+                    itens: [
+                        { label: '🥣 Ração',       fn: () => { renderProducts('racao','cao');      scroll(); } },
+                        { label: '💊 Remédios',    fn: () => { renderProducts('remedios','cao');   scroll(); } },
+                        { label: '🎾 Brinquedos',  fn: () => { renderProducts('brinquedos','cao'); scroll(); } },
+                        { label: '🧸 Acessórios',  fn: () => { renderProducts('acessorios','cao'); scroll(); } }
+                    ]
+                },
+                'Gatos': {
+                    titulo: 'Categoria',
+                    itens: [
+                        { label: '🥣 Ração',          fn: () => { renderProducts('racao','gato');      scroll(); } },
+                        { label: '💊 Remédios',        fn: () => { renderProducts('remedios','gato');   scroll(); } },
+                        { label: '🎾 Brinquedos',      fn: () => { renderProducts('brinquedos','gato'); scroll(); } },
+                        { label: '🪣 Areia Higiênica', fn: () => { renderProducts('acessorios','gato'); scroll(); } }
+                    ]
+                },
+                'Farmácia': {
+                    titulo: 'Para qual pet?',
+                    itens: [
+                        { label: '🐕 Remédios p/ Cão',  fn: () => { renderProducts('remedios','cao');  scroll(); } },
+                        { label: '🐱 Remédios p/ Gato', fn: () => { renderProducts('remedios','gato'); scroll(); } },
+                        { label: '💊 Ver Todos',         fn: () => { renderProducts('remedios');        scroll(); } }
+                    ]
+                },
+                'Acessórios': {
+                    titulo: 'Para qual pet?',
+                    itens: [
+                        { label: '🐕 Para Cães',  fn: () => { renderProducts('acessorios','cao');  scroll(); } },
+                        { label: '🐱 Para Gatos', fn: () => { renderProducts('acessorios','gato'); scroll(); } },
+                        { label: '🧸 Ver Todos',  fn: () => { renderProducts('acessorios');        scroll(); } }
+                    ]
+                },
+                'Brinquedos': {
+                    titulo: 'Para qual pet?',
+                    itens: [
+                        { label: '🐕 Para Cães',     fn: () => { renderProducts('brinquedos','cao');  scroll(); } },
+                        { label: '🐱 Para Gatos',    fn: () => { renderProducts('brinquedos','gato'); scroll(); } },
+                        { label: '🏠 Ver Todos',     fn: () => { renderProducts('brinquedos');        scroll(); } }
+                    ]
+                },
+                'Agendamento': {
+                    titulo: 'Tipo de entrega',
+                    itens: [
+                        { label: '⚡ Entrega Expressa', fn: () => openSection('agendamento') },
+                        { label: '📅 Entrega Agendada', fn: () => openSection('agendamento') }
+                    ]
+                },
+                'Vacinas': {
+                    titulo: 'Espécie',
+                    itens: [
+                        { label: '🐕 Vacina Cão',  fn: () => openSection('vacinas') },
+                        { label: '🐱 Vacina Gato', fn: () => openSection('vacinas') }
+                    ]
+                },
+                'Outros': {
+                    titulo: '🔍 Buscar por marca',
+                    busca: true
+                },
+                'Nossa Equipe': {
+                    titulo: 'Saiba mais',
+                    itens: [
+                        { label: '👥 Conheça a Equipe', fn: () => document.querySelector('.equipe-section').scrollIntoView({ behavior: 'smooth' }) },
+                        { label: '💬 Fale Conosco',     fn: () => openSection('contact') }
+                    ]
+                }
+            };
+
+            // Criar elemento dropdown global
+            const dropdown = document.createElement('div');
+            dropdown.className = 'cat-dropdown';
+            document.body.appendChild(dropdown);
+            let hideTimer;
+
+            function positionAndShow(wrapper, data) {
+                clearTimeout(hideTimer);
+
+                if (data.busca) {
+                    // Modo especial: campo de pesquisa por marca
+                    dropdown.innerHTML =
+                        `<div class="cat-dropdown-header">${data.titulo}</div><hr>` +
+                        `<div style="padding:8px 12px">
+                            <input id="marcaInput" type="text" placeholder="Ex: Royal Canin, Pedigree..."
+                                style="width:100%;padding:8px 10px;border:1px solid #c4d0e0;border-radius:8px;
+                                font-size:0.84rem;color:#1a2340;outline:none;background:#f4f7fb">
+                        </div>
+                        <div id="marcaResultados" style="max-height:180px;overflow-y:auto"></div>`;
+
+                    const input = dropdown.querySelector('#marcaInput');
+                    const resultados = dropdown.querySelector('#marcaResultados');
+
+                    const buscarMarca = (termo) => {
+                        const t = termo.trim().toLowerCase();
+                        if (!t) { resultados.innerHTML = '<div style="padding:8px 16px;font-size:0.82rem;color:#5a6a85">Digite uma marca para pesquisar</div>'; return; }
+                        const encontrados = products.filter(p =>
+                            (p.name + ' ' + p.description).toLowerCase().includes(t)
+                        );
+                        if (!encontrados.length) {
+                            resultados.innerHTML = `<div style="padding:8px 16px;font-size:0.82rem;color:#D6324A">Nenhum resultado para "${termo}"</div>`;
+                            return;
+                        }
+                        // Deduplica por marca (primeiras palavras do nome)
+                        const marcas = [...new Set(encontrados.map(p => p.name.split(' ').slice(0,2).join(' ')))].slice(0, 8);
+                        resultados.innerHTML = marcas.map((m, i) =>
+                            `<a data-termo="${encontrados.find(p=>p.name.startsWith(m.split(' ')[0])).name}"
+                                data-idx="${i}" style="cursor:pointer">${m}</a>`
+                        ).join('');
+                        resultados.querySelectorAll('a').forEach(a => {
+                            a.addEventListener('click', e => {
+                                e.stopPropagation();
+                                const termo2 = a.dataset.termo.split(' ')[0];
+                                const filtrados = products.filter(p =>
+                                    (p.name+' '+p.description).toLowerCase().includes(termo2.toLowerCase())
+                                );
+                                const grid = document.getElementById('productsGrid');
+                                grid.innerHTML = filtrados.map(product => `
+                                    <div class="product-card">
+                                        ${product.imgUrl ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` : ''}
+                                        <div class="product-emoji" style="${product.imgUrl?'display:none':''}">${product.emoji}</div>
+                                        <h3 class="product-name">${product.name}</h3>
+                                        <p class="product-description">${product.description}</p>
+                                        <div class="product-category">${product.category.toUpperCase()}</div>
+                                        <p class="product-price-label">À vista por</p>
+                                        <p class="product-price">R$ ${product.price.toFixed(2)}</p>
+                                        <div class="product-price-discount">
+                                            <span class="disc-label"><i class="fa-solid fa-tag"></i> 1ª Compra pelo Site</span>
+                                            <span class="disc-value">R$ ${(product.price*0.9).toFixed(2)}</span>
+                                            <span class="disc-badge">-10%</span>
+                                        </div>
+                                        <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
+                                    </div>`
+                                ).join('');
+                                document.getElementById('produtosSection').scrollIntoView({ behavior: 'smooth' });
+                                dropdown.style.display = 'none';
+                            });
+                        });
+                    };
+
+                    input.addEventListener('input', () => buscarMarca(input.value));
+                    buscarMarca('');
+                    setTimeout(() => input.focus(), 50);
+                } else {
+                    // Modo normal: lista de itens
+                    dropdown.innerHTML =
+                        `<div class="cat-dropdown-header">${data.titulo}</div><hr>` +
+                        data.itens.map((item, i) => `<a data-i="${i}">${item.label}</a>`).join('');
+
+                    dropdown.querySelectorAll('a').forEach(a => {
+                        a.addEventListener('click', e => {
+                            e.stopPropagation();
+                            data.itens[+a.dataset.i].fn();
+                            dropdown.style.display = 'none';
+                        });
+                    });
+                }
+
+                dropdown.style.display = 'block';
+                const r = wrapper.getBoundingClientRect();
+                dropdown.style.minWidth = 'max-content';
+                dropdown.style.left = '-9999px';
+                dropdown.style.display = 'block';
+                const dw = dropdown.offsetWidth;
+                let left = r.left + r.width / 2 - dw / 2;
+                left = Math.max(4, Math.min(left, window.innerWidth - dw - 4));
+                dropdown.style.left = left + 'px';
+                // Sempre abaixo do botão
+                dropdown.style.top = (r.bottom + 6) + 'px';
+            }
+
+            function initSubmenus() {
+                document.querySelectorAll('.cat-circle-border').forEach(circle => {
+                    const wrapper = circle.parentElement;
+                    const span = wrapper.querySelector('span');
+                    if (!span) return;
+                    const label = span.textContent.trim();
+                    if (!submenus[label]) return;
+
+                    wrapper.style.position = 'relative';
+                    wrapper.addEventListener('mouseenter', () => positionAndShow(wrapper, submenus[label]));
+                    wrapper.addEventListener('mouseleave', () => {
+                        hideTimer = setTimeout(() => { dropdown.style.display = 'none'; }, 220);
+                    });
+                });
+
+                dropdown.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+                dropdown.addEventListener('mouseleave', () => { dropdown.style.display = 'none'; });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSubmenus);
+            } else {
+                setTimeout(initSubmenus, 100);
+            }
+        })();
     </script>
 
     <!-- MODAL CARRINHO -->
