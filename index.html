@@ -1308,13 +1308,15 @@
         .cat-dropdown {
             display: none;
             position: fixed;
-            background: #fff;
+            background: rgba(255,255,255,0.11);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 12px;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
             padding: 6px 0;
             min-width: 185px;
             z-index: 99999;
-            border: 1px solid #e4eaf3;
+            border: 1px solid rgba(255,255,255,0.4);
             animation: fadeIn 0.15s ease;
         }
         .cat-dropdown a {
@@ -3179,12 +3181,13 @@
 
                 if (data.busca) {
                     // Modo especial: campo de pesquisa por marca
+                    dropdown.style.minWidth = 'max-content';
                     dropdown.innerHTML =
                         `<div class="cat-dropdown-header">${data.titulo}</div><hr>` +
-                        `<div style="padding:8px 12px">
-                            <input id="marcaInput" type="text" placeholder="Ex: Royal Canin, Pedigree..."
-                                style="width:100%;padding:8px 10px;border:1px solid #c4d0e0;border-radius:8px;
-                                font-size:0.84rem;color:#1a2340;outline:none;background:#f4f7fb">
+                        `<div style="padding:6px 8px">
+                            <input id="marcaInput" type="text" placeholder="Marca..."
+                                style="width:100%;padding:6px 8px;border:1px solid #c4d0e0;border-radius:8px;
+                                font-size:0.8rem;color:#1a2340;outline:none;background:#f4f7fb;box-sizing:border-box">
                         </div>
                         <div id="marcaResultados" style="max-height:180px;overflow-y:auto"></div>`;
 
@@ -3258,15 +3261,16 @@
 
                 dropdown.style.display = 'block';
                 const r = wrapper.getBoundingClientRect();
-                dropdown.style.minWidth = 'max-content';
+                // Largura do botão +20%, centralizado
+                const dw = r.width * 1.44;
+                dropdown.style.width = dw + 'px';
+                dropdown.style.minWidth = 'unset';
                 dropdown.style.left = '-9999px';
+                dropdown.style.top = '-9999px';
                 dropdown.style.display = 'block';
-                const dw = dropdown.offsetWidth;
-                let left = r.left + r.width / 2 - dw / 2;
-                left = Math.max(4, Math.min(left, window.innerWidth - dw - 4));
-                dropdown.style.left = left + 'px';
-                // Sempre abaixo do botão
-                dropdown.style.top = (r.bottom + 6) + 'px';
+                const dh = dropdown.offsetHeight;
+                dropdown.style.left = (r.left + r.width / 2 - dw / 2) + 'px';
+                dropdown.style.top = (r.top - dh - 6) + 'px';
             }
 
             function initSubmenus() {
