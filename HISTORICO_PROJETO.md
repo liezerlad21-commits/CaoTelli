@@ -223,13 +223,49 @@ ae05318 Atualizacao do site CaoTelli
   - id:55 Torre Arranhador 3 Andares → gato em torre
 
 **Sessão 21/04/2026 — O que foi feito:**
-- **Hero melhorado:** gradiente escuro (azul profundo → azul → vermelho) com texto branco + sombra. Ficou mais impactante visualmente.
-- **Seção "Produtos em Destaque" (`destaques-section`)** adicionada antes do rodapé: 4 cards com imagem, tag colorida, preço inicial e botão que filtra os produtos por categoria.
-- **Seção "Nossa Equipe" (`equipe-section`)** adicionada antes do rodapé: foto real da equipe (`equipe_caotelli.jpg`) à esquerda, texto + 4 diferenciais em grid + botão WhatsApp à direita. Responsivo para celular.
-- Arquivo `equipe_caotelli.jpg` salvo na raiz do projeto.
-- HTML validado sem erros de estrutura.
 
-**Próxima ação sugerida:** commitar as alterações, depois seguir para Firebase (autenticação) ou validação dos formulários.
+### Hero
+- Gradiente claro (azul pastel → azul celeste → rosinha) com texto branco + sombra forte para legibilidade.
+- Padding reduzido ao mínimo para o conteúdo subir na tela e os círculos ficarem longe da barra de tarefas.
+- Espaçamentos internos (h1, p, linha dos círculos) todos compactados.
+
+### Seção "Produtos em Destaque" (`destaques-section`)
+- 4 cards com imagem, tag colorida, preço inicial e botão que filtra produtos por categoria.
+- Adicionada antes do rodapé.
+
+### Seção "Nossa Equipe" (`equipe-section`)
+- Layout de 3 colunas: texto à esquerda | foto centralizada (605px) | texto à direita.
+- Foto real da equipe (`equipe_caotelli.jpg`) com borda e sombra.
+- 4 diferenciais divididos nos dois lados + botão WhatsApp.
+- Responsivo: empilha no celular.
+
+### Círculo "Nossa Equipe" no hero
+- Adicionado após o círculo de Vacinas na barra de categorias.
+- Usa a `equipe_caotelli.jpg` como imagem do círculo.
+- Ao clicar, rola até a seção Nossa Equipe.
+
+### Submenus em cascata (hover)
+- Cada círculo do hero exibe um submenu ao passar o mouse, com itens específicos:
+  - **Todos:** Para Cães / Para Gatos / Ver Tudo
+  - **Cães:** Ração / Remédios / Brinquedos / Acessórios (filtros por pet)
+  - **Gatos:** Ração / Remédios / Brinquedos / Areia Higiênica
+  - **Farmácia:** Remédios p/ Cão / Remédios p/ Gato / Ver Todos
+  - **Acessórios:** Para Cães / Para Gatos / Ver Todos
+  - **Brinquedos:** Para Cães / Para Gatos / Ver Todos
+  - **Agendamento:** Entrega Expressa / Entrega Agendada
+  - **Vacinas:** Vacina Cão / Vacina Gato
+  - **Nossa Equipe:** Conheça a Equipe / Fale Conosco
+  - **Outros:** campo de busca por marca (filtra produtos em tempo real)
+- Dropdown usa `position:fixed`, aparece **abaixo** do botão, largura `max-content` centralizada no círculo.
+- Implementado via JS puro (sem bibliotecas).
+
+### Outros ajustes visuais
+- Bordas dos cards de produto: de `2px` → `1px` (mais finas).
+- Entrega expressa atualizada para **60 minutos** em todo o site (meta tags, seção equipe, FAQ).
+- Botões do hero: texto escuro (`#1a2340`).
+- Arquivo `equipe_caotelli.jpg` salvo e renomeado na raiz do projeto.
+
+**Próxima ação sugerida:** commitar tudo, depois seguir para Firebase (autenticação) ou validação dos formulários.
 
 ---
 
