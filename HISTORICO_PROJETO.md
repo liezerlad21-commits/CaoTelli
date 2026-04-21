@@ -265,7 +265,21 @@ ae05318 Atualizacao do site CaoTelli
 - Botões do hero: texto escuro (`#1a2340`).
 - Arquivo `equipe_caotelli.jpg` salvo e renomeado na raiz do projeto.
 
-**Próxima ação sugerida:** commitar tudo, depois seguir para Firebase (autenticação) ou validação dos formulários.
+**Sessão 21/04/2026 — CONTINUAÇÃO (tarde)**
+
+### Ajustes finais nos submenus em cascata:
+- Dropdown posicionado **acima do botão**, centralizado nas laterais.
+- Largura do dropdown = **largura do botão × 1.44** (dois aumentos de 20%).
+- Transparência do dropdown: `rgba(255,255,255,0.11)` com `backdrop-filter: blur(10px)` — efeito vidro fosco bem transparente.
+- Botão **"Outros"**: campo de busca por marca com placeholder curto ("Marca...") e largura proporcional ao botão.
+- Dropdown do "Outros" também usa `max-content` para não forçar largura maior que os outros.
+
+### Ajuste do push para o GitHub:
+- Identificado problema com `index.lock` bloqueando o git do Windows.
+- Solução: apagar o lock via CMD (`del /f`) e rodar `git add -A && git commit && git push` direto no CMD.
+- Confirmado que o último commit já tinha todas as alterações da sessão.
+
+**Próxima ação sugerida:** commitar as alterações desta tarde, depois seguir para Firebase (autenticação) ou validação dos formulários.
 
 ---
 
