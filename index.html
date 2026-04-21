@@ -411,11 +411,20 @@
 
         /* HERO SECTION */
         .hero {
-            background: linear-gradient(135deg, #e8f5fb, #fce8ec);
-            padding: 28px 20px 20px 20px;
+            background: linear-gradient(135deg, #b8e4f9 0%, #d6f0fc 45%, #fad4dc 100%);
+            padding: 42px 20px 28px 20px;
             text-align: center;
-            border-bottom: 2px solid var(--primary-purple);
+            border-bottom: 3px solid var(--primary-purple);
             animation: fadeIn 1s ease-in;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 10 Q25 0 50 10 Q75 20 100 10 L100 20 L0 20Z' fill='rgba(255,255,255,0.06)'/%3E%3C/svg%3E") bottom/100% auto no-repeat;
+            pointer-events: none;
         }
 
         .hero-container {
@@ -427,20 +436,24 @@
             font-size: 48px;
             margin-bottom: 20px;
             animation: glow 3s ease-in-out infinite;
-            color: var(--primary-cyan);
+            color: #ffffff;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.55), 0 0 20px rgba(0,60,120,0.45);
+            -webkit-text-stroke: 0.5px rgba(0,50,100,0.25);
         }
 
         .hero p {
             font-size: 18px;
-            color: var(--text-gray);
+            color: #ffffff;
             margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.5), 0 0 12px rgba(0,60,120,0.35);
         }
 
         .hero-btn {
             padding: 15px 40px;
             background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
             border: none;
-            color: var(--dark-bg);
+            color: #1a2340;
             font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
@@ -1290,6 +1303,241 @@
         .product-name, .cart-item-name { color: #1a2340 !important; }
         .product-description, .product-category { color: #5a6a85 !important; }
         .promo-text { color: #ffffff !important; }
+
+        /* ===== NOSSA EQUIPE ===== */
+        .equipe-section {
+            background: linear-gradient(135deg, #f0f7fc 0%, #fff 50%, #fdf0f3 100%);
+            padding: 64px 20px;
+            border-top: 3px solid #e4eaf3;
+            border-bottom: 3px solid #e4eaf3;
+        }
+        .equipe-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+        .equipe-foto-wrap {
+            flex: 0 0 auto;
+            width: 605px;
+            max-width: 54%;
+        }
+        .equipe-foto-wrap img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 12px 48px rgba(0,136,194,0.18), 0 4px 16px rgba(214,50,74,0.10);
+            object-fit: cover;
+            aspect-ratio: 4/3;
+            display: block;
+            border: 4px solid #fff;
+            outline: 3px solid #0088C2;
+        }
+        .equipe-texto-esq {
+            flex: 1;
+            text-align: right;
+        }
+        .equipe-texto-dir {
+            flex: 1;
+            text-align: left;
+        }
+        .equipe-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #0088C2, #D6324A);
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+        }
+        .equipe-texto h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1a2340;
+            line-height: 1.2;
+            margin-bottom: 14px;
+        }
+        .equipe-texto h2 span {
+            color: #0088C2;
+        }
+        .equipe-texto p {
+            color: #5a6a85;
+            font-size: 1rem;
+            line-height: 1.75;
+            margin-bottom: 28px;
+        }
+        .equipe-diferenciais {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .diferencial-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: 0 2px 8px rgba(0,136,194,0.08);
+            border: 1px solid #e4eaf3;
+        }
+        .diferencial-item .icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .diferencial-item strong {
+            display: block;
+            color: #1a2340;
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+        .diferencial-item span {
+            color: #5a6a85;
+            font-size: 0.8rem;
+        }
+        .equipe-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #0088C2, #D6324A);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.97rem;
+            padding: 13px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 16px rgba(0,136,194,0.25);
+        }
+        .equipe-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,136,194,0.35);
+        }
+        @media (max-width: 900px) {
+            .equipe-inner {
+                flex-direction: column;
+                gap: 28px;
+            }
+            .equipe-foto-wrap {
+                width: 100%;
+                max-width: 100%;
+            }
+            .equipe-texto-esq, .equipe-texto-dir {
+                text-align: center;
+                width: 100%;
+            }
+            .equipe-texto-esq .diferencial-item,
+            .equipe-texto-dir .diferencial-item {
+                justify-content: center;
+            }
+        }
+
+        /* ===== DESTAQUES / PROMOÇÕES VISUAIS ===== */
+        .destaques-section {
+            background: #fff;
+            padding: 56px 20px 40px;
+        }
+        .destaques-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .destaques-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .destaques-header h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a2340;
+            margin-bottom: 8px;
+        }
+        .destaques-header p {
+            color: #5a6a85;
+            font-size: 1rem;
+        }
+        .destaques-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .destaque-card {
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .destaque-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+        }
+        .destaque-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        .destaque-card-body {
+            padding: 16px;
+            background: #fff;
+            border: 1px solid #e4eaf3;
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+        }
+        .destaque-card-body .tag {
+            background: linear-gradient(135deg, #D6324A, #ff6b6b);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .destaque-card-body h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1a2340;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .destaque-card-body .preco {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0088C2;
+        }
+        .destaque-card-body .btn-add {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 9px;
+            background: linear-gradient(135deg, #0088C2, #D6324A);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .destaque-card-body .btn-add:hover { opacity: 0.88; }
+        @media (max-width: 600px) {
+            .destaques-grid { grid-template-columns: 1fr 1fr; }
+            .destaque-card img { height: 130px; }
+        }
+        @media (max-width: 380px) {
+            .destaques-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -1671,6 +1919,95 @@
                 </div>
                 <button type="submit" class="btn-primary">Enviar Mensagem</button>
             </form>
+        </div>
+    </section>
+
+    <!-- SEÇÃO DESTAQUES -->
+    <section class="destaques-section">
+        <div class="destaques-inner">
+            <div class="destaques-header">
+                <h2>🔥 Produtos em Destaque</h2>
+                <p>Os queridinhos dos nossos clientes — qualidade e preço que você vai amar!</p>
+            </div>
+            <div class="destaques-grid">
+                <div class="destaque-card" onclick="showCategory('racao');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
+                    <img src="https://images.unsplash.com/photo-1601758065893-25c11bde46b1?w=400&h=180&fit=crop&auto=format" alt="Ração Premium" onerror="this.src='https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=180&fit=crop'">
+                    <div class="destaque-card-body">
+                        <span class="tag">Mais Vendido</span>
+                        <h3>Rações Premium</h3>
+                        <div class="preco">A partir de R$ 29,90</div>
+                        <button class="btn-add" onclick="event.stopPropagation();showCategory('racao');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Rações →</button>
+                    </div>
+                </div>
+                <div class="destaque-card" onclick="showCategory('remedios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
+                    <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=400&h=180&fit=crop&auto=format" alt="Remédios Pet" onerror="this.src='https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=180&fit=crop'">
+                    <div class="destaque-card-body">
+                        <span class="tag">Saúde</span>
+                        <h3>Remédios &amp; Suplementos</h3>
+                        <div class="preco">A partir de R$ 12,90</div>
+                        <button class="btn-add" onclick="event.stopPropagation();showCategory('remedios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Remédios →</button>
+                    </div>
+                </div>
+                <div class="destaque-card" onclick="showCategory('brinquedos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
+                    <img src="https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=400&h=180&fit=crop&auto=format" alt="Brinquedos Pet" onerror="this.src='https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=400&h=180&fit=crop'">
+                    <div class="destaque-card-body">
+                        <span class="tag">Diversão</span>
+                        <h3>Brinquedos &amp; Casinhas</h3>
+                        <div class="preco">A partir de R$ 18,90</div>
+                        <button class="btn-add" onclick="event.stopPropagation();showCategory('brinquedos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Brinquedos →</button>
+                    </div>
+                </div>
+                <div class="destaque-card" onclick="showCategory('acessorios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
+                    <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=180&fit=crop&auto=format" alt="Acessórios Pet" onerror="this.src='https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=400&h=180&fit=crop'">
+                    <div class="destaque-card-body">
+                        <span class="tag">Novidade</span>
+                        <h3>Acessórios &amp; Areia</h3>
+                        <div class="preco">A partir de R$ 9,90</div>
+                        <button class="btn-add" onclick="event.stopPropagation();showCategory('acessorios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Acessórios →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NOSSA EQUIPE -->
+    <section class="equipe-section">
+        <div class="equipe-inner">
+            <!-- ESQUERDA -->
+            <div class="equipe-texto-esq">
+                <span class="equipe-badge">🐾 Nossa História</span>
+                <h2 style="font-size:1.7rem;font-weight:800;color:#1a2340;line-height:1.25;margin:12px 0 14px">Uma equipe <span style="color:#0088C2">apaixonada</span> pelos seus pets</h2>
+                <p style="color:#5a6a85;font-size:0.97rem;line-height:1.75;margin-bottom:20px">A CãoTelli nasceu do amor pelos animais e do desejo de oferecer o melhor para o seu pet. Atendimento com carinho, do jeito que seu bichinho merece.</p>
+                <div class="diferencial-item" style="justify-content:flex-end;margin-bottom:12px">
+                    <span class="icon">🚚</span>
+                    <div><strong>Entrega em até 3h</strong><span>Rápida e confiável em Canoas/RS</span></div>
+                </div>
+                <div class="diferencial-item" style="justify-content:flex-end">
+                    <span class="icon">💬</span>
+                    <div><strong>Atendimento Personalizado</strong><span>Via WhatsApp ou na loja</span></div>
+                </div>
+            </div>
+
+            <!-- CENTRO: FOTO -->
+            <div class="equipe-foto-wrap">
+                <img src="equipe_caotelli.jpg" alt="Equipe CãoTelli — Rações e Acessórios em Canoas/RS" onerror="this.style.display='none'">
+            </div>
+
+            <!-- DIREITA -->
+            <div class="equipe-texto-dir">
+                <div class="diferencial-item" style="margin-bottom:12px">
+                    <span class="icon">🏆</span>
+                    <div><strong>Produtos de Qualidade</strong><span>Marcas líderes do mercado</span></div>
+                </div>
+                <div class="diferencial-item" style="margin-bottom:20px">
+                    <span class="icon">📍</span>
+                    <div><strong>Seg. a Sáb., 9h–19h</strong><span>Av. Santos Ferreira, 997 — Canoas</span></div>
+                </div>
+                <p style="color:#5a6a85;font-size:0.97rem;line-height:1.75;margin-bottom:20px">Nossa equipe está sempre pronta para te ajudar a escolher o produto ideal — com conhecimento e um atendimento que você não encontra em qualquer lugar.</p>
+                <a class="equipe-btn" href="https://wa.me/5551997655755?text=Ol%C3%A1%2C%20vim%20pelo%20site%20e%20gostaria%20de%20falar%20com%20a%20equipe%20%F0%9F%90%BE" target="_blank">
+                    📱 Falar com a equipe
+                </a>
+            </div>
         </div>
     </section>
 

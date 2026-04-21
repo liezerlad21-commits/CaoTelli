@@ -195,7 +195,7 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 17/04/2026
+**Data:** 21/04/2026
 
 - Confirmado que o carrinho já estava persistido no localStorage (feito em sessão anterior). Item 3 do backlog concluído.
 - **SEO implementado** no `index.html`:
@@ -222,7 +222,14 @@ ae05318 Atualizacao do site CaoTelli
   - id:54 Arranhador Papelão → gato bengal em superfície
   - id:55 Torre Arranhador 3 Andares → gato em torre
 
-**Próxima ação sugerida:** commitar as alterações (SEO + sitemap + robots.txt + imagens brinquedos) e depois escolher o próximo item do backlog (sugestão: validação real dos formulários ou autenticação de usuários).
+**Sessão 21/04/2026 — O que foi feito:**
+- **Hero melhorado:** gradiente escuro (azul profundo → azul → vermelho) com texto branco + sombra. Ficou mais impactante visualmente.
+- **Seção "Produtos em Destaque" (`destaques-section`)** adicionada antes do rodapé: 4 cards com imagem, tag colorida, preço inicial e botão que filtra os produtos por categoria.
+- **Seção "Nossa Equipe" (`equipe-section`)** adicionada antes do rodapé: foto real da equipe (`equipe_caotelli.jpg`) à esquerda, texto + 4 diferenciais em grid + botão WhatsApp à direita. Responsivo para celular.
+- Arquivo `equipe_caotelli.jpg` salvo na raiz do projeto.
+- HTML validado sem erros de estrutura.
+
+**Próxima ação sugerida:** commitar as alterações, depois seguir para Firebase (autenticação) ou validação dos formulários.
 
 ---
 
