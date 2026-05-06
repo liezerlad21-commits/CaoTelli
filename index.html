@@ -351,6 +351,29 @@
             transform: scale(1.07);
             box-shadow: 0 10px 32px rgba(0,199,255,0.45);
         }
+        .floating-cart.drag-over {
+            transform: scale(1.18);
+            box-shadow: 0 0 0 4px #ff3b6e, 0 12px 40px rgba(255,59,110,0.5);
+            background: linear-gradient(135deg, #ff3b6e, #ff7043);
+            animation: cartPulse .35s ease infinite alternate;
+        }
+        @keyframes cartPulse {
+            from { transform: scale(1.15); }
+            to   { transform: scale(1.22); }
+        }
+        .product-card.dragging {
+            opacity: 0.45;
+            transform: scale(0.96);
+            outline: 2px dashed #0088C2;
+        }
+        .drag-hint {
+            font-size: 0.72rem;
+            color: #0088C2;
+            text-align: center;
+            margin-top: 4px;
+            opacity: 0.7;
+            pointer-events: none;
+        }
         .floating-cart-icon {
             font-size: 1.5rem;
             line-height: 1;
@@ -2412,7 +2435,7 @@
             }
 
             grid.innerHTML = filtered.map(product => `
-                <div class="product-card">
+                <div class="product-card" draggable="true" ondragstart="startDrag(event, ${product.id})">
                     ${product.imgUrl
                         ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
                         : ''}
@@ -2428,6 +2451,7 @@
                         <span class="disc-badge">-10%</span>
                     </div>
                     <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
+                    <p class="drag-hint">🛒 Arraste para o carrinho</p>
                 </div>
             `).join('');
         }
@@ -2737,7 +2761,7 @@
             }
 
             grid.innerHTML = filtered.map(product => `
-                <div class="product-card">
+                <div class="product-card" draggable="true" ondragstart="startDrag(event, ${product.id})">
                     ${product.imgUrl
                         ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
                         : ''}
@@ -2753,6 +2777,7 @@
                         <span class="disc-badge">-10%</span>
                     </div>
                     <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
+                    <p class="drag-hint">🛒 Arraste para o carrinho</p>
                 </div>
             `).join('');
         }
@@ -3219,7 +3244,7 @@
                                 );
                                 const grid = document.getElementById('productsGrid');
                                 grid.innerHTML = filtrados.map(product => `
-                                    <div class="product-card">
+                                    <div class="product-card" draggable="true" ondragstart="startDrag(event, ${product.id})">
                                         ${product.imgUrl ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` : ''}
                                         <div class="product-emoji" style="${product.imgUrl?'display:none':''}">${product.emoji}</div>
                                         <h3 class="product-name">${product.name}</h3>
@@ -3233,6 +3258,7 @@
                                             <span class="disc-badge">-10%</span>
                                         </div>
                                         <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
+                                        <p class="drag-hint">🛒 Arraste para o carrinho</p>
                                     </div>`
                                 ).join('');
                                 document.getElementById('produtosSection').scrollIntoView({ behavior: 'smooth' });
@@ -3298,6 +3324,47 @@
                 setTimeout(initSubmenus, 100);
             }
         })();
+
+        // ===== DRAG & DROP PARA O CARRINHO =====
+        function startDrag(event, productId) {
+            event.dataTransfer.setData('text/plain', productId);
+            event.dataTransfer.effectAllowed = 'copy';
+            const card = event.currentTarget;
+            card.classList.add('dragging');
+            document.addEventListener('dragend', function cleanup() {
+                card.classList.remove('dragging');
+                document.removeEventListener('dragend', cleanup);
+            }, { once: true });
+        }
+
+        function initCartDrop() {
+            const cartEl = document.getElementById('floatingCart');
+            if (!cartEl) return;
+
+            cartEl.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                cartEl.classList.add('drag-over');
+            });
+
+            cartEl.addEventListener('dragleave', function(e) {
+                // só remove se saiu de verdade do elemento
+                if (!cartEl.contains(e.relatedTarget)) {
+                    cartEl.classList.remove('drag-over');
+                }
+            });
+
+            cartEl.addEventListener('drop', function(e) {
+                e.preventDefault();
+                cartEl.classList.remove('drag-over');
+                const productId = parseInt(e.dataTransfer.getData('text/plain'));
+                if (!isNaN(productId)) {
+                    addToCart(productId);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initCartDrop);
     </script>
 
     <!-- MODAL CARRINHO -->
@@ -3425,7 +3492,7 @@
 </div>
 
 <!-- CARRINHO FLUTUANTE -->
-<div class="floating-cart" onclick="toggleCart()" title="Ver carrinho">
+<div class="floating-cart" id="floatingCart" onclick="toggleCart()" title="Ver carrinho">
     <span class="floating-cart-icon"><i class="fa-solid fa-cart-shopping"></i></span>
     <span class="floating-cart-label">Carrinho</span>
     <span class="floating-cart-badge" id="floatingCartBadge">0</span>

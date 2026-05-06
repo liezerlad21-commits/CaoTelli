@@ -195,7 +195,13 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 21/04/2026
+**Data:** 06/05/2026
+
+- **Skill de retomada criada** no Cowork (Claude): skill `caotelli` que lê automaticamente o `HISTORICO_PROJETO.md` a cada nova sessão e apresenta resumo compacto do estado do projeto (última sessão, o que foi feito, próximos passos). Resolve o problema de perda de contexto entre sessões.
+
+---
+
+## 9.1 SESSÃO ANTERIOR — 21/04/2026
 
 - Confirmado que o carrinho já estava persistido no localStorage (feito em sessão anterior). Item 3 do backlog concluído.
 - **SEO implementado** no `index.html`:
