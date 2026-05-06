@@ -328,6 +328,52 @@
         }
 
         /* CARRINHO FLUTUANTE */
+
+        /* ===== WHATSAPP FLUTUANTE ===== */
+        .floating-wa {
+            position: fixed;
+            bottom: 106px;
+            right: 28px;
+            z-index: 9998;
+            background: #25D366;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(37,211,102,0.5);
+            transition: transform .2s, box-shadow .2s;
+            text-decoration: none;
+        }
+        .floating-wa:hover {
+            transform: scale(1.12);
+            box-shadow: 0 8px 28px rgba(37,211,102,0.65);
+        }
+        .floating-wa i {
+            color: #fff;
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+        .floating-wa-tooltip {
+            position: absolute;
+            right: 68px;
+            background: #1a2340;
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s;
+        }
+        .floating-wa:hover .floating-wa-tooltip {
+            opacity: 1;
+        }
+
         .floating-cart {
             position: fixed;
             bottom: 28px;
@@ -1327,6 +1373,177 @@
         .product-description, .product-category { color: #5a6a85 !important; }
         .promo-text { color: #ffffff !important; }
 
+
+
+        /* ===== SEÇÃO OFERTAS ===== */
+        .ofertas-section {
+            padding: 36px 20px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .ofertas-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .ofertas-header h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #D6324A;
+            margin: 0;
+        }
+        .ofertas-badge {
+            background: #D6324A;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: .5px;
+            animation: pulse .8s ease infinite alternate;
+        }
+        .ofertas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 18px;
+        }
+        .oferta-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1.5px solid #fde8ec;
+            position: relative;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .oferta-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(214,50,74,0.15);
+        }
+        .oferta-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #D6324A;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+        .oferta-img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .oferta-emoji {
+            font-size: 3rem;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .oferta-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #1a2340;
+            margin: 0;
+        }
+        .oferta-preco-original {
+            font-size: 0.78rem;
+            color: #5a6a85;
+            text-decoration: line-through;
+            margin: 0;
+        }
+        .oferta-preco-novo {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #D6324A;
+            margin: 0;
+        }
+        .oferta-economia {
+            font-size: 0.72rem;
+            color: #1a9e5c;
+            font-weight: 600;
+        }
+        #ofertasSection {
+            display: block;
+        }
+
+        /* ===== GOOGLE REVIEWS BADGE ===== */
+        .google-reviews-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+            padding: 10px 18px 10px 12px;
+            cursor: pointer;
+            margin-top: 18px;
+            transition: transform .2s, box-shadow .2s;
+            border: 1.5px solid rgba(0,136,194,0.12);
+            max-width: 280px;
+        }
+        .google-reviews-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+        }
+        .grb-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 54px;
+            height: 54px;
+            flex-shrink: 0;
+        }
+        .grb-caotelli-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .grb-divider {
+            width: 1px;
+            height: 44px;
+            background: #e4eaf3;
+            margin: 0 14px;
+            flex-shrink: 0;
+        }
+        .grb-right {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .grb-google-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .grb-google-text {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #5a6a85;
+            letter-spacing: .5px;
+        }
+        .grb-stars {
+            color: #FBBC05;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+        .grb-info {
+            font-size: 0.78rem;
+            color: #5a6a85;
+        }
+        .grb-info strong {
+            color: #1a2340;
+            font-size: 0.85rem;
+        }
+
         /* ===== SUBMENU CATEGORIAS ===== */
         .cat-dropdown {
             display: none;
@@ -1652,7 +1869,7 @@
             <div class="nav-item active" onclick="showCategory('todos')">Todos os Produtos</div>
             <div class="nav-item" onclick="showCategory('racao')">🍖 Ração</div>
             <div class="nav-item" onclick="showCategory('brinquedos')">🎾 Brinquedos</div>
-            <div class="nav-item" onclick="showCategory('remedios')">💊 Remédios</div>
+            <div class="nav-item" onclick="showCategory('remedios')">💊 Medicamentos</div>
             <div class="nav-item" onclick="showCategory('acessorios')">📿 Acessórios</div>
             <div class="nav-item" onclick="openSection('agendamento')">📅 Agendamento</div>
             <div class="nav-item" onclick="openSection('vacinas')">💉 Vacinas</div>
@@ -1672,12 +1889,31 @@
                     Tudo o que seu pet precisa em um só lugar 🐾
                 </p>
                 <p style="color:#5a6a85;font-size:14px;margin:0 0 22px 0;text-align:center">
-                    Ração · Remédios · Acessórios · Canoas/RS
+                    Ração · Medicamentos · Acessórios · Canoas/RS
                 </p>
                 <button class="hero-btn" onclick="showCategory('todos')" style="position:relative;z-index:2;font-size:1.1rem;padding:14px 36px">Ver Produtos →</button>
+                <!-- BADGE GOOGLE REVIEWS -->
+                <div class="google-reviews-badge" onclick="window.open('https://g.page/r/caotelli/review','_blank')" title="Ver avaliações no Google">
+                    <div class="grb-logo">
+                        <img src="logo_caotelli.png" alt="CãoTelli" class="grb-caotelli-logo">
+                    </div>
+                    <div class="grb-divider"></div>
+                    <div class="grb-right">
+                        <div class="grb-google-row">
+                            <svg class="grb-g" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                            <span class="grb-google-text">Google</span>
+                        </div>
+                        <div class="grb-stars">★★★★★</div>
+                        <div class="grb-info"><strong>5,0</strong> · <span>1.800 avaliações</span></div>
+                    </div>
+                </div>
                 <div style="margin-top:6px;z-index:2;position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
                     <div style="display:flex;gap:16px;width:max-content;padding:4px 16px 4px;margin:0 auto;">
 
+                        <div onclick="showOfertas();document.getElementById('ofertasSection').scrollIntoView({behavior:'smooth'})" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:82px">
+                            <div class="cat-circle-border" style="width:78px;height:78px;border-radius:50%;overflow:hidden;border:2.5px solid #D6324A;box-shadow:0 2px 8px rgba(0,0,0,0.15);background:linear-gradient(135deg,#D6324A,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:2rem">🏷️</div>
+                            <span style="font-size:0.72rem;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.4)">Ofertas</span>
+                        </div>
                         <div onclick="showCategory('todos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:82px">
                             <div class="cat-circle-border" style="width:78px;height:78px;border-radius:50%;overflow:hidden;border:2.5px solid #0088C2;box-shadow:0 2px 8px rgba(0,0,0,0.15)">
                                 <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=200&h=200&fit=crop&auto=format" alt="Todos" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='🐾'">
@@ -1768,6 +2004,11 @@
     </div>
 
     <!-- SEÇÃO DE PRODUTOS -->
+    <!-- SEÇÃO OFERTAS -->
+    <div id="ofertasSection">
+        <div class="ofertas-section"></div>
+    </div>
+
     <section class="section" id="produtosSection">
         <h2 class="section-title">📦 Nossos Produtos</h2>
         <div id="searchResultTitle" class="search-title" style="display:none"></div>
@@ -2017,12 +2258,12 @@
                     </div>
                 </div>
                 <div class="destaque-card" onclick="showCategory('remedios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
-                    <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=400&h=180&fit=crop&auto=format" alt="Remédios Pet" onerror="this.src='https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=180&fit=crop'">
+                    <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=400&h=180&fit=crop&auto=format" alt="Medicamentos Pet" onerror="this.src='https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=180&fit=crop'">
                     <div class="destaque-card-body">
                         <span class="tag">Saúde</span>
-                        <h3>Remédios &amp; Suplementos</h3>
+                        <h3>Medicamentos &amp; Suplementos</h3>
                         <div class="preco">A partir de R$ 12,90</div>
-                        <button class="btn-add" onclick="event.stopPropagation();showCategory('remedios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Remédios →</button>
+                        <button class="btn-add" onclick="event.stopPropagation();showCategory('remedios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Medicamentos →</button>
                     </div>
                 </div>
                 <div class="destaque-card" onclick="showCategory('brinquedos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
@@ -2400,6 +2641,7 @@
         // INICIALIZAR
         function init() {
             renderProducts('todos');
+            renderOfertas();
             renderCoupons();
             adicionarPet();
             // Define data mínima do agendamento como hoje
@@ -2454,6 +2696,52 @@
                     <p class="drag-hint">🛒 Arraste para o carrinho</p>
                 </div>
             `).join('');
+        }
+
+
+        // ===== OFERTAS =====
+        // Defina aqui os IDs dos produtos em oferta e o % de desconto
+        const ofertas = [
+            { id: 1,  desconto: 20 },
+            { id: 5,  desconto: 15 },
+            { id: 10, desconto: 25 },
+            { id: 20, desconto: 18 },
+            { id: 30, desconto: 22 },
+            { id: 44, desconto: 30 },
+        ];
+
+        function renderOfertas() {
+            const container = document.querySelector('#ofertasSection .ofertas-section');
+            if (!container) return;
+            const items = ofertas.map(o => {
+                const p = products.find(pr => pr.id === o.id);
+                if (!p) return '';
+                const precoNovo = (p.price * (1 - o.desconto / 100));
+                return `
+                <div class="oferta-card" draggable="true" ondragstart="startDrag(event, ${p.id})">
+                    <span class="oferta-tag">-${o.desconto}% OFF</span>
+                    ${p.imgUrl
+                        ? `<img class="oferta-img" src="${p.imgUrl}" alt="${p.name}" onerror="this.style.display='none'">`
+                        : `<div class="oferta-emoji">${p.emoji}</div>`}
+                    <p class="oferta-name">${p.name}</p>
+                    <p class="oferta-preco-original">De R$ ${p.price.toFixed(2)}</p>
+                    <p class="oferta-preco-novo">R$ ${precoNovo.toFixed(2)}</p>
+                    <span class="oferta-economia">Economia de R$ ${(p.price - precoNovo).toFixed(2)}</span>
+                    <button class="add-to-cart-btn" style="margin-top:4px" onclick="addToCart(${p.id})">Adicionar ao Carrinho</button>
+                    <p class="drag-hint">🛒 Arraste para o carrinho</p>
+                </div>`;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="ofertas-header">
+                    <h2>🏷️ Ofertas Especiais</h2>
+                    <span class="ofertas-badge">LIMITADO</span>
+                </div>
+                <div class="ofertas-grid">${items}</div>`;
+        }
+
+        function showOfertas() {
+            document.getElementById('ofertasSection').scrollIntoView({ behavior: 'smooth' });
         }
 
         // RENDERIZAR CUPONS
@@ -3032,7 +3320,7 @@
                         <div><strong style="color:#0088C2">💳 Quais formas de pagamento vocês aceitam?</strong><br>Aceitamos pagamento via PIX. Ao finalizar o pedido, você recebe a chave PIX e pode enviar o comprovante pelo WhatsApp.</div>
                         <div><strong style="color:#0088C2">🐕 Vocês têm ração para cães de todas as raças?</strong><br>Sim! Trabalhamos com diversas marcas e tamanhos, como Golden Special, Monello, Primogato e outras. Veja o catálogo completo na seção de produtos.</div>
                         <div><strong style="color:#0088C2">🐱 Têm produtos para gatos também?</strong><br>Claro! Temos rações, areia higiênica, brinquedos e acessórios especialmente para gatos.</div>
-                        <div><strong style="color:#0088C2">💊 Vocês vendem medicamentos e antiparasitários?</strong><br>Sim, temos uma seleção de remédios, antiparasitários e suplementos para cães e gatos. Confira na aba "Remédios".</div>
+                        <div><strong style="color:#0088C2">💊 Vocês vendem medicamentos e antiparasitários?</strong><br>Sim, temos uma seleção de medicamentos, antiparasitários e suplementos para cães e gatos. Confira na aba "Medicamentos".</div>
                         <div><strong style="color:#0088C2">🔄 Posso trocar um produto?</strong><br>Sim! Aceitamos trocas e devoluções dentro do prazo legal. O produto deve estar em perfeitas condições e com embalagem original. Entre em contato pelo WhatsApp.</div>
                         <div><strong style="color:#0088C2">📅 Posso agendar a entrega?</strong><br>Sim! Na seção de Agendamento você pode escolher data e horário. Agendamentos devem ser feitos com pelo menos 24h de antecedência.</div>
                         <div><strong style="color:#0088C2">📍 Qual o endereço da loja?</strong><br>Av. Santos Ferreira, 997 — Bairro Mal. Rondon, Canoas/RS. Atendemos de Segunda a Sábado, das 9h às 19h.</div>
@@ -3130,7 +3418,7 @@
                     titulo: 'Categoria',
                     itens: [
                         { label: '🥣 Ração',       fn: () => { renderProducts('racao','cao');      scroll(); } },
-                        { label: '💊 Remédios',    fn: () => { renderProducts('remedios','cao');   scroll(); } },
+                        { label: '💊 Medicamentos',    fn: () => { renderProducts('remedios','cao';   scroll(); } },
                         { label: '🎾 Brinquedos',  fn: () => { renderProducts('brinquedos','cao'); scroll(); } },
                         { label: '🧸 Acessórios',  fn: () => { renderProducts('acessorios','cao'); scroll(); } }
                     ]
@@ -3139,7 +3427,7 @@
                     titulo: 'Categoria',
                     itens: [
                         { label: '🥣 Ração',          fn: () => { renderProducts('racao','gato');      scroll(); } },
-                        { label: '💊 Remédios',        fn: () => { renderProducts('remedios','gato');   scroll(); } },
+                        { label: '💊 Medicamentos',        fn: () => { renderProducts('remedios','gato';   scroll(); } },
                         { label: '🎾 Brinquedos',      fn: () => { renderProducts('brinquedos','gato'); scroll(); } },
                         { label: '🪣 Areia Higiênica', fn: () => { renderProducts('acessorios','gato'); scroll(); } }
                     ]
@@ -3147,8 +3435,8 @@
                 'Farmácia': {
                     titulo: 'Para qual pet?',
                     itens: [
-                        { label: '🐕 Remédios p/ Cão',  fn: () => { renderProducts('remedios','cao');  scroll(); } },
-                        { label: '🐱 Remédios p/ Gato', fn: () => { renderProducts('remedios','gato'); scroll(); } },
+                        { label: '🐕 Medicamentos p/ Cão',  fn: () => { renderProducts('remedios','cao';  scroll(); } },
+                        { label: '🐱 Medicamentos p/ Gato', fn: () => { renderProducts('remedios','gato'; scroll(); } },
                         { label: '💊 Ver Todos',         fn: () => { renderProducts('remedios');        scroll(); } }
                     ]
                 },
@@ -3448,55 +3736,4 @@
             <div style="background:#f4f7fb; border-radius:10px; padding:12px; margin-bottom:16px;">
                 <div style="font-size:.75rem; color:#5a6a85; margin-bottom:6px;">Chave Pix (temporária)</div>
                 <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
-                    <span id="pix-chave" style="font-size:.9rem; font-weight:600; color:#1a2340; letter-spacing:.5px;">caotelli@pagamento.com</span>
-                    <button onclick="copiarChavePix()" style="background:#0088C2; border:none; color:white; padding:5px 12px; border-radius:7px; font-size:.75rem; cursor:pointer; font-weight:600;">Copiar</button>
-                </div>
-            </div>
-
-            <!-- INSTRUÇÕES -->
-            <div style="background:#fffbea; border:1px solid #ffd700; border-radius:10px; padding:10px 14px; margin-bottom:20px; text-align:left;">
-                <p style="font-size:.78rem; color:#7a6000; line-height:1.6;">
-                    <strong>📋 Após pagar:</strong><br>
-                    1. Tire print do comprovante<br>
-                    2. Clique em "Enviar Comprovante" abaixo<br>
-                    3. Aguarde confirmação do CãoTelli 🐾
-                </p>
-            </div>
-
-            <!-- BOTÕES -->
-            <button onclick="enviarComprovante()" style="width:100%; padding:14px; background:linear-gradient(135deg,#25D366,#128C7E); border:none; color:white; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; margin-bottom:10px;">
-                📲 Enviar Comprovante pelo WhatsApp
-            </button>
-            <button onclick="fecharPixModal()" style="width:100%; padding:12px; background:#f5f5f5; border:2px solid #ccc; color:#444; border-radius:10px; font-size:.95rem; cursor:pointer; font-weight:600;">
-                ✕ Cancelar pagamento
-            </button>
-        </div>
-    </div>
-
-<!-- LIGHTBOX PRODUTO -->
-<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox(event)">
-    <div class="lightbox-box">
-        <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-        <img class="lightbox-img" id="lightboxImg" src="" alt="">
-        <div class="lightbox-name" id="lightboxName"></div>
-        <div class="lightbox-desc" id="lightboxDesc"></div>
-        <p style="font-size:12px;color:#888;margin-bottom:2px">À vista por</p>
-        <div class="lightbox-price" id="lightboxPrice"></div>
-        <div class="product-price-discount" style="flex-wrap:wrap">
-            <span class="disc-label"><i class="fa-solid fa-tag"></i> 1ª Compra pelo Site</span>
-            <span class="disc-value" id="lightboxDiscValue"></span>
-            <span class="disc-badge">-10%</span>
-        </div>
-        <button class="lightbox-add-btn" id="lightboxAddBtn">🛒 Adicionar ao Carrinho</button>
-    </div>
-</div>
-
-<!-- CARRINHO FLUTUANTE -->
-<div class="floating-cart" id="floatingCart" onclick="toggleCart()" title="Ver carrinho">
-    <span class="floating-cart-icon"><i class="fa-solid fa-cart-shopping"></i></span>
-    <span class="floating-cart-label">Carrinho</span>
-    <span class="floating-cart-badge" id="floatingCartBadge">0</span>
-</div>
-
-</body>
-</html>
+                    <span id="pix-chave" style="font-size:.9rem; font-weight:600; color:
