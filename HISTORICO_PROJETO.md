@@ -151,7 +151,7 @@ CaoTelli/
 
 ## 7. PRÓXIMOS PASSOS (backlog priorizado)
 
-1. **Autenticação de usuários** — login/senha, sessão via `localStorage` ou back-end.
+1. ~~**Autenticação de usuários**~~ ✅ — Firebase Authentication com e-mail/senha implementado (07/05/2026).
 2. **Integração de pagamento real** — PIX via Mercado Pago (API), cartão de crédito.
 3. **Persistir o carrinho** em `localStorage` (para não perder ao recarregar).
 4. **Painel administrativo** — gerenciar produtos, preços, pedidos.
@@ -195,13 +195,51 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 06/05/2026
+**Data:** 07/05/2026
+
+### Firebase Authentication integrado ✅ (item 1 do backlog CONCLUÍDO)
+
+**O que foi feito:**
+- Projeto Firebase criado (`caotelli-fd86c`) no console.firebase.google.com
+- Método de login **E-mail/senha** ativado no Firebase Authentication
+- App Web registrado (`caotelli-web`) e `firebaseConfig` obtido
+- Domínio `liezerlad21-commits.github.io` adicionado aos domínios autorizados
+- Firebase SDK (v10.12.0) integrado no `index.html` via `<script type="module">` antes do `</body>`
+- Seção `#profile` reformulada com **abas Login / Cadastro**:
+  - Aba Login: e-mail + senha → chama `fazerLogin()` via Firebase
+  - Aba Cadastro: nome, e-mail, senha, confirmar senha, telefone, CPF, endereço, pets → chama `salvarCadastro()` que cria usuário no Firebase + salva dados extras no `localStorage`
+- Ícone de usuário no header atualizado dinamicamente: mostra nome do usuário logado em azul
+- Painel "logado" exibe nome, e-mail e botão "Sair da conta" (`fazerLogout()`)
+- Testado com sucesso: cadastro de `teste@caotelli.com` funcionou, painel logado exibiu corretamente
+
+**Funções JS adicionadas:**
+- `mostrarAba(aba)` — alterna entre abas Login/Cadastro
+- `fazerLogin(e)` — login via Firebase com tratamento de erros em PT-BR
+- `fazerLogout()` — logout via Firebase
+- `salvarCadastro(e)` — atualizado para criar usuário no Firebase + salvar extras no localStorage
+
+**firebaseConfig em uso:**
+```javascript
+apiKey: "AIzaSyCzjha3u7Vvdf-9gQjG0_n6LZJGqVjuo-Y"
+authDomain: "caotelli-fd86c.firebaseapp.com"
+projectId: "caotelli-fd86c"
+storageBucket: "caotelli-fd86c.firebasestorage.app"
+messagingSenderId: "645159096599"
+appId: "1:645159096599:web:c917d4e5e9266d6b7aa752"
+measurementId: "G-F8SLXL559F"
+```
+
+**Próxima ação sugerida:** Integração de pagamento real (Mercado Pago — PIX + cartão) ou validação dos formulários.
+
+---
+
+## 9.1 SESSÃO ANTERIOR — 06/05/2026
 
 - **Skill de retomada criada** no Cowork (Claude): skill `caotelli` que lê automaticamente o `HISTORICO_PROJETO.md` a cada nova sessão e apresenta resumo compacto do estado do projeto (última sessão, o que foi feito, próximos passos). Resolve o problema de perda de contexto entre sessões.
 
 ---
 
-## 9.1 SESSÃO ANTERIOR — 21/04/2026
+## 9.2 SESSÃO ANTERIOR — 21/04/2026
 
 - Confirmado que o carrinho já estava persistido no localStorage (feito em sessão anterior). Item 3 do backlog concluído.
 - **SEO implementado** no `index.html`:
