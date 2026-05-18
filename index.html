@@ -1622,6 +1622,52 @@
         .frv-stars { color:#FBBC05;font-size:1rem;letter-spacing:1px; }
         .frv-info { font-size:0.72rem;color:#5a6a85; }
         .frv-info strong { color:#1a2340;font-size:0.8rem; }
+
+        /* ═══════════════ PAINEL ADMIN ═══════════════ */
+        #adminBtn { display:none;align-items:center;gap:5px;font-size:0.85rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#D6324A,#a01e33);border:none;border-radius:8px;padding:6px 14px;cursor:pointer;transition:.2s; }
+        #adminBtn:hover { opacity:.85; }
+
+        .admin-tabs { display:flex;gap:0;border-bottom:2px solid #e4eaf3;margin-bottom:24px;flex-wrap:wrap; }
+        .admin-tab { padding:12px 20px;border:none;background:none;font-weight:600;font-size:0.95rem;color:#5a6a85;border-bottom:3px solid transparent;cursor:pointer;transition:.2s;white-space:nowrap; }
+        .admin-tab.active { color:#0088C2;border-bottom-color:#0088C2; }
+        .admin-tab-content { display:none; }
+        .admin-tab-content.active { display:block;animation:fadeIn .3s ease; }
+
+        .admin-table { width:100%;border-collapse:collapse;font-size:0.9rem; }
+        .admin-table th { background:#f4f7fb;color:#1a2340;font-weight:700;padding:10px 12px;text-align:left;border-bottom:2px solid #e4eaf3; }
+        .admin-table td { padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle; }
+        .admin-table tr:hover td { background:#f9fbff; }
+        .admin-table img { width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid #e4eaf3; }
+        .admin-table input[type=text],.admin-table input[type=number],.admin-table input[type=url] { border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:0.85rem;width:100%;box-sizing:border-box; }
+
+        .btn-admin { border:none;border-radius:7px;padding:6px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;transition:.2s; }
+        .btn-admin.salvar  { background:#0088C2;color:#fff; }
+        .btn-admin.excluir { background:#D6324A;color:#fff; }
+        .btn-admin.novo    { background:linear-gradient(135deg,#0088C2,#005f8a);color:#fff;padding:10px 22px;font-size:0.95rem;margin-bottom:18px; }
+        .btn-admin.cupom-ativo   { background:#2ecc71;color:#fff; }
+        .btn-admin.cupom-inativo { background:#aaa;color:#fff; }
+        .btn-admin:hover { opacity:.82; }
+
+        .admin-badge { display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:700; }
+        .badge-pago     { background:#d4f5e9;color:#1a7a4a; }
+        .badge-pendente { background:#fff3cd;color:#856404; }
+        .badge-entregue { background:#cce5ff;color:#004085; }
+        .badge-cancelado{ background:#f8d7da;color:#721c24; }
+
+        .admin-stats { display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px; }
+        .admin-stat  { background:#fff;border-radius:12px;padding:16px 22px;box-shadow:0 2px 8px rgba(0,0,0,.07);flex:1;min-width:140px;text-align:center; }
+        .admin-stat .stat-num  { font-size:2rem;font-weight:800;color:#0088C2; }
+        .admin-stat .stat-label{ font-size:0.82rem;color:#5a6a85;margin-top:2px; }
+
+        .admin-modal-overlay { display:none;position:fixed;inset:0;background:rgba(26,35,64,.5);z-index:10000;justify-content:center;align-items:center; }
+        .admin-modal-overlay.active { display:flex; }
+        .admin-modal { background:#fff;border-radius:16px;padding:28px;width:92%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.18); }
+        .admin-modal h3 { margin-bottom:18px;color:#1a2340; }
+        .admin-modal .form-group { margin-bottom:14px; }
+        .admin-modal label { font-weight:600;font-size:0.88rem;color:#5a6a85;display:block;margin-bottom:4px; }
+        .admin-modal input,.admin-modal select,.admin-modal textarea { width:100%;border:1.5px solid #dde3ee;border-radius:8px;padding:9px 12px;font-size:0.92rem;outline:none;transition:.2s; }
+        .admin-modal input:focus,.admin-modal select:focus { border-color:#0088C2; }
+        .admin-modal-btns { display:flex;gap:10px;margin-top:20px;justify-content:flex-end; }
     </style>
 </head>
 <body>
@@ -1655,6 +1701,7 @@
                     <span class="cart-count" id="cartCount">0</span>
                 </div>
                 <div class="header-icon" id="headerPerfilBtn" onclick="openSection('profile')" title="Entrar / Cadastrar" style="display:flex;align-items:center;gap:5px;font-size:0.85rem;font-weight:600;color:#5a6a85;cursor:pointer"><i class="fa-solid fa-circle-user" style="font-size:1.4rem;color:#b0b8c1"></i></div>
+                <div class="header-icon" id="adminBtn" onclick="openSection('admin')" title="Painel Admin"><i class="fa-solid fa-screwdriver-wrench" style="font-size:1rem"></i> Admin</div>
                 <div class="header-icon" onclick="openSection('contact')"><i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.3rem"></i></div>
             </div>
         </div>
@@ -2074,6 +2121,118 @@
             </form>
         </div>
     </section>
+
+    <!-- PAINEL ADMIN -->
+    <section class="section hidden-section" id="admin">
+        <h2 class="section-title">⚙️ Painel Administrativo</h2>
+
+        <!-- STATS -->
+        <div class="admin-stats" id="adminStats"></div>
+
+        <!-- ABAS -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="abrirAbaAdmin('produtos')">📦 Produtos</button>
+            <button class="admin-tab" onclick="abrirAbaAdmin('pedidos')">📋 Pedidos</button>
+            <button class="admin-tab" onclick="abrirAbaAdmin('clientes')">👥 Clientes</button>
+            <button class="admin-tab" onclick="abrirAbaAdmin('cupons')">🎫 Cupons</button>
+        </div>
+
+        <!-- ABA PRODUTOS -->
+        <div class="admin-tab-content active" id="adminProdutos">
+            <button class="btn-admin novo" onclick="abrirModalProduto(null)">+ Novo Produto</button>
+            <div style="overflow-x:auto">
+                <table class="admin-table" id="tabelaProdutos">
+                    <thead><tr>
+                        <th>Img</th><th>ID</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Ações</th>
+                    </tr></thead>
+                    <tbody id="produtosBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA PEDIDOS -->
+        <div class="admin-tab-content" id="adminPedidos">
+            <div style="overflow-x:auto">
+                <table class="admin-table" id="tabelaPedidos">
+                    <thead><tr>
+                        <th>Nº</th><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Status</th><th>Ação</th>
+                    </tr></thead>
+                    <tbody id="pedidosBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA CLIENTES -->
+        <div class="admin-tab-content" id="adminClientes">
+            <div style="overflow-x:auto">
+                <table class="admin-table">
+                    <thead><tr>
+                        <th>Nome</th><th>E-mail</th><th>Telefone</th><th>Endereço</th><th>Pets</th><th>Cadastro</th>
+                    </tr></thead>
+                    <tbody id="clientesBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA CUPONS -->
+        <div class="admin-tab-content" id="adminCupons">
+            <button class="btn-admin novo" onclick="abrirModalCupom(null)">+ Novo Cupom</button>
+            <div style="overflow-x:auto">
+                <table class="admin-table">
+                    <thead><tr>
+                        <th>Código</th><th>Desconto</th><th>Descrição</th><th>Status</th><th>Ações</th>
+                    </tr></thead>
+                    <tbody id="cuponsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODAL PRODUTO -->
+    <div class="admin-modal-overlay" id="modalProduto">
+        <div class="admin-modal">
+            <h3 id="modalProdutoTitulo">📦 Novo Produto</h3>
+            <input type="hidden" id="mpId">
+            <div class="form-group"><label>Nome *</label><input type="text" id="mpNome" placeholder="Nome do produto"></div>
+            <div class="form-group"><label>Categoria *</label>
+                <select id="mpCategoria" style="width:100%;border:1.5px solid #dde3ee;border-radius:8px;padding:9px 12px;font-size:.92rem">
+                    <option value="racao">Ração</option>
+                    <option value="remedios">Remédios</option>
+                    <option value="acessorios">Acessórios</option>
+                    <option value="brinquedos">Brinquedos</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Preço (R$) *</label><input type="number" id="mpPreco" step="0.01" min="0" placeholder="0.00"></div>
+            <div class="form-group"><label>Emoji</label><input type="text" id="mpEmoji" placeholder="🐾" maxlength="4"></div>
+            <div class="form-group"><label>URL da Imagem</label><input type="url" id="mpImgUrl" placeholder="https://..."></div>
+            <div class="form-group"><label>Descrição</label><textarea id="mpDesc" rows="3" style="width:100%;border:1.5px solid #dde3ee;border-radius:8px;padding:9px 12px;font-size:.92rem;resize:vertical" placeholder="Descrição do produto"></textarea></div>
+            <div class="admin-modal-btns">
+                <button class="btn-admin excluir" onclick="fecharModalProduto()">Cancelar</button>
+                <button class="btn-admin salvar" onclick="salvarProduto()">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CUPOM -->
+    <div class="admin-modal-overlay" id="modalCupom">
+        <div class="admin-modal">
+            <h3 id="modalCupomTitulo">🎫 Novo Cupom</h3>
+            <input type="hidden" id="mcIdx">
+            <div class="form-group"><label>Código *</label><input type="text" id="mcCodigo" placeholder="EX: PROMO10" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Desconto (%) *</label><input type="number" id="mcDesconto" min="1" max="100" placeholder="10"></div>
+            <div class="form-group"><label>Descrição</label><input type="text" id="mcDesc" placeholder="Descrição do cupom"></div>
+            <div class="form-group"><label>Status</label>
+                <select id="mcAtivo" style="width:100%;border:1.5px solid #dde3ee;border-radius:8px;padding:9px 12px;font-size:.92rem">
+                    <option value="1">✅ Ativo</option>
+                    <option value="0">❌ Inativo</option>
+                </select>
+            </div>
+            <div class="admin-modal-btns">
+                <button class="btn-admin excluir" onclick="fecharModalCupom()">Cancelar</button>
+                <button class="btn-admin salvar" onclick="salvarCupom()">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- SEÇÃO DESTAQUES -->
     <section class="destaques-section">
@@ -3511,6 +3670,299 @@
         }
 
         document.addEventListener('DOMContentLoaded', initCartDrop);
+
+        // ═══════════════════════════════════════════════
+        //  PAINEL ADMIN
+        // ═══════════════════════════════════════════════
+        const ADMIN_EMAILS = ['liezerlad21@gmail.com', 'caotelli@gmail.com']; // adicione o e-mail do dono aqui
+
+        // Cupons gerenciados (carrega do localStorage ou usa padrão)
+        function getCupons() {
+            const s = localStorage.getItem('caotelli_cupons');
+            if (s) return JSON.parse(s);
+            return [
+                { codigo:'BEMPET15',  desconto:15, descricao:'Primeira compra',       ativo:true },
+                { codigo:'VERÃO20',   desconto:20, descricao:'Toda a loja',           ativo:true },
+                { codigo:'FRETE10',   desconto:10, descricao:'Desconto no frete',     ativo:true },
+                { codigo:'PREMIUM25', desconto:25, descricao:'Produtos selecionados', ativo:true },
+            ];
+        }
+        function saveCupons(arr) {
+            localStorage.setItem('caotelli_cupons', JSON.stringify(arr));
+            // Atualiza o objeto global usado pelo checkout
+            window.coupons = {};
+            arr.forEach(c => { if(c.ativo) window.coupons[c.codigo.toUpperCase()] = c.desconto; });
+        }
+        // Inicializa cupons no objeto global
+        saveCupons(getCupons());
+
+        // Produtos: usa o array global `products` e persiste alterações
+        function saveProducts() {
+            localStorage.setItem('caotelli_produtos', JSON.stringify(products));
+        }
+        function loadProducts() {
+            const s = localStorage.getItem('caotelli_produtos');
+            if (s) {
+                const saved = JSON.parse(s);
+                // Mescla com array original (saved tem prioridade)
+                saved.forEach(p => {
+                    const idx = products.findIndex(x => x.id === p.id);
+                    if (idx >= 0) products[idx] = p; else products.push(p);
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadProducts);
+
+        // ── Abas ──────────────────────────────────────
+        function abrirAbaAdmin(aba) {
+            document.querySelectorAll('.admin-tab').forEach((t,i) => {
+                const ids = ['produtos','pedidos','clientes','cupons'];
+                t.classList.toggle('active', ids[i] === aba);
+            });
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('admin' + aba.charAt(0).toUpperCase() + aba.slice(1)).classList.add('active');
+            if (aba === 'produtos')  renderAdminProdutos();
+            if (aba === 'pedidos')   renderAdminPedidos();
+            if (aba === 'clientes')  renderAdminClientes();
+            if (aba === 'cupons')    renderAdminCupons();
+        }
+
+        // ── Stats ─────────────────────────────────────
+        function renderAdminStats() {
+            const clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+            const pedidos  = JSON.parse(localStorage.getItem('caotelli_pedidos')  || '[]');
+            const cupons   = getCupons();
+            const totalVendas = pedidos.reduce((s,p) => s + (p.total||0), 0);
+            document.getElementById('adminStats').innerHTML = `
+                <div class="admin-stat"><div class="stat-num">${products.length}</div><div class="stat-label">Produtos</div></div>
+                <div class="admin-stat"><div class="stat-num">${pedidos.length}</div><div class="stat-label">Pedidos</div></div>
+                <div class="admin-stat"><div class="stat-num">${clientes.length}</div><div class="stat-label">Clientes</div></div>
+                <div class="admin-stat"><div class="stat-num" style="color:#D6324A">R$${totalVendas.toFixed(2)}</div><div class="stat-label">Total Vendas</div></div>
+                <div class="admin-stat"><div class="stat-num">${cupons.filter(c=>c.ativo).length}</div><div class="stat-label">Cupons Ativos</div></div>
+            `;
+        }
+
+        // ── Produtos ──────────────────────────────────
+        function renderAdminProdutos() {
+            const tbody = document.getElementById('produtosBody');
+            tbody.innerHTML = products.map(p => `
+                <tr>
+                    <td>${p.imgUrl ? `<img src="${p.imgUrl}" alt="${p.name}" onerror="this.src='logo_caotelli.png'">` : `<span style="font-size:2rem">${p.emoji||'🐾'}</span>`}</td>
+                    <td><small style="color:#aaa">#${p.id}</small></td>
+                    <td style="font-weight:600;max-width:180px">${p.name}</td>
+                    <td><span style="background:#e4eaf3;padding:2px 8px;border-radius:12px;font-size:0.8rem">${p.category}</span></td>
+                    <td style="font-weight:700;color:#0088C2">R$${p.price.toFixed(2)}</td>
+                    <td style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button class="btn-admin salvar" onclick="abrirModalProduto(${p.id})">✏️ Editar</button>
+                        <button class="btn-admin excluir" onclick="excluirProduto(${p.id})">🗑️ Excluir</button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        function abrirModalProduto(id) {
+            const modal = document.getElementById('modalProduto');
+            if (id === null) {
+                document.getElementById('modalProdutoTitulo').textContent = '📦 Novo Produto';
+                document.getElementById('mpId').value = '';
+                ['mpNome','mpPreco','mpEmoji','mpImgUrl','mpDesc'].forEach(f => document.getElementById(f).value = '');
+                document.getElementById('mpCategoria').value = 'racao';
+            } else {
+                const p = products.find(x => x.id === id);
+                if (!p) return;
+                document.getElementById('modalProdutoTitulo').textContent = '✏️ Editar Produto';
+                document.getElementById('mpId').value       = p.id;
+                document.getElementById('mpNome').value     = p.name;
+                document.getElementById('mpCategoria').value= p.category;
+                document.getElementById('mpPreco').value    = p.price;
+                document.getElementById('mpEmoji').value    = p.emoji || '';
+                document.getElementById('mpImgUrl').value   = p.imgUrl || '';
+                document.getElementById('mpDesc').value     = p.description || '';
+            }
+            modal.classList.add('active');
+        }
+        function fecharModalProduto() { document.getElementById('modalProduto').classList.remove('active'); }
+
+        function salvarProduto() {
+            const nome  = document.getElementById('mpNome').value.trim();
+            const preco = parseFloat(document.getElementById('mpPreco').value);
+            if (!nome || isNaN(preco)) { alert('Preencha nome e preço!'); return; }
+            const id = document.getElementById('mpId').value;
+            const obj = {
+                id:          id ? parseInt(id) : Date.now(),
+                name:        nome,
+                category:    document.getElementById('mpCategoria').value,
+                price:       preco,
+                emoji:       document.getElementById('mpEmoji').value || '🐾',
+                imgUrl:      document.getElementById('mpImgUrl').value.trim(),
+                description: document.getElementById('mpDesc').value.trim(),
+            };
+            if (id) {
+                const idx = products.findIndex(x => x.id === parseInt(id));
+                if (idx >= 0) products[idx] = obj;
+            } else {
+                products.push(obj);
+            }
+            saveProducts();
+            fecharModalProduto();
+            renderAdminProdutos();
+            renderAdminStats();
+            showNotification('Produto salvo com sucesso! ✅', 'success');
+        }
+
+        function excluirProduto(id) {
+            if (!confirm('Excluir este produto?')) return;
+            const idx = products.findIndex(x => x.id === id);
+            if (idx >= 0) products.splice(idx, 1);
+            saveProducts();
+            renderAdminProdutos();
+            renderAdminStats();
+            showNotification('Produto excluído!', 'error');
+        }
+
+        // ── Pedidos ───────────────────────────────────
+        function renderAdminPedidos() {
+            const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+            const tbody   = document.getElementById('pedidosBody');
+            if (!pedidos.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">Nenhum pedido registrado ainda.</td></tr>';
+                return;
+            }
+            const statusBadge = { pago:'badge-pago', pendente:'badge-pendente', entregue:'badge-entregue', cancelado:'badge-cancelado' };
+            tbody.innerHTML = pedidos.slice().reverse().map((p,i) => `
+                <tr>
+                    <td><strong>#${pedidos.length - i}</strong></td>
+                    <td style="font-size:0.82rem;color:#5a6a85">${p.data || '-'}</td>
+                    <td>${p.cliente || '-'}</td>
+                    <td style="font-size:0.82rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(p.itens||[]).map(x=>x.name).join(', ')}</td>
+                    <td style="font-weight:700;color:#0088C2">R$${(p.total||0).toFixed(2)}</td>
+                    <td><span class="admin-badge ${statusBadge[p.status]||'badge-pendente'}">${p.status||'Pendente'}</span></td>
+                    <td>
+                        <select onchange="atualizarStatusPedido(${pedidos.length-1-i}, this.value)" style="border:1px solid #dde3ee;border-radius:6px;padding:4px 8px;font-size:0.82rem">
+                            <option value="pendente"  ${(p.status||'pendente')==='pendente'  ?'selected':''}>Pendente</option>
+                            <option value="pago"      ${p.status==='pago'      ?'selected':''}>Pago</option>
+                            <option value="entregue"  ${p.status==='entregue'  ?'selected':''}>Entregue</option>
+                            <option value="cancelado" ${p.status==='cancelado' ?'selected':''}>Cancelado</option>
+                        </select>
+                    </td>
+                </tr>`).join('');
+        }
+
+        function atualizarStatusPedido(idx, status) {
+            const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+            if (pedidos[idx]) { pedidos[idx].status = status; localStorage.setItem('caotelli_pedidos', JSON.stringify(pedidos)); }
+            renderAdminPedidos();
+            showNotification('Status atualizado!', 'success');
+        }
+
+        // ── Clientes ──────────────────────────────────
+        function renderAdminClientes() {
+            const clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+            const tbody    = document.getElementById('clientesBody');
+            if (!clientes.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:30px">Nenhum cliente cadastrado ainda.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = clientes.map(c => `
+                <tr>
+                    <td style="font-weight:600">${c.nome||'-'}</td>
+                    <td style="font-size:0.85rem;color:#5a6a85">${c.email||'-'}</td>
+                    <td>${c.telefone||'-'}</td>
+                    <td style="font-size:0.82rem;max-width:160px">${c.endereco||'-'}</td>
+                    <td style="font-size:0.82rem">${(c.pets||[]).map(p=>p.nome||p).join(', ')||'-'}</td>
+                    <td style="font-size:0.78rem;color:#aaa">${c.cadastro||'-'}</td>
+                </tr>`).join('');
+        }
+
+        // ── Cupons ────────────────────────────────────
+        function renderAdminCupons() {
+            const arr   = getCupons();
+            const tbody = document.getElementById('cuponsBody');
+            tbody.innerHTML = arr.map((c,i) => `
+                <tr>
+                    <td><strong style="font-family:monospace;font-size:1rem;color:#D6324A">${c.codigo}</strong></td>
+                    <td style="font-weight:700;color:#0088C2">${c.desconto}%</td>
+                    <td style="font-size:0.88rem;color:#5a6a85">${c.descricao||'-'}</td>
+                    <td><span class="admin-badge ${c.ativo?'badge-pago':'badge-cancelado'}">${c.ativo?'✅ Ativo':'❌ Inativo'}</span></td>
+                    <td style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button class="btn-admin salvar" onclick="abrirModalCupom(${i})">✏️ Editar</button>
+                        <button class="btn-admin excluir" onclick="excluirCupom(${i})">🗑️ Excluir</button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        function abrirModalCupom(idx) {
+            const modal = document.getElementById('modalCupom');
+            document.getElementById('mcIdx').value = idx === null ? '' : idx;
+            if (idx === null) {
+                document.getElementById('modalCupomTitulo').textContent = '🎫 Novo Cupom';
+                ['mcCodigo','mcDesconto','mcDesc'].forEach(f => document.getElementById(f).value = '');
+                document.getElementById('mcAtivo').value = '1';
+            } else {
+                const c = getCupons()[idx];
+                document.getElementById('modalCupomTitulo').textContent = '✏️ Editar Cupom';
+                document.getElementById('mcCodigo').value   = c.codigo;
+                document.getElementById('mcDesconto').value = c.desconto;
+                document.getElementById('mcDesc').value     = c.descricao||'';
+                document.getElementById('mcAtivo').value    = c.ativo ? '1' : '0';
+            }
+            modal.classList.add('active');
+        }
+        function fecharModalCupom() { document.getElementById('modalCupom').classList.remove('active'); }
+
+        function salvarCupom() {
+            const codigo   = document.getElementById('mcCodigo').value.trim().toUpperCase();
+            const desconto = parseInt(document.getElementById('mcDesconto').value);
+            if (!codigo || isNaN(desconto)) { alert('Preencha código e desconto!'); return; }
+            const arr  = getCupons();
+            const idx  = document.getElementById('mcIdx').value;
+            const novo = { codigo, desconto, descricao: document.getElementById('mcDesc').value.trim(), ativo: document.getElementById('mcAtivo').value === '1' };
+            if (idx !== '') arr[parseInt(idx)] = novo; else arr.push(novo);
+            saveCupons(arr);
+            fecharModalCupom();
+            renderAdminCupons();
+            renderAdminStats();
+            showNotification('Cupom salvo! ✅', 'success');
+        }
+
+        function excluirCupom(idx) {
+            if (!confirm('Excluir este cupom?')) return;
+            const arr = getCupons();
+            arr.splice(idx, 1);
+            saveCupons(arr);
+            renderAdminCupons();
+            renderAdminStats();
+            showNotification('Cupom excluído!', 'error');
+        }
+
+        // ── Abrir painel admin ─────────────────────────
+        const _origOpenSection = openSection;
+        function openSection(id) {
+            _origOpenSection(id);
+            if (id === 'admin') { renderAdminStats(); renderAdminProdutos(); }
+        }
+
+        // ── Fechar modal clicando fora ─────────────────
+        document.addEventListener('click', e => {
+            if (e.target.classList.contains('admin-modal-overlay')) {
+                fecharModalProduto(); fecharModalCupom();
+            }
+        });
+
+        // ── Salvar pedido ao fazer checkout ──────────
+        const _origCheckout = typeof checkout === 'function' ? checkout : null;
+        function registrarPedido() {
+            if (!window.cart || !window.cart.length) return;
+            const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+            const total   = window.cart.reduce((s,i) => s + i.price * i.quantity, 0);
+            pedidos.push({
+                data:    new Date().toLocaleString('pt-BR'),
+                cliente: window._fbUser ? window._fbUser.email : 'Visitante',
+                itens:   window.cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price })),
+                total:   total,
+                status:  'pendente',
+            });
+            localStorage.setItem('caotelli_pedidos', JSON.stringify(pedidos));
+        }
     </script>
 
     <!-- MODAL CARRINHO -->
@@ -3674,6 +4126,13 @@
   // Reage ao estado de autenticação
   onAuthStateChanged(auth, (user) => {
     window._fbUser = user || null;
+
+    // Mostra/oculta botão Admin
+    const adminBtnEl = document.getElementById('adminBtn');
+    if (adminBtnEl) {
+      const isAdmin = user && (window.ADMIN_EMAILS || ['liezerlad21@gmail.com','caotelli@gmail.com']).includes(user.email);
+      adminBtnEl.style.display = isAdmin ? 'flex' : 'none';
+    }
 
     // Atualiza ícone do header
     const btn = document.getElementById('headerPerfilBtn');
