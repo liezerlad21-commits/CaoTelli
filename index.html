@@ -3935,11 +3935,18 @@
         }
 
         // ── Abrir painel admin ─────────────────────────
-        const _origOpenSection = openSection;
-        function openSection(id) {
-            _origOpenSection(id);
-            if (id === 'admin') { renderAdminStats(); renderAdminProdutos(); }
-        }
+        // Quando o botão admin é clicado, renderiza o painel via MutationObserver
+        document.addEventListener('DOMContentLoaded', () => {
+            const adminSection = document.getElementById('admin');
+            if (!adminSection) return;
+            const obs = new MutationObserver(() => {
+                if (adminSection.classList.contains('active')) {
+                    renderAdminStats();
+                    renderAdminProdutos();
+                }
+            });
+            obs.observe(adminSection, { attributes: true, attributeFilter: ['class'] });
+        });
 
         // ── Fechar modal clicando fora ─────────────────
         document.addEventListener('click', e => {
