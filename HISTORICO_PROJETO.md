@@ -195,7 +195,27 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 07/05/2026
+**Data:** 18/05/2026
+
+### Painel Administrativo implementado ✅ (item 4 do backlog CONCLUÍDO)
+
+**O que foi feito:**
+- Botão **⚙️ Admin** adicionado no header — aparece automaticamente só para e-mails admin (`liezerlad21@gmail.com`, `caotelli@gmail.com`)
+- Nova seção `#admin` (hidden-section) com 4 abas completas:
+  - **📦 Produtos**: listar, editar, criar e excluir produtos do catálogo. Alterações salvas em `localStorage.caotelli_produtos` e sincronizadas com o array global `products`
+  - **📋 Pedidos**: lista de pedidos registrados em `localStorage.caotelli_pedidos`, com seletor de status (Pendente / Pago / Entregue / Cancelado) editável direto na tabela
+  - **👥 Clientes**: exibe todos os cadastros de `localStorage.caotelli_clientes` (nome, e-mail, telefone, endereço, pets, data de cadastro)
+  - **🎫 Cupons**: CRUD completo — criar, editar, ativar/desativar e excluir cupons; sincronizado com o objeto global `coupons` usado no checkout
+- **Cards de resumo** no topo do painel: total de produtos, pedidos, clientes, faturamento e cupons ativos
+- Modais de criação/edição para Produtos e Cupons
+- Função `registrarPedido()` pronta para salvar pedidos ao fazer checkout
+- Commit: `507ef06` — enviado para GitHub Pages com sucesso
+
+**Próxima ação sugerida:** Integração de pagamento real (Mercado Pago — PIX + cartão) ou painel admin com Firestore para persistência real dos pedidos/produtos.
+
+---
+
+## 9.1 SESSÃO ANTERIOR — 07/05/2026
 
 ### Firebase Authentication integrado ✅ (item 1 do backlog CONCLUÍDO)
 
