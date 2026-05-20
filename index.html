@@ -3015,11 +3015,13 @@
 
         function enviarComprovante() {
             const total = document.getElementById('pix-total').textContent;
-            const itens = cart.map(i => `• ${i.nome} x${i.qty} — R$ ${(i.preco * i.qty).toFixed(2).replace('.',',')}`).join('\n');
+            const itens = cart.map(i => `• ${i.name} x${i.quantity} — R$ ${(i.price * i.quantity).toFixed(2).replace('.',',')}`).join('\n');
             const msg = encodeURIComponent(
                 `Olá CãoTelli! 🐾 Acabei de realizar o pagamento via Pix.\n\n*Pedido:*\n${itens}\n\n*Total: ${total}*\n\nSegue o comprovante em anexo.`
             );
             window.open(`https://wa.me/5551997655755?text=${msg}`, '_blank');
+            // Registra pedido no painel admin
+            registrarPedido();
             // Limpa carrinho após enviar
             cart = [];
             appliedCoupon = null;
@@ -3704,11 +3706,10 @@
             const s = localStorage.getItem('caotelli_produtos');
             if (s) {
                 const saved = JSON.parse(s);
-                // Mescla com array original (saved tem prioridade)
-                saved.forEach(p => {
-                    const idx = products.findIndex(x => x.id === p.id);
-                    if (idx >= 0) products[idx] = p; else products.push(p);
-                });
+                // Substitui o array completamente pelo estado salvo
+                // (merge era problemático: produtos excluídos voltavam após reload)
+                products.length = 0;
+                saved.forEach(p => products.push(p));
             }
         }
         document.addEventListener('DOMContentLoaded', loadProducts);

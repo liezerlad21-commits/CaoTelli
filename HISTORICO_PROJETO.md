@@ -409,3 +409,42 @@ git diff HASH1 HASH2 -- index.html
 > "Atualiza o histórico com o que fizemos hoje."
 
 Assim a seção **9. ONDE PARAMOS** fica sempre viva e eu não perco o fio da meada entre uma conversa e outra.
+
+---
+
+## 11. SESSÃO 18/05/2026
+
+### O que foi feito:
+
+**Painel Administrativo — concluído e funcionando:**
+- Adicionado botão **🔧 Admin** no cabeçalho (visível apenas para e-mails admin: liezerlad21@gmail.com, caotelli@gmail.com)
+- Painel com 4 abas: **Produtos / Pedidos / Clientes / Cupons**
+- Cards de estatísticas no topo: total de produtos, pedidos, clientes, valor vendas, cupons ativos
+- CRUD completo de produtos (Novo, Editar, Excluir) com modal
+- CRUD completo de cupons com modal
+- Visualização de pedidos e clientes cadastrados
+- Dados persistidos em localStorage
+
+**Correção crítica de bug (botões perfil/WhatsApp parados):**
+- Causa: override de `openSection` com `function openSection(){}` após `const _origOpenSection = openSection` causava recursão infinita por hoisting do JavaScript
+- Solução: substituído pelo padrão **MutationObserver** — observa quando a classe `active` é adicionada à `#admin` section, aí renderiza o painel. Zero interferência com a função original `openSection`
+
+**Correção de truncamento do index.html:**
+- Arquivo estava cortado no meio do SVG do botão floating-reviews (faltava `</body></html>`)
+- Recuperado o tail correto via `git show HEAD:index.html` e remendado via Python binário
+
+**Login e teste do painel admin:**
+- Liézer se cadastrou com liezerlad21@gmail.com no Firebase via site
+- Botão Admin apareceu corretamente no header após login
+- Painel exibiu: 55 produtos, 0 pedidos, 2 clientes, R$0,00 vendas, 4 cupons ativos
+- Todas as abas funcionando
+
+**Commits no GitHub:**
+- Commits mais recentes: `ccc8891`, `9945eaf`, `507ef06` (feat: painel administrativo)
+- Site ao vivo: https://liezerlad21-commits.github.io/CaoTelli/
+
+### Próximos passos:
+1. **Testar CRUD do painel** — adicionar/editar/excluir produto e cupom pelo painel admin
+2. **Firebase Firestore** — migrar produtos e pedidos do localStorage para banco real (opcional, para múltiplos dispositivos)
+3. **Mercado Pago** — integrar pagamento real (Pix + cartão)
+4. **Domínio .com.br** — registrar em registro.br (~R$40/ano)
