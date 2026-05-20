@@ -1989,9 +1989,59 @@
                 <div style="font-size:4rem;margin-bottom:10px">🐾</div>
                 <h3 id="perfilNomeLogado" style="color:#0088C2;margin-bottom:4px"></h3>
                 <p id="perfilEmailLogado" style="color:#5a6a85;font-size:0.9rem;margin-bottom:20px"></p>
-                <button onclick="fazerLogout()" style="background:linear-gradient(135deg,#E8445A,#c0392b);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:1rem;padding:12px 32px;">
-                    🚪 Sair da conta
-                </button>
+                <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                    <button id="btnEditarPerfil" onclick="abrirEdicaoPerfil()" style="background:linear-gradient(135deg,#0088C2,#005f8a);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:1rem;padding:12px 32px;">
+                        ✏️ Editar meus dados
+                    </button>
+                    <button onclick="fazerLogout()" style="background:linear-gradient(135deg,#E8445A,#c0392b);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:1rem;padding:12px 32px;">
+                        🚪 Sair da conta
+                    </button>
+                </div>
+            </div>
+
+            <!-- FORMULÁRIO DE EDIÇÃO DE DADOS -->
+            <div id="formEdicaoPerfil" style="display:none;max-width:560px;margin:24px auto 0 auto;">
+                <h3 style="color:#0088C2;margin-bottom:16px;font-size:1.1rem;text-align:center;">✏️ Editar Dados Cadastrais</h3>
+                <form onsubmit="salvarEdicaoPerfil(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome Completo *</label>
+                            <input type="text" id="editNome" placeholder="Seu nome completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail (não editável)</label>
+                            <input type="email" id="editEmail" disabled style="opacity:0.6;cursor:not-allowed;background:#f0f0f0;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Telefone / WhatsApp *</label>
+                            <input type="tel" id="editTelefone" placeholder="(51) 99999-9999" required maxlength="15" oninput="mascaraTelefone(this)">
+                        </div>
+                        <div class="form-group">
+                            <label>CPF</label>
+                            <input type="text" id="editCpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço de Entrega</label>
+                        <input type="text" id="editEndereco" placeholder="Rua, número, bairro, cidade">
+                    </div>
+                    <!-- PETS -->
+                    <div style="margin-top:4px;margin-bottom:4px;font-weight:600;color:#1a2340;font-size:0.95rem;">🐾 Meus Pets</div>
+                    <div id="petsContainerEdit"></div>
+                    <button type="button" onclick="adicionarPetEdit()" style="display:flex;align-items:center;gap:8px;background:none;border:2px dashed #0088C2;color:#0088C2;font-weight:600;font-size:0.95rem;padding:10px 20px;border-radius:10px;cursor:pointer;margin-top:4px;margin-bottom:16px;width:100%;justify-content:center">
+                        🐾 Adicionar outro pet
+                    </button>
+                    <div style="display:flex;gap:10px;margin-top:8px;">
+                        <button type="button" onclick="fecharEdicaoPerfil()" style="flex:1;padding:13px;background:#e4eaf3;border:none;border-radius:10px;color:#5a6a85;font-weight:700;cursor:pointer;font-size:1rem;">
+                            Cancelar
+                        </button>
+                        <button type="submit" style="flex:2;padding:13px 32px;background:linear-gradient(135deg,#0088C2,#005f8a);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:1rem;">
+                            💾 Salvar alterações
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -2707,6 +2757,210 @@
             setTimeout(() => { document.getElementById('cadastroSuccess').style.display = 'none'; }, 5000);
             showNotification('Conta criada! Bem-vindo(a), ' + nome.split(' ')[0] + '! 🐾');
         }
+
+        // ─── EDIÇÃO DE PERFIL ───────────────────────────────────────────
+
+        let petCountEdit = 0;
+
+        function criarBlocoPetEdit(numero) {
+            const div = document.createElement('div');
+            div.id = 'petBlocoEdit_' + numero;
+            div.style.cssText = 'background:#f4f7fb;border:1px solid #dde3ef;border-radius:12px;padding:16px;margin-bottom:12px;position:relative';
+            div.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <strong style="color:#0088C2;font-size:0.95rem">🐾 Pet ${numero}</strong>
+                    ${numero > 1 ? `<button type="button" onclick="removerPetEdit(${numero})" style="background:none;border:none;color:#D6324A;cursor:pointer;font-size:1.1rem;padding:2px 6px" title="Remover pet">✕</button>` : ''}
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Pet ${numero}</label>
+                        <input type="text" id="petNomeEdit_${numero}" placeholder="Ex: Rex, Mia..." style="width:100%">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="petTipoEdit_${numero}" onchange="atualizarRacasEdit(${numero})" style="width:100%;padding:10px 12px;border:1px solid #cdd5e0;border-radius:8px;font-size:0.95rem;background:#fff;color:#1a2340">
+                            <option value="">Selecione...</option>
+                            <option value="cao">🐕 Cão</option>
+                            <option value="gato">🐱 Gato</option>
+                            <option value="outros">🐾 Outros</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Espécie / Raça</label>
+                    <select id="petRacaEdit_${numero}" style="width:100%;padding:10px 12px;border:1px solid #cdd5e0;border-radius:8px;font-size:0.95rem;background:#fff;color:#1a2340" disabled>
+                        <option value="">Selecione o tipo primeiro</option>
+                    </select>
+                </div>
+            `;
+            return div;
+        }
+
+        function adicionarPetEdit(dadosPet) {
+            petCountEdit++;
+            const container = document.getElementById('petsContainerEdit');
+            container.appendChild(criarBlocoPetEdit(petCountEdit));
+            if (dadosPet) {
+                const n = petCountEdit;
+                if (dadosPet.nome) document.getElementById('petNomeEdit_' + n).value = dadosPet.nome;
+                if (dadosPet.tipo) {
+                    const selTipo = document.getElementById('petTipoEdit_' + n);
+                    selTipo.value = dadosPet.tipo;
+                    atualizarRacasEdit(n);
+                    if (dadosPet.raca) {
+                        setTimeout(() => {
+                            const selRaca = document.getElementById('petRacaEdit_' + n);
+                            if (selRaca) selRaca.value = dadosPet.raca;
+                        }, 50);
+                    }
+                }
+            }
+        }
+
+        function removerPetEdit(numero) {
+            const bloco = document.getElementById('petBlocoEdit_' + numero);
+            if (bloco) bloco.remove();
+        }
+
+        function atualizarRacasEdit(numero) {
+            const tipo = document.getElementById('petTipoEdit_' + numero).value;
+            const selectRaca = document.getElementById('petRacaEdit_' + numero);
+            if (!tipo) {
+                selectRaca.innerHTML = '<option value="">Selecione o tipo primeiro</option>';
+                selectRaca.disabled = true;
+                return;
+            }
+            const racas = racasPorTipo[tipo] || [];
+            selectRaca.innerHTML = '<option value="">Selecione a raça...</option>' +
+                racas.map(r => `<option value="${r}">${r}</option>`).join('');
+            selectRaca.disabled = false;
+        }
+
+        function coletarPetsEdit() {
+            const pets = [];
+            const blocos = document.querySelectorAll('[id^="petBlocoEdit_"]');
+            blocos.forEach(bloco => {
+                const num = bloco.id.split('_')[1];
+                const nome = (document.getElementById('petNomeEdit_' + num) || {}).value?.trim() || '';
+                const tipo = (document.getElementById('petTipoEdit_' + num) || {}).value || '';
+                const raca = (document.getElementById('petRacaEdit_' + num) || {}).value || '';
+                if (nome || tipo || raca) pets.push({ nome, tipo, raca });
+            });
+            return pets;
+        }
+
+        async function abrirEdicaoPerfil() {
+            const form = document.getElementById('formEdicaoPerfil');
+            const btn  = document.getElementById('btnEditarPerfil');
+            if (form.style.display !== 'none') {
+                fecharEdicaoPerfil();
+                return;
+            }
+            const user = window._fbUser;
+            if (!user) return;
+            const email = user.email;
+
+            // Busca dados do Firestore
+            let dados = null;
+            if (window._db && window._fsGetDoc) {
+                try {
+                    const snap = await window._fsGetDoc(window._fsDoc(window._db, 'clientes', email));
+                    if (snap.exists()) dados = snap.data();
+                } catch(err) { console.warn('Firestore getDoc:', err); }
+            }
+            // Fallback localStorage
+            if (!dados) {
+                const lista = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+                dados = lista.find(c => c.email === email) || {};
+            }
+
+            // Preenche os campos
+            document.getElementById('editNome').value     = dados.nome     || user.displayName || '';
+            document.getElementById('editEmail').value    = email;
+            document.getElementById('editTelefone').value = dados.telefone || '';
+            document.getElementById('editCpf').value      = dados.cpf      || '';
+            document.getElementById('editEndereco').value = dados.endereco  || '';
+
+            // Preenche pets
+            document.getElementById('petsContainerEdit').innerHTML = '';
+            petCountEdit = 0;
+            const pets = dados.pets || [];
+            if (pets.length > 0) {
+                pets.forEach(p => adicionarPetEdit(p));
+            } else {
+                adicionarPetEdit();
+            }
+
+            form.style.display = '';
+            btn.innerHTML = '❌ Cancelar edição';
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function fecharEdicaoPerfil() {
+            document.getElementById('formEdicaoPerfil').style.display = 'none';
+            document.getElementById('btnEditarPerfil').innerHTML = '✏️ Editar meus dados';
+        }
+
+        async function salvarEdicaoPerfil(e) {
+            e.preventDefault();
+            const user = window._fbUser;
+            if (!user) return;
+
+            const nome = document.getElementById('editNome').value.trim();
+            const tel  = document.getElementById('editTelefone').value.trim();
+            const cpf  = document.getElementById('editCpf').value.trim();
+
+            if (!validarTelefone(tel)) {
+                showNotification('Informe um telefone válido com DDD. Ex: (51) 99999-9999', 'error');
+                return;
+            }
+            if (cpf && !validarCPF(cpf)) {
+                showNotification('CPF inválido. Use o formato 000.000.000-00', 'error');
+                return;
+            }
+
+            const email = user.email;
+            const dados = {
+                nome,
+                email,
+                telefone: tel,
+                cpf,
+                endereco: document.getElementById('editEndereco').value.trim(),
+                pets: coletarPetsEdit()
+            };
+
+            // Atualiza nome no Firebase Auth
+            if (window._fbUpdateProfile && user) {
+                try { await window._fbUpdateProfile(user, { displayName: nome }); } catch(err) { console.warn('updateProfile:', err); }
+            }
+
+            // Atualiza no Firestore (merge para não sobrescrever campo cadastro)
+            if (window._db && window._fsSetDoc) {
+                try {
+                    await window._fsSetDoc(window._fsDoc(window._db, 'clientes', email), dados, { merge: true });
+                } catch(err) { console.warn('Firestore update clientes:', err); }
+            }
+
+            // Atualiza no localStorage
+            const lista = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+            const idx = lista.findIndex(c => c.email === email);
+            if (idx !== -1) {
+                lista[idx] = { ...lista[idx], ...dados };
+            } else {
+                lista.push({ ...dados, cadastro: new Date().toLocaleDateString('pt-BR') });
+            }
+            localStorage.setItem('caotelli_clientes', JSON.stringify(lista));
+
+            // Atualiza nome exibido no header/painel
+            const nomeExibido = nome.split(' ')[0];
+            const elNome = document.getElementById('perfilNomeLogado');
+            if (elNome) elNome.textContent = '👋 Olá, ' + nomeExibido + '!';
+
+            fecharEdicaoPerfil();
+            showNotification('✅ Dados atualizados com sucesso! 🐾');
+        }
+
+        // ─── FIM EDIÇÃO DE PERFIL ────────────────────────────────────────
 
         // INICIALIZAR
         function init() {
@@ -4185,7 +4439,7 @@
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
            signOut, onAuthStateChanged, updateProfile }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, collection, doc, getDocs, addDoc, setDoc, deleteDoc, updateDoc }
+  import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, updateDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -4216,6 +4470,7 @@
   window._fsGetDocs   = getDocs;
   window._fsAddDoc    = addDoc;
   window._fsSetDoc    = setDoc;
+  window._fsGetDoc    = getDoc;
   window._fsDeleteDoc = deleteDoc;
   window._fsUpdateDoc = updateDoc;
 
