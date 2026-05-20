@@ -2067,7 +2067,10 @@
                     <button type="submit" style="padding:13px 32px;background:linear-gradient(135deg,#0088C2,#005f8a);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:1rem;width:100%;margin-top:8px">
                         🔑 Entrar na conta
                     </button>
-                    <p style="text-align:center;margin-top:14px;color:#5a6a85;font-size:0.9rem">
+                    <p style="text-align:center;margin-top:12px;font-size:0.9rem">
+                        <a href="#" onclick="esqueceuSenha();return false;" style="color:#5a6a85;text-decoration:underline;">Esqueci minha senha</a>
+                    </p>
+                    <p style="text-align:center;margin-top:6px;color:#5a6a85;font-size:0.9rem">
                         Não tem conta? <a href="#" onclick="mostrarAba('cadastro');return false;" style="color:#0088C2;font-weight:600">Cadastre-se</a>
                     </p>
                 </form>
@@ -2217,7 +2220,7 @@
             <div style="overflow-x:auto">
                 <table class="admin-table">
                     <thead><tr>
-                        <th>Nome</th><th>E-mail</th><th>Telefone</th><th>Endereço</th><th>Pets</th><th>Cadastro</th>
+                        <th>Nome</th><th>E-mail</th><th>Telefone</th><th>Endereço</th><th>Pets</th><th>Cadastro</th><th>Ações</th>
                     </tr></thead>
                     <tbody id="clientesBody"></tbody>
                 </table>
@@ -2687,6 +2690,30 @@
         }
 
         // LOGOUT
+        async function esqueceuSenha() {
+            const email = document.getElementById('loginEmail').value.trim();
+            if (!email) {
+                showNotification('Digite seu e-mail no campo acima antes de continuar.', 'error');
+                document.getElementById('loginEmail').focus();
+                return;
+            }
+            if (!window._fbResetPassword || !window._fbAuth) {
+                showNotification('Firebase ainda carregando, tente novamente.', 'error');
+                return;
+            }
+            try {
+                await window._fbResetPassword(window._fbAuth, email);
+                showNotification('📧 E-mail de redefinição enviado para ' + email + '! Verifique sua caixa de entrada.');
+            } catch(err) {
+                const msgs = {
+                    'auth/user-not-found':  'Nenhuma conta encontrada com esse e-mail.',
+                    'auth/invalid-email':   'E-mail inválido.',
+                    'auth/too-many-requests': 'Muitas tentativas. Aguarde alguns minutos.'
+                };
+                showNotification(msgs[err.code] || 'Erro ao enviar e-mail: ' + err.message, 'error');
+            }
+        }
+
         async function fazerLogout() {
             if (!window._fbAuth) return;
             await window._fbSignOut(window._fbAuth);
@@ -4160,7 +4187,7 @@
         // ── Clientes ──────────────────────────────────
         async function renderAdminClientes() {
             const tbody = document.getElementById('clientesBody');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">⏳ Carregando clientes...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">⏳ Carregando clientes...</td></tr>';
             let clientes = [];
             if (window._db) {
                 try {
@@ -4174,7 +4201,7 @@
                 clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
             }
             if (!clientes.length) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:30px">Nenhum cliente cadastrado ainda.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">Nenhum cliente cadastrado ainda.</td></tr>';
                 return;
             }
             tbody.innerHTML = clientes.map(c => `
@@ -4185,7 +4212,40 @@
                     <td style="font-size:0.82rem;max-width:160px">${c.endereco||'-'}</td>
                     <td style="font-size:0.82rem">${(c.pets||[]).map(p=>p.nome||p).join(', ')||'-'}</td>
                     <td style="font-size:0.78rem;color:#aaa">${c.cadastro||'-'}</td>
+                    <td>
+                        <button class="btn-admin excluir" onclick="excluirCliente('${c.email}')" title="Remove dados do cliente do Firestore e localStorage">🗑️ Excluir</button>
+                    </td>
                 </tr>`).join('');
+
+            // Aviso sobre exclusão de conta Firebase
+            const aviso = document.getElementById('avisoExclusaoFirebase');
+            if (!aviso) {
+                const div = document.createElement('div');
+                div.id = 'avisoExclusaoFirebase';
+                div.style.cssText = 'margin-top:12px;padding:12px 16px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;font-size:0.85rem;color:#795548;';
+                div.innerHTML = `⚠️ O botão <strong>Excluir</strong> remove os dados do cliente do banco e do histórico local. Para excluir a conta de login (e-mail/senha) do Firebase, acesse: <a href="https://console.firebase.google.com/project/caotelli-fd86c/authentication/users" target="_blank" style="color:#0088C2;font-weight:600">Firebase Console → Authentication</a>`;
+                tbody.closest('table').after(div);
+            }
+        }
+
+        async function excluirCliente(email) {
+            if (!email) return;
+            if (!confirm(`Excluir todos os dados do cliente "${email}"?\n\nEsta ação remove os dados do Firestore e do histórico local. A conta de login deve ser excluída separadamente no Firebase Console.`)) return;
+
+            // Remove do Firestore
+            if (window._db && window._fsDeleteDoc) {
+                try {
+                    await window._fsDeleteDoc(window._fsDoc(window._db, 'clientes', email));
+                } catch(e) { console.warn('Firestore excluir cliente:', e); }
+            }
+
+            // Remove do localStorage
+            const lista = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+            const nova = lista.filter(c => c.email !== email);
+            localStorage.setItem('caotelli_clientes', JSON.stringify(nova));
+
+            showNotification('Cliente excluído com sucesso.', 'error');
+            renderAdminClientes();
         }
 
         // ── Cupons ────────────────────────────────────
@@ -4437,7 +4497,7 @@
 <script type="module">
   import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-           signOut, onAuthStateChanged, updateProfile }
+           signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc, updateDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -4461,7 +4521,8 @@
   window._fbCreateUser    = createUserWithEmailAndPassword;
   window._fbSignIn        = signInWithEmailAndPassword;
   window._fbSignOut       = signOut;
-  window._fbUpdateProfile = updateProfile;
+  window._fbUpdateProfile   = updateProfile;
+  window._fbResetPassword   = sendPasswordResetEmail;
 
   // Firestore — expõe db e helpers globalmente
   window._db          = db;

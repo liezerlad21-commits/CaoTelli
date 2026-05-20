@@ -195,7 +195,31 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 18/05/2026
+**Data:** 20/05/2026
+
+### Firebase Firestore integrado ✅ + 3 bugs críticos corrigidos
+
+**O que foi feito:**
+
+- **Bug 1 corrigido:** Produtos excluídos voltavam após reload — `loadProducts()` agora substitui o array completo pelo localStorage em vez de fazer merge
+- **Bug 2 corrigido:** Mensagem do WhatsApp chegava com nome/preço como NaN — campos `i.nome`/`i.preco`/`i.qty` corrigidos para `i.name`/`i.price`/`i.quantity`
+- **Bug 3 corrigido:** Pedidos nunca apareciam no painel admin — `registrarPedido()` agora é chamada dentro de `enviarComprovante()`
+- **Firestore criado** no console Firebase (projeto `caotelli-fd86c`, modo teste, região `nam5`)
+- **Firestore integrado** no `index.html` (SDK v10.12.0):
+  - `clientes` → salvo no Firestore via `setDoc` com e-mail como ID (sem duplicatas)
+  - `pedidos` → salvo no Firestore via `addDoc` a cada compra confirmada
+  - `cupons` → sincronizados no Firestore via `setDoc`; excluídos via `deleteDoc`
+  - `renderAdminPedidos()` e `renderAdminClientes()` agora buscam do Firestore (fallback localStorage)
+  - `carregarCuponsFirestore()` chamada no DOMContentLoaded para sincronizar cupons
+- **Testado e funcionando:** Clientes (2), Cupons (4 ativos), Pedidos (vazio — aguarda primeira compra real)
+- **Admin:** botão aparece apenas para `liezerlad21@gmail.com` e `caotelli@gmail.com`
+- Commits: `e8e24eb`, `125443b`
+
+**Próxima ação sugerida:** Mercado Pago (Pix + cartão real) ou domínio .com.br
+
+---
+
+## 9.1 SESSÃO ANTERIOR — 18/05/2026
 
 ### Painel Administrativo implementado ✅ (item 4 do backlog CONCLUÍDO)
 
