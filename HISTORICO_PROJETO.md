@@ -197,6 +197,23 @@ ae05318 Atualizacao do site CaoTelli
 
 **Data:** 20/05/2026
 
+### Edição de perfil, recuperação de senha e gestão de clientes no admin ✅
+
+**O que foi feito:**
+
+- **Edição de dados cadastrais** — painel do usuário logado agora tem botão "✏️ Editar meus dados" que abre formulário com nome, telefone, CPF, endereço e pets. Salva no Firestore (merge) e localStorage. Atualiza nome exibido no painel na hora.
+- **Esqueci minha senha** — link adicionado no formulário de login. Usuário digita o e-mail e o Firebase envia link de redefinição. Trata erros em PT-BR (conta não encontrada, e-mail inválido, muitas tentativas).
+- **Exclusão de clientes no admin** — aba "👥 Clientes" do painel admin ganhou coluna "Ações" com botão "🗑️ Excluir". Remove dados do Firestore e localStorage com confirmação. Aviso amarelo exibido abaixo da tabela com link direto para o Firebase Console (Authentication) para deletar a conta de login.
+- **`getDoc` exposto** — `window._fsGetDoc = getDoc` adicionado no módulo Firebase para buscar documento único do Firestore (necessário para pré-preencher o formulário de edição).
+- **FixAndPush.bat criado** — bat auxiliar que remove o index.lock do Git antes de commitar e fazer push (resolve problema recorrente de lock entre sandbox e Windows).
+- Commits: `d18980f`, `efd3c7e`
+
+**Próxima ação sugerida:** Integração de pagamento real (Mercado Pago — PIX + cartão) ou domínio .com.br
+
+---
+
+## 9. SESSÃO ANTERIOR — 20/05/2026 (manhã)
+
 ### Firebase Firestore integrado ✅ + 3 bugs críticos corrigidos
 
 **O que foi feito:**
