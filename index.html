@@ -2682,16 +2682,22 @@
                 }
             }
 
-            // Salva dados extras no localStorage
+            // Salva dados extras no localStorage e no Firestore
             const dados = {
                 nome, email, telefone: tel, cpf,
                 endereco: document.getElementById('cadEndereco').value.trim(),
                 pets:     coletarPets(),
-                data:     new Date().toLocaleDateString('pt-BR')
+                cadastro: new Date().toLocaleDateString('pt-BR')
             };
             const lista = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
             lista.push(dados);
             localStorage.setItem('caotelli_clientes', JSON.stringify(lista));
+            // Firestore: usa e-mail como ID do documento (evita duplicatas)
+            if (window._db) {
+                try {
+                    await window._fsSetDoc(window._fsDoc(window._db, 'clientes', email), dados);
+                } catch(e) { console.warn('Firestore clientes:', e); }
+            }
 
             document.getElementById('cadastroSuccess').style.display = 'block';
             document.getElementById('petsContainer').innerHTML = '';
@@ -3694,6 +3700,27 @@
             // Atualiza o objeto global usado pelo checkout
             window.coupons = {};
             arr.forEach(c => { if(c.ativo) window.coupons[c.codigo.toUpperCase()] = c.desconto; });
+            // Sincroniza com Firestore (cada cupom = documento com código como ID)
+            if (window._db) {
+                arr.forEach(c => {
+                    window._fsSetDoc(window._fsDoc(window._db, 'cupons', c.codigo.toUpperCase()), c)
+                       .catch(e => console.warn('Firestore cupons:', e));
+                });
+            }
+        }
+
+        // Carrega cupons do Firestore e atualiza localStorage + objeto global
+        async function carregarCuponsFirestore() {
+            if (!window._db) return;
+            try {
+                const snap = await window._fsGetDocs(window._fsCol(window._db, 'cupons'));
+                if (snap.empty) return; // sem cupons no Firestore, usa os locais
+                const arr = [];
+                snap.forEach(d => arr.push(d.data()));
+                localStorage.setItem('caotelli_cupons', JSON.stringify(arr));
+                window.coupons = {};
+                arr.forEach(c => { if(c.ativo) window.coupons[c.codigo.toUpperCase()] = c.desconto; });
+            } catch(e) { console.warn('Firestore carregarCupons:', e); }
         }
         // Inicializa cupons no objeto global
         saveCupons(getCupons());
@@ -3712,7 +3739,11 @@
                 saved.forEach(p => products.push(p));
             }
         }
-        document.addEventListener('DOMContentLoaded', loadProducts);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            // Carrega cupons do Firestore (atualiza cache local)
+            carregarCuponsFirestore();
+        });
 
         // ── Abas ──────────────────────────────────────
         function abrirAbaAdmin(aba) {
@@ -3821,24 +3852,38 @@
         }
 
         // ── Pedidos ───────────────────────────────────
-        function renderAdminPedidos() {
-            const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
-            const tbody   = document.getElementById('pedidosBody');
+        async function renderAdminPedidos() {
+            const tbody = document.getElementById('pedidosBody');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">⏳ Carregando pedidos...</td></tr>';
+            let pedidos = [];
+            if (window._db) {
+                try {
+                    const snap = await window._fsGetDocs(window._fsCol(window._db, 'pedidos'));
+                    snap.forEach(d => pedidos.push({ _fsId: d.id, ...d.data() }));
+                    // ordena do mais recente para o mais antigo pela data
+                    pedidos.sort((a,b) => new Date(b.data) - new Date(a.data));
+                } catch(e) {
+                    console.warn('Firestore pedidos:', e);
+                    pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]').reverse();
+                }
+            } else {
+                pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]').reverse();
+            }
             if (!pedidos.length) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">Nenhum pedido registrado ainda.</td></tr>';
                 return;
             }
             const statusBadge = { pago:'badge-pago', pendente:'badge-pendente', entregue:'badge-entregue', cancelado:'badge-cancelado' };
-            tbody.innerHTML = pedidos.slice().reverse().map((p,i) => `
+            tbody.innerHTML = pedidos.map((p,i) => `
                 <tr>
                     <td><strong>#${pedidos.length - i}</strong></td>
                     <td style="font-size:0.82rem;color:#5a6a85">${p.data || '-'}</td>
                     <td>${p.cliente || '-'}</td>
                     <td style="font-size:0.82rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(p.itens||[]).map(x=>x.name).join(', ')}</td>
                     <td style="font-weight:700;color:#0088C2">R$${(p.total||0).toFixed(2)}</td>
-                    <td><span class="admin-badge ${statusBadge[p.status]||'badge-pendente'}">${p.status||'Pendente'}</span></td>
+                    <td><span class="admin-badge ${statusBadge[(p.status||'pendente').toLowerCase()]||'badge-pendente'}">${p.status||'Pendente'}</span></td>
                     <td>
-                        <select onchange="atualizarStatusPedido(${pedidos.length-1-i}, this.value)" style="border:1px solid #dde3ee;border-radius:6px;padding:4px 8px;font-size:0.82rem">
+                        <select onchange="atualizarStatusPedido('${p._fsId||''}', this.value)" style="border:1px solid #dde3ee;border-radius:6px;padding:4px 8px;font-size:0.82rem">
                             <option value="pendente"  ${(p.status||'pendente')==='pendente'  ?'selected':''}>Pendente</option>
                             <option value="pago"      ${p.status==='pago'      ?'selected':''}>Pago</option>
                             <option value="entregue"  ${p.status==='entregue'  ?'selected':''}>Entregue</option>
@@ -3848,17 +3893,32 @@
                 </tr>`).join('');
         }
 
-        function atualizarStatusPedido(idx, status) {
-            const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
-            if (pedidos[idx]) { pedidos[idx].status = status; localStorage.setItem('caotelli_pedidos', JSON.stringify(pedidos)); }
+        async function atualizarStatusPedido(fsId, status) {
+            if (window._db && fsId) {
+                try {
+                    await window._fsUpdateDoc(window._fsDoc(window._db, 'pedidos', fsId), { status });
+                } catch(e) { console.warn('Firestore update pedido:', e); }
+            }
             renderAdminPedidos();
             showNotification('Status atualizado!', 'success');
         }
 
         // ── Clientes ──────────────────────────────────
-        function renderAdminClientes() {
-            const clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
-            const tbody    = document.getElementById('clientesBody');
+        async function renderAdminClientes() {
+            const tbody = document.getElementById('clientesBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">⏳ Carregando clientes...</td></tr>';
+            let clientes = [];
+            if (window._db) {
+                try {
+                    const snap = await window._fsGetDocs(window._fsCol(window._db, 'clientes'));
+                    snap.forEach(d => clientes.push(d.data()));
+                } catch(e) {
+                    console.warn('Firestore clientes:', e);
+                    clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+                }
+            } else {
+                clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+            }
             if (!clientes.length) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:30px">Nenhum cliente cadastrado ainda.</td></tr>';
                 return;
@@ -3925,11 +3985,18 @@
             showNotification('Cupom salvo! ✅', 'success');
         }
 
-        function excluirCupom(idx) {
+        async function excluirCupom(idx) {
             if (!confirm('Excluir este cupom?')) return;
             const arr = getCupons();
+            const codigo = arr[idx]?.codigo?.toUpperCase();
             arr.splice(idx, 1);
             saveCupons(arr);
+            // Remove do Firestore
+            if (window._db && codigo) {
+                try {
+                    await window._fsDeleteDoc(window._fsDoc(window._db, 'cupons', codigo));
+                } catch(e) { console.warn('Firestore excluirCupom:', e); }
+            }
             renderAdminCupons();
             renderAdminStats();
             showNotification('Cupom excluído!', 'error');
@@ -3958,18 +4025,26 @@
 
         // ── Salvar pedido ao fazer checkout ──────────
         const _origCheckout = typeof checkout === 'function' ? checkout : null;
-        function registrarPedido() {
+        async function registrarPedido() {
             if (!window.cart || !window.cart.length) return;
-            const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
-            const total   = window.cart.reduce((s,i) => s + i.price * i.quantity, 0);
-            pedidos.push({
+            const total  = window.cart.reduce((s,i) => s + i.price * i.quantity, 0);
+            const pedido = {
                 data:    new Date().toLocaleString('pt-BR'),
                 cliente: window._fbUser ? window._fbUser.email : 'Visitante',
                 itens:   window.cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price })),
                 total:   total,
                 status:  'pendente',
-            });
+            };
+            // Salva no localStorage (fallback local)
+            const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+            pedidos.push(pedido);
             localStorage.setItem('caotelli_pedidos', JSON.stringify(pedidos));
+            // Salva no Firestore (persiste entre dispositivos)
+            if (window._db) {
+                try {
+                    await window._fsAddDoc(window._fsCol(window._db, 'pedidos'), pedido);
+                } catch(e) { console.warn('Firestore pedidos:', e); }
+            }
         }
     </script>
 
@@ -4110,6 +4185,8 @@
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
            signOut, onAuthStateChanged, updateProfile }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, doc, getDocs, addDoc, setDoc, deleteDoc, updateDoc }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey:            "AIzaSyCzjha3u7Vvdf-9gQjG0_n6LZJGqVjuo-Y",
@@ -4123,6 +4200,7 @@
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db   = getFirestore(app);
 
   // Expõe globalmente para o JS principal (não-module)
   window._fbAuth          = auth;
@@ -4130,6 +4208,16 @@
   window._fbSignIn        = signInWithEmailAndPassword;
   window._fbSignOut       = signOut;
   window._fbUpdateProfile = updateProfile;
+
+  // Firestore — expõe db e helpers globalmente
+  window._db          = db;
+  window._fsCol       = collection;
+  window._fsDoc       = doc;
+  window._fsGetDocs   = getDocs;
+  window._fsAddDoc    = addDoc;
+  window._fsSetDoc    = setDoc;
+  window._fsDeleteDoc = deleteDoc;
+  window._fsUpdateDoc = updateDoc;
 
   // Reage ao estado de autenticação
   onAuthStateChanged(auth, (user) => {
