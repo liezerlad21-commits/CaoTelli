@@ -42,4 +42,7 @@ if %errorlevel%==0 (
 ) else (
     echo   Erro ao enviar. Verifique sua conexao com a internet.
     echo   Lembre-se de criar o repositorio no GitHub primeiro:
-    echo   github.com/new
+    echo   github.com/new  (nome: CaoTelli)
+)
+echo.
+pause

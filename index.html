@@ -6,7 +6,7 @@
     <title>CãoTelli — Pet Shop em Canoas/RS | Rações e Acessórios</title>
 
     <!-- SEO Básico -->
-    <meta name="description" content="CãoTelli Pet Shop em Canoas/RS — Rações, remédios, brinquedos e acessórios para cães e gatos. Entrega em até 60 minutos. Atendimento de seg. a sáb., 9h às 19h. Fale pelo WhatsApp (51) 99765-5755.">
+    <meta name="description" content="CãoTelli Pet Shop em Canoas/RS — Rações, medicamentos, brinquedos e acessórios para cães e gatos. Entrega em até 60 minutos. Atendimento de seg. a sáb., 9h às 19h. Fale pelo WhatsApp (51) 99765-5755.">
     <meta name="keywords" content="pet shop canoas, ração cachorro canoas, ração gato canoas, acessórios pet canoas, veterinário canoas, caotelli, cão telli, pet shop rs">
     <meta name="author" content="CãoTelli Rações e Acessórios">
     <meta name="robots" content="index, follow">
@@ -16,7 +16,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://liezerlad21-commits.github.io/CaoTelli/">
     <meta property="og:title" content="CãoTelli — Pet Shop em Canoas/RS | Rações e Acessórios">
-    <meta property="og:description" content="Rações, remédios, brinquedos e acessórios para seu pet. Entrega em até 60 minutos em Canoas/RS. Atendimento seg. a sáb., 9h às 19h.">
+    <meta property="og:description" content="Rações, medicamentos, brinquedos e acessórios para seu pet. Entrega em até 60 minutos em Canoas/RS. Atendimento seg. a sáb., 9h às 19h.">
     <meta property="og:image" content="https://liezerlad21-commits.github.io/CaoTelli/logo_caotelli.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -26,7 +26,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="CãoTelli — Pet Shop em Canoas/RS">
-    <meta name="twitter:description" content="Rações, remédios, brinquedos e acessórios para seu pet. Entrega em até 60 minutos em Canoas/RS.">
+    <meta name="twitter:description" content="Rações, medicamentos, brinquedos e acessórios para seu pet. Entrega em até 60 minutos em Canoas/RS.">
     <meta name="twitter:image" content="https://liezerlad21-commits.github.io/CaoTelli/logo_caotelli.png">
 
     <!-- Favicon -->
@@ -1550,6 +1550,73 @@
         }
 
         /* ===== DESTAQUES / PROMOÇÕES VISUAIS ===== */
+        /* SEÇÃO DE OFERTAS */
+        .ofertas-section {
+            background: linear-gradient(135deg, #fff5f7 0%, #fff 60%, #f0f9ff 100%);
+            padding: 48px 20px 40px;
+            border-top: 3px solid #D6324A;
+            border-bottom: 3px solid #0088C2;
+        }
+        .ofertas-inner { max-width: 1200px; margin: 0 auto; }
+        .ofertas-header { text-align: center; margin-bottom: 28px; }
+        .ofertas-header h2 { font-size: 1.9rem; font-weight: 800; color: #1a2340; }
+        .ofertas-header p { color: #5a6a85; font-size: 1rem; margin-top: 6px; }
+        .ofertas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .oferta-card {
+            background: #fff;
+            border-radius: 14px;
+            border: 2px solid #D6324A;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(214,50,74,0.10);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .oferta-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(214,50,74,0.18); }
+        .oferta-badge {
+            position: absolute; top: 10px; left: 10px;
+            background: #D6324A; color: #fff;
+            font-size: 0.75rem; font-weight: 800;
+            padding: 4px 10px; border-radius: 20px;
+            z-index: 1;
+        }
+        .oferta-timer {
+            position: absolute; top: 10px; right: 10px;
+            background: #1a2340; color: #fff;
+            font-size: 0.7rem; font-weight: 700;
+            padding: 4px 8px; border-radius: 8px;
+            z-index: 1;
+        }
+        .oferta-img-wrap {
+            width: 100%; height: 170px;
+            display: flex; align-items: center; justify-content: center;
+            background: #fafafa; padding: 10px;
+        }
+        .oferta-img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+        .oferta-img-wrap .oferta-emoji { font-size: 3.5rem; }
+        .oferta-body { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
+        .oferta-name { font-size: 0.92rem; font-weight: 700; color: #1a2340; margin-bottom: 8px; }
+        .oferta-preco-de { font-size: 0.82rem; color: #aaa; text-decoration: line-through; }
+        .oferta-preco-por { font-size: 1.4rem; font-weight: 900; color: #D6324A; margin: 2px 0 10px; }
+        .oferta-btn {
+            width: 100%; padding: 10px;
+            background: linear-gradient(135deg, #D6324A, #0088C2);
+            color: #fff; border: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            margin-top: auto; transition: opacity .2s;
+        }
+        .oferta-btn:hover { opacity: 0.88; }
+        .ofertas-vazia { text-align: center; color: #aaa; padding: 32px; font-size: 1rem; }
+        @media (max-width: 768px) {
+            .ofertas-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .oferta-img-wrap { height: 120px; }
+        }
+
         .destaques-section {
             background: #fff;
             padding: 56px 20px 40px;
@@ -1667,6 +1734,18 @@
         #adminBtn { display:none;align-items:center;gap:5px;font-size:0.85rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#D6324A,#a01e33);border:none;border-radius:8px;padding:6px 14px;cursor:pointer;transition:.2s; }
         #adminBtn:hover { opacity:.85; }
 
+        .destaque-slot { width:160px;height:180px;border:2px dashed #0088C2;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#0088C2;font-size:0.85rem;cursor:pointer;position:relative;background:#f0f9ff;transition:.2s; }
+        .destaque-slot:hover { background:#e0f2fe; }
+        .destaque-slot.preenchido { border-style:solid;border-color:#0088C2;background:#fff; }
+        .destaque-slot img { width:80px;height:80px;object-fit:contain;margin-bottom:6px; }
+        .destaque-slot .slot-nome { font-size:0.75rem;font-weight:600;color:#1a2340;text-align:center;padding:0 6px; }
+        .destaque-slot .slot-remover { position:absolute;top:6px;right:6px;background:#D6324A;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center; }
+        .prod-destaque-item { border:1px solid #e4eaf3;border-radius:10px;padding:10px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:.2s; }
+        .prod-destaque-item:hover { border-color:#0088C2;background:#f0f9ff; }
+        .prod-destaque-item.selecionado { border-color:#0088C2;background:#e0f2fe; }
+        .prod-destaque-item img,.prod-destaque-item .prod-emoji { width:60px;height:60px;object-fit:contain; }
+        .prod-destaque-item .prod-emoji { font-size:2.2rem;display:flex;align-items:center;justify-content:center; }
+        .prod-destaque-item span { font-size:0.75rem;font-weight:600;color:#1a2340;text-align:center; }
         .admin-tabs { display:flex;gap:0;border-bottom:2px solid #e4eaf3;margin-bottom:24px;flex-wrap:wrap; }
         .admin-tab { padding:12px 20px;border:none;background:none;font-weight:600;font-size:0.95rem;color:#5a6a85;border-bottom:3px solid transparent;cursor:pointer;transition:.2s;white-space:nowrap; }
         .admin-tab.active { color:#0088C2;border-bottom-color:#0088C2; }
@@ -1753,7 +1832,7 @@
             <div class="nav-item active" onclick="showCategory('todos')">Todos os Produtos</div>
             <div class="nav-item" onclick="showCategory('racao')">🍖 Ração</div>
             <div class="nav-item" onclick="showCategory('brinquedos')">🎾 Brinquedos</div>
-            <div class="nav-item" onclick="showCategory('remedios')">💊 Remédios</div>
+            <div class="nav-item" onclick="showCategory('medicamentos')">💊 Medicamentos</div>
             <div class="nav-item" onclick="showCategory('acessorios')">📿 Acessórios</div>
             <div class="nav-item" onclick="openSection('agendamento')">📅 Agendamento</div>
             <div class="nav-item" onclick="openSection('vacinas')">💉 Vacinas</div>
@@ -1773,7 +1852,7 @@
                     Tudo o que seu pet precisa em um só lugar 🐾
                 </p>
                 <p style="color:#5a6a85;font-size:14px;margin:0 0 22px 0;text-align:center">
-                    Ração · Remédios · Acessórios · Canoas/RS
+                    Ração · Medicamentos · Acessórios · Canoas/RS
                 </p>
                 <button class="hero-btn" onclick="showCategory('todos')" style="position:relative;z-index:2;font-size:1.1rem;padding:14px 36px">Ver Produtos →</button>
                 <div class="hero-circles-outer">
@@ -1800,7 +1879,7 @@
                             <span style="font-size:0.78rem;font-weight:700;color:#0088C2;text-align:center;white-space:nowrap">Gatos</span>
                         </div>
 
-                        <div onclick="showCategory('remedios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:82px">
+                        <div onclick="showCategory('medicamentos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:82px">
                             <div class="cat-circle-border" style="width:78px;height:78px;border-radius:50%;overflow:hidden;border:2.5px solid rgba(255,255,255,0.4);box-shadow:0 2px 8px rgba(0,0,0,0.15)">
                                 <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop&auto=format" alt="Farmácia" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='💊'">
                             </div>
@@ -1875,6 +1954,19 @@
     </div>
 
     <!-- SEÇÃO DE PRODUTOS -->
+    <!-- SEÇÃO DE OFERTAS -->
+    <section class="ofertas-section" id="ofertasSection" style="display:none">
+        <div class="ofertas-inner">
+            <div class="ofertas-header">
+                <h2>🔥 Ofertas Especiais</h2>
+                <p>Aproveite antes que acabe — preços por tempo limitado!</p>
+            </div>
+            <div class="ofertas-grid" id="ofertasGrid">
+                <div class="ofertas-vazia">Nenhuma oferta ativa no momento.</div>
+            </div>
+        </div>
+    </section>
+
     <section class="section" id="produtosSection">
         <h2 class="section-title">📦 Nossos Produtos</h2>
         <div id="searchResultTitle" class="search-title" style="display:none"></div>
@@ -2228,6 +2320,9 @@
             <button class="admin-tab" onclick="abrirAbaAdmin('pedidos')">📋 Pedidos</button>
             <button class="admin-tab" onclick="abrirAbaAdmin('clientes')">👥 Clientes</button>
             <button class="admin-tab" onclick="abrirAbaAdmin('cupons')">🎫 Cupons</button>
+            <button class="admin-tab" onclick="abrirAbaAdmin('ofertas')">🔥 Ofertas</button>
+            <button class="admin-tab" onclick="abrirAbaAdmin('destaques')">⭐ Destaques</button>
+            <button class="admin-tab" onclick="abrirAbaAdmin('configuracoes')">⚙️ Config</button>
         </div>
 
         <!-- ABA PRODUTOS -->
@@ -2279,7 +2374,111 @@
                 </table>
             </div>
         </div>
+
+        <!-- ABA OFERTAS -->
+        <div class="admin-tab-content" id="adminOfertas">
+            <button class="btn-admin novo" onclick="abrirModalOferta(null)">+ Nova Oferta</button>
+            <div style="overflow-x:auto;margin-top:14px">
+                <table class="admin-table">
+                    <thead><tr>
+                        <th>Produto</th><th>Preço Original</th><th>Preço Oferta</th><th>Desconto</th><th>Validade</th><th>Status</th><th>Ações</th>
+                    </tr></thead>
+                    <tbody id="ofertasBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA DESTAQUES -->
+        <div class="admin-tab-content" id="adminDestaques">
+            <p style="color:#5a6a85;margin-bottom:16px">Escolha até 4 produtos para aparecer na seção <strong>Produtos em Destaque</strong>.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px" id="destaquesSlots">
+                <div class="destaque-slot" data-slot="0"></div>
+                <div class="destaque-slot" data-slot="1"></div>
+                <div class="destaque-slot" data-slot="2"></div>
+                <div class="destaque-slot" data-slot="3"></div>
+            </div>
+            <button class="btn-admin salvar" onclick="salvarDestaques()">💾 Salvar Destaques</button>
+            <hr style="margin:24px 0;border-color:#e4eaf3">
+            <p style="color:#5a6a85;margin-bottom:12px;font-weight:600">Selecione os produtos:</p>
+            <input type="text" id="buscaDestaque" placeholder="🔍 Buscar produto..." oninput="filtrarProdutosDestaque()" style="width:100%;max-width:400px;padding:10px 14px;border:1px solid #dde3ee;border-radius:8px;margin-bottom:16px;font-size:0.95rem">
+            <div id="listaProdutosDestaque" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;max-height:400px;overflow-y:auto"></div>
+        </div>
+
+        <!-- ABA CONFIGURAÇÕES -->
+        <div class="admin-tab-content" id="adminConfiguracoes">
+            <div style="max-width:500px">
+                <h3 style="color:#1a2340;margin-bottom:20px">⚙️ Configurações do Site</h3>
+
+                <!-- MODO MANUTENÇÃO -->
+                <div style="background:#fff;border:1px solid #e4eaf3;border-radius:12px;padding:20px;margin-bottom:16px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                        <div>
+                            <strong style="font-size:1rem;color:#1a2340">🔧 Modo Manutenção</strong>
+                            <p style="color:#5a6a85;font-size:0.85rem;margin-top:4px">Quando ativado, visitantes veem tela de manutenção. Você continua com acesso total.</p>
+                        </div>
+                        <button id="btnManutencao" onclick="toggleManutencao()" style="padding:10px 20px;border-radius:8px;border:none;font-weight:700;font-size:0.9rem;cursor:pointer;min-width:130px;background:#e8f5e9;color:#2e7d32">🟢 Site Ativo</button>
+                    </div>
+                </div>
+
+                <!-- IMPORTAR CLIENTES -->
+                <div style="background:#fff;border:1px solid #e4eaf3;border-radius:12px;padding:20px;margin-bottom:16px">
+                    <strong style="font-size:1rem;color:#1a2340">📥 Importar Clientes (Excel)</strong>
+                    <p style="color:#5a6a85;font-size:0.85rem;margin-top:4px;margin-bottom:12px">Selecione um arquivo .xlsx com colunas: <strong>nome, email, telefone, cpf, endereco, pet, raca</strong></p>
+                    <input type="file" id="importarExcel" accept=".xlsx,.xls" onchange="importarClientesExcel(this)" style="display:none">
+                    <button onclick="document.getElementById('importarExcel').click()" style="padding:10px 18px;background:#0088C2;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">📂 Selecionar Arquivo Excel</button>
+                    <div id="importacaoStatus" style="margin-top:12px;font-size:0.85rem;color:#5a6a85"></div>
+                </div>
+
+                <!-- EXPORTAR DADOS -->
+                <div style="background:#fff;border:1px solid #e4eaf3;border-radius:12px;padding:20px">
+                    <strong style="font-size:1rem;color:#1a2340">📤 Exportar Dados</strong>
+                    <p style="color:#5a6a85;font-size:0.85rem;margin-top:4px;margin-bottom:12px">Baixe os dados em formato CSV para abrir no Excel.</p>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <button onclick="exportarCSV('clientes')" style="padding:10px 16px;background:#0088C2;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">👥 Exportar Clientes</button>
+                        <button onclick="exportarCSV('pedidos')" style="padding:10px 16px;background:#D6324A;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">📋 Exportar Pedidos</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </section>
+
+    <!-- MODAL OFERTA -->
+    <div class="admin-modal-overlay" id="modalOferta" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px">
+        <div class="admin-modal" style="background:#fff;border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:28px">
+            <h3 id="modalOfertaTitulo" style="color:#1a2340;margin-bottom:20px">🔥 Nova Oferta</h3>
+            <input type="hidden" id="ofId">
+            <div class="form-group" style="margin-bottom:14px">
+                <label style="font-weight:600;font-size:0.85rem;color:#5a6a85;display:block;margin-bottom:6px">Produto *</label>
+                <select id="ofProduto" style="width:100%;padding:10px;border:1px solid #dde3ee;border-radius:8px;font-size:0.95rem" onchange="preencherDadosProdutoOferta()">
+                    <option value="">Selecione um produto...</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+                <label style="font-weight:600;font-size:0.85rem;color:#5a6a85;display:block;margin-bottom:6px">Preço Original (R$)</label>
+                <input type="number" id="ofPrecoOriginal" step="0.01" style="width:100%;padding:10px;border:1px solid #dde3ee;border-radius:8px;font-size:0.95rem" readonly>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+                <label style="font-weight:600;font-size:0.85rem;color:#5a6a85;display:block;margin-bottom:6px">Preço Oferta (R$) *</label>
+                <input type="number" id="ofPrecoOferta" step="0.01" placeholder="Ex: 79.90" style="width:100%;padding:10px;border:1px solid #dde3ee;border-radius:8px;font-size:0.95rem">
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+                <label style="font-weight:600;font-size:0.85rem;color:#5a6a85;display:block;margin-bottom:6px">Válido até</label>
+                <input type="datetime-local" id="ofValidade" style="width:100%;padding:10px;border:1px solid #dde3ee;border-radius:8px;font-size:0.95rem">
+            </div>
+            <div class="form-group" style="margin-bottom:20px">
+                <label style="font-weight:600;font-size:0.85rem;color:#5a6a85;display:block;margin-bottom:6px">Status</label>
+                <select id="ofStatus" style="width:100%;padding:10px;border:1px solid #dde3ee;border-radius:8px;font-size:0.95rem">
+                    <option value="ativa">Ativa</option>
+                    <option value="inativa">Inativa</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button onclick="fecharModalOferta()" style="padding:10px 20px;background:#f4f7fb;border:none;border-radius:8px;font-weight:600;cursor:pointer;color:#5a6a85">Cancelar</button>
+                <button onclick="salvarOferta()" style="padding:10px 20px;background:linear-gradient(135deg,#D6324A,#0088C2);color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer">Salvar Oferta</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL PRODUTO -->
     <div class="admin-modal-overlay" id="modalProduto">
@@ -2290,7 +2489,7 @@
             <div class="form-group"><label>Categoria *</label>
                 <select id="mpCategoria" style="width:100%;border:1.5px solid #dde3ee;border-radius:8px;padding:9px 12px;font-size:.92rem">
                     <option value="racao">Ração</option>
-                    <option value="remedios">Remédios</option>
+                    <option value="medicamentos">Medicamentos</option>
                     <option value="acessorios">Acessórios</option>
                     <option value="brinquedos">Brinquedos</option>
                 </select>
@@ -2344,13 +2543,13 @@
                         <button class="btn-add" onclick="event.stopPropagation();showCategory('racao');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Rações →</button>
                     </div>
                 </div>
-                <div class="destaque-card" onclick="showCategory('remedios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
-                    <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=400&h=180&fit=crop&auto=format" alt="Remédios Pet" onerror="this.src='https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=180&fit=crop'">
+                <div class="destaque-card" onclick="showCategory('medicamentos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
+                    <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=400&h=180&fit=crop&auto=format" alt="Medicamentos Pet" onerror="this.src='https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=180&fit=crop'">
                     <div class="destaque-card-body">
                         <span class="tag">Saúde</span>
-                        <h3>Remédios &amp; Suplementos</h3>
+                        <h3>Medicamentos &amp; Suplementos</h3>
                         <div class="preco">A partir de R$ 12,90</div>
-                        <button class="btn-add" onclick="event.stopPropagation();showCategory('remedios');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Remédios →</button>
+                        <button class="btn-add" onclick="event.stopPropagation();showCategory('medicamentos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">Ver Medicamentos →</button>
                     </div>
                 </div>
                 <div class="destaque-card" onclick="showCategory('brinquedos');document.getElementById('produtosSection').scrollIntoView({behavior:'smooth'})">
@@ -2503,18 +2702,18 @@
             { id:26, name:"ATACAMA ALL BREEDS 20KG",                             category:"racao",     price:92.00,  emoji:"🐕", imgUrl:"https://tse4.mm.bing.net/th/id/OIP.Q01QgivRonVRk607kVxVXgHaD4?rs=1&pid=ImgDetMain&o=7&rm=3", description:"Para todas as raças e tamanhos! Fórmula completa com proteínas selecionadas, vitaminas e minerais. Custo-benefício imbatível." },
             { id:27, name:"ATACAMA ALL BREEDS 14KG",                             category:"racao",     price:72.00,  emoji:"🐕", imgUrl:"https://m.magazineluiza.com.br/a-static/420x420/atacama-all-breeds-14kg-supra/petsonagacomercioderacoes2/14291/2b3fcb0a4303b65a136d2d94a2d91a4f.jpeg", description:"Versão econômica para todas as raças. Mesmo sabor e qualidade da linha Atacama em embalagem menor, perfeita para famílias menores." },
             // ─── MEDICAMENTOS ───
-            { id:28, name:"SIMPARIC 40MG 10,1–20KG COMBO C/3",                  category:"remedios",  price:145.00, emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_615483-MLB85975230434_062025-F.webp", description:"Proteção mensal contra pulgas, carrapatos e ácaros para cães de 10,1 a 20kg. Combo com 3 comprimidos mastigáveis palatáveis." },
-            { id:29, name:"SERESTO COLEIRA GRANDE",                              category:"remedios",  price:198.00, emoji:"🦮", imgUrl:"https://m.media-amazon.com/images/I/51GIVh3gXAL._AC_SL1000_.jpg", description:"Proteção contínua por até 8 meses contra pulgas e carrapatos. Coleira antiparasitária resistente à água para cães acima de 8kg." },
-            { id:30, name:"SIMPARIC 80MG 20,1–40KG COMBO C/3",                  category:"remedios",  price:165.00, emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1116836/simparic_20_a_40kg_80mg_3_comprimidos_mastigaveis_palataveis_zoetis_251_1_f3ba12201edc1fd5680bc54d4c9da7a1.jpg", description:"Eliminação rápida de pulgas e carrapatos em cães de 20,1 a 40kg. Combo 3 comprimidos — protege por 3 meses sem estresse." },
-            { id:31, name:"SIMPARIC 20MG 5,1–10KG 1 COMP",                      category:"remedios",  price:52.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_770123-MLA95705741252_102025-F.webp", description:"Comprimido mastigável de fácil administração para cães de 5,1 a 10kg. Age em 3 horas contra pulgas e elimina carrapatos em 8 horas." },
-            { id:32, name:"SIMPARIC 40MG 10,1–20KG 1 COMP",                     category:"remedios",  price:55.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_893443-MLB104455859844_012026-F.webp", description:"Proteção mensal eficaz contra pulgas e carrapatos para cães de 10,1 a 20kg. Um comprimido com sabor que os cães adoram." },
-            { id:33, name:"SIMPARIC 20MG 5,1–10KG COMBO C/3",                   category:"remedios",  price:145.00, emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1122713/antipulgas_simparic_5_1_ate_10kg_20mg_3_comprimidos_2701_1_74695711855516fef2c1d343c5a98a73.png", description:"Economize comprando o combo! Proteção de 3 meses para cães de 5,1 a 10kg. Sabor palatável para facilitar a administração." },
-            { id:34, name:"AGEMOXI CL 250MG",                                    category:"remedios",  price:38.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_983362-MLB83210885335_032025-F.webp", description:"Antibiótico de amplo espectro com amoxicilina 250mg e ácido clavulânico. Tratamento de infecções em cães e gatos — com receita veterinária." },
-            { id:35, name:"AGEMOXI CL 50MG",                                     category:"remedios",  price:28.00,  emoji:"💊", imgUrl:"https://tse1.mm.bing.net/th/id/OIP.mrBBQDp7mK2GWFg8iR5QVAHaI4?w=600&h=720&rs=1&pid=ImgDetMain&o=7&rm=3", description:"Versão 50mg do antibiótico Agemoxi com amoxicilina e clavulanato. Indicado para animais de menor porte — com receita veterinária." },
-            { id:36, name:"SIMPARIC 80MG 20,1–40KG 1 COMP",                     category:"remedios",  price:58.00,  emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1116836/simparic_20_a_40kg_80mg_3_comprimidos_mastigaveis_palataveis_zoetis_251_1_f3ba12201edc1fd5680bc54d4c9da7a1.jpg", description:"Um comprimido de proteção completa para cães de 20,1 a 40kg. Sabor palatável e ação rápida contra pulgas, carrapatos e ácaros." },
-            { id:37, name:"SIMPARIC 10MG 2,6–5KG 1 COMP",                       category:"remedios",  price:45.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_860240-MLB91991165754_092025-F.webp", description:"Ideal para cães pequenos de 2,6 a 5kg. Comprimido mastigável com ação rápida e eficaz contra pulgas e carrapatos por 30 dias." },
-            { id:38, name:"SIMPARIC 10MG 2,6–5KG COMBO C/3",                    category:"remedios",  price:128.00, emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_660151-MLB53901392150_022023-F.webp", description:"Combo econômico de 3 meses para cães de 2,6 a 5kg. Protege contra pulgas, carrapatos e previte infestações no ambiente." },
-            { id:39, name:"SIMPARIC 120MG 40,1–60KG COMBO C/3",                 category:"remedios",  price:175.00, emoji:"💊", imgUrl:"https://th.bing.com/th/id/OIP.xKU0vYFVBlkQOS-PM7r8SwAAAA?w=168&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", description:"Para cães grandes de 40,1 a 60kg. Combo 3 meses de proteção total contra pulgas, carrapatos e sarna. Comprimido mastigável palatável." },
+            { id:28, name:"SIMPARIC 40MG 10,1–20KG COMBO C/3",                  category:"medicamentos",  price:145.00, emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_615483-MLB85975230434_062025-F.webp", description:"Proteção mensal contra pulgas, carrapatos e ácaros para cães de 10,1 a 20kg. Combo com 3 comprimidos mastigáveis palatáveis." },
+            { id:29, name:"SERESTO COLEIRA GRANDE",                              category:"medicamentos",  price:198.00, emoji:"🦮", imgUrl:"https://m.media-amazon.com/images/I/51GIVh3gXAL._AC_SL1000_.jpg", description:"Proteção contínua por até 8 meses contra pulgas e carrapatos. Coleira antiparasitária resistente à água para cães acima de 8kg." },
+            { id:30, name:"SIMPARIC 80MG 20,1–40KG COMBO C/3",                  category:"medicamentos",  price:165.00, emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1116836/simparic_20_a_40kg_80mg_3_comprimidos_mastigaveis_palataveis_zoetis_251_1_f3ba12201edc1fd5680bc54d4c9da7a1.jpg", description:"Eliminação rápida de pulgas e carrapatos em cães de 20,1 a 40kg. Combo 3 comprimidos — protege por 3 meses sem estresse." },
+            { id:31, name:"SIMPARIC 20MG 5,1–10KG 1 COMP",                      category:"medicamentos",  price:52.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_770123-MLA95705741252_102025-F.webp", description:"Comprimido mastigável de fácil administração para cães de 5,1 a 10kg. Age em 3 horas contra pulgas e elimina carrapatos em 8 horas." },
+            { id:32, name:"SIMPARIC 40MG 10,1–20KG 1 COMP",                     category:"medicamentos",  price:55.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_893443-MLB104455859844_012026-F.webp", description:"Proteção mensal eficaz contra pulgas e carrapatos para cães de 10,1 a 20kg. Um comprimido com sabor que os cães adoram." },
+            { id:33, name:"SIMPARIC 20MG 5,1–10KG COMBO C/3",                   category:"medicamentos",  price:145.00, emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1122713/antipulgas_simparic_5_1_ate_10kg_20mg_3_comprimidos_2701_1_74695711855516fef2c1d343c5a98a73.png", description:"Economize comprando o combo! Proteção de 3 meses para cães de 5,1 a 10kg. Sabor palatável para facilitar a administração." },
+            { id:34, name:"AGEMOXI CL 250MG",                                    category:"medicamentos",  price:38.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_983362-MLB83210885335_032025-F.webp", description:"Antibiótico de amplo espectro com amoxicilina 250mg e ácido clavulânico. Tratamento de infecções em cães e gatos — com receita veterinária." },
+            { id:35, name:"AGEMOXI CL 50MG",                                     category:"medicamentos",  price:28.00,  emoji:"💊", imgUrl:"https://tse1.mm.bing.net/th/id/OIP.mrBBQDp7mK2GWFg8iR5QVAHaI4?w=600&h=720&rs=1&pid=ImgDetMain&o=7&rm=3", description:"Versão 50mg do antibiótico Agemoxi com amoxicilina e clavulanato. Indicado para animais de menor porte — com receita veterinária." },
+            { id:36, name:"SIMPARIC 80MG 20,1–40KG 1 COMP",                     category:"medicamentos",  price:58.00,  emoji:"💊", imgUrl:"https://images.tcdn.com.br/img/img_prod/1116836/simparic_20_a_40kg_80mg_3_comprimidos_mastigaveis_palataveis_zoetis_251_1_f3ba12201edc1fd5680bc54d4c9da7a1.jpg", description:"Um comprimido de proteção completa para cães de 20,1 a 40kg. Sabor palatável e ação rápida contra pulgas, carrapatos e ácaros." },
+            { id:37, name:"SIMPARIC 10MG 2,6–5KG 1 COMP",                       category:"medicamentos",  price:45.00,  emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_860240-MLB91991165754_092025-F.webp", description:"Ideal para cães pequenos de 2,6 a 5kg. Comprimido mastigável com ação rápida e eficaz contra pulgas e carrapatos por 30 dias." },
+            { id:38, name:"SIMPARIC 10MG 2,6–5KG COMBO C/3",                    category:"medicamentos",  price:128.00, emoji:"💊", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_660151-MLB53901392150_022023-F.webp", description:"Combo econômico de 3 meses para cães de 2,6 a 5kg. Protege contra pulgas, carrapatos e previte infestações no ambiente." },
+            { id:39, name:"SIMPARIC 120MG 40,1–60KG COMBO C/3",                 category:"medicamentos",  price:175.00, emoji:"💊", imgUrl:"https://th.bing.com/th/id/OIP.xKU0vYFVBlkQOS-PM7r8SwAAAA?w=168&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", description:"Para cães grandes de 40,1 a 60kg. Combo 3 meses de proteção total contra pulgas, carrapatos e sarna. Comprimido mastigável palatável." },
             // ─── AREIA ───
             { id:40, name:"PIPICAT MULTICAT 12KG",                               category:"acessorios", price:62.00, emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/61TfMzlowYL._AC_SL1000_.jpg", description:"Areia de alta absorção para lares com vários gatos. Grãos que formam grumos compactos e facilitam a limpeza. Controle de odor por mais tempo." },
             { id:41, name:"PIPICAT CLASSIC 12KG",                                category:"acessorios", price:55.00, emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/814N+4Q89KL._AC_SL1500_.jpg", description:"A areia clássica e confiável que os gatos adoram! Alta absorção, grãos que aglomeram com facilidade e eliminação eficaz de odores." },
@@ -3670,7 +3869,7 @@
                         <div><strong style="color:#0088C2">💳 Quais formas de pagamento vocês aceitam?</strong><br>Aceitamos pagamento via PIX. Ao finalizar o pedido, você recebe a chave PIX e pode enviar o comprovante pelo WhatsApp.</div>
                         <div><strong style="color:#0088C2">🐕 Vocês têm ração para cães de todas as raças?</strong><br>Sim! Trabalhamos com diversas marcas e tamanhos, como Golden Special, Monello, Primogato e outras. Veja o catálogo completo na seção de produtos.</div>
                         <div><strong style="color:#0088C2">🐱 Têm produtos para gatos também?</strong><br>Claro! Temos rações, areia higiênica, brinquedos e acessórios especialmente para gatos.</div>
-                        <div><strong style="color:#0088C2">💊 Vocês vendem medicamentos e antiparasitários?</strong><br>Sim, temos uma seleção de remédios, antiparasitários e suplementos para cães e gatos. Confira na aba "Remédios".</div>
+                        <div><strong style="color:#0088C2">💊 Vocês vendem medicamentos e antiparasitários?</strong><br>Sim, temos uma seleção de medicamentos, antiparasitários e suplementos para cães e gatos. Confira na aba "Medicamentos".</div>
                         <div><strong style="color:#0088C2">🔄 Posso trocar um produto?</strong><br>Sim! Aceitamos trocas e devoluções dentro do prazo legal. O produto deve estar em perfeitas condições e com embalagem original. Entre em contato pelo WhatsApp.</div>
                         <div><strong style="color:#0088C2">📅 Posso agendar a entrega?</strong><br>Sim! Na seção de Agendamento você pode escolher data e horário. Agendamentos devem ser feitos com pelo menos 24h de antecedência.</div>
                         <div><strong style="color:#0088C2">📍 Qual o endereço da loja?</strong><br>Av. Santos Ferreira, 997 — Bairro Mal. Rondon, Canoas/RS. Atendemos de Segunda a Sábado, das 9h às 19h.</div>
@@ -3768,7 +3967,7 @@
                     titulo: 'Categoria',
                     itens: [
                         { label: '🥣 Ração',       fn: () => { renderProducts('racao','cao');      scroll(); } },
-                        { label: '💊 Remédios',    fn: () => { renderProducts('remedios','cao');   scroll(); } },
+                        { label: '💊 Medicamentos',    fn: () => { renderProducts('medicamentos','cao');   scroll(); } },
                         { label: '🎾 Brinquedos',  fn: () => { renderProducts('brinquedos','cao'); scroll(); } },
                         { label: '🧸 Acessórios',  fn: () => { renderProducts('acessorios','cao'); scroll(); } }
                     ]
@@ -3777,7 +3976,7 @@
                     titulo: 'Categoria',
                     itens: [
                         { label: '🥣 Ração',          fn: () => { renderProducts('racao','gato');      scroll(); } },
-                        { label: '💊 Remédios',        fn: () => { renderProducts('remedios','gato');   scroll(); } },
+                        { label: '💊 Medicamentos',        fn: () => { renderProducts('medicamentos','gato');   scroll(); } },
                         { label: '🎾 Brinquedos',      fn: () => { renderProducts('brinquedos','gato'); scroll(); } },
                         { label: '🪣 Areia Higiênica', fn: () => { renderProducts('acessorios','gato'); scroll(); } }
                     ]
@@ -3785,9 +3984,9 @@
                 'Farmácia': {
                     titulo: 'Para qual pet?',
                     itens: [
-                        { label: '🐕 Remédios p/ Cão',  fn: () => { renderProducts('remedios','cao');  scroll(); } },
-                        { label: '🐱 Remédios p/ Gato', fn: () => { renderProducts('remedios','gato'); scroll(); } },
-                        { label: '💊 Ver Todos',         fn: () => { renderProducts('remedios');        scroll(); } }
+                        { label: '🐕 Medicamentos p/ Cão',  fn: () => { renderProducts('medicamentos','cao');  scroll(); } },
+                        { label: '🐱 Medicamentos p/ Gato', fn: () => { renderProducts('medicamentos','gato'); scroll(); } },
+                        { label: '💊 Ver Todos',         fn: () => { renderProducts('medicamentos');        scroll(); } }
                     ]
                 },
                 'Acessórios': {
@@ -4074,16 +4273,19 @@
 
         // ── Abas ──────────────────────────────────────
         function abrirAbaAdmin(aba) {
-            document.querySelectorAll('.admin-tab').forEach((t,i) => {
-                const ids = ['produtos','pedidos','clientes','cupons'];
-                t.classList.toggle('active', ids[i] === aba);
-            });
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            const ids = ['produtos','pedidos','clientes','cupons','ofertas','destaques','configuracoes'];
+            const idx = ids.indexOf(aba);
+            if (idx >= 0) document.querySelectorAll('.admin-tab')[idx].classList.add('active');
             document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById('admin' + aba.charAt(0).toUpperCase() + aba.slice(1)).classList.add('active');
-            if (aba === 'produtos')  renderAdminProdutos();
-            if (aba === 'pedidos')   renderAdminPedidos();
-            if (aba === 'clientes')  renderAdminClientes();
-            if (aba === 'cupons')    renderAdminCupons();
+            if (aba === 'produtos')       renderAdminProdutos();
+            if (aba === 'pedidos')        renderAdminPedidos();
+            if (aba === 'clientes')       renderAdminClientes();
+            if (aba === 'cupons')         renderAdminCupons();
+            if (aba === 'ofertas')        renderAdminOfertas();
+            if (aba === 'destaques')      renderAdminDestaques();
+            if (aba === 'configuracoes')  renderAdminConfiguracoes();
         }
 
         // ── Stats ─────────────────────────────────────
@@ -4406,6 +4608,433 @@
                 } catch(e) { console.warn('Firestore pedidos:', e); }
             }
         }
+        // ════════════════════════════════════════════
+        // ██  OFERTAS  ████████████████████████████████
+        // ════════════════════════════════════════════
+
+        // --- Salvar/carregar ofertas via Firestore + localStorage ---
+        function getOfertas() {
+            return JSON.parse(localStorage.getItem('caotelli_ofertas') || '[]');
+        }
+        function saveOfertasLocal(arr) {
+            localStorage.setItem('caotelli_ofertas', JSON.stringify(arr));
+        }
+        async function carregarOfertasFirestore() {
+            if (!window._db) return;
+            try {
+                const snap = await window._fsGetDocs(window._fsCol(window._db, 'ofertas'));
+                const arr = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                saveOfertasLocal(arr);
+            } catch(e) { console.warn('Firestore ofertas load:', e); }
+        }
+
+        // --- Admin: renderizar tabela de ofertas ---
+        function renderAdminOfertas() {
+            carregarOfertasFirestore().then(() => {
+                const arr = getOfertas();
+                const tbody = document.getElementById('ofertasBody');
+                if (!tbody) return;
+                if (!arr.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px">Nenhuma oferta cadastrada</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = arr.map((o, i) => `
+                    <tr>
+                        <td style="padding:10px 8px">${o.nomeProduto || '—'}</td>
+                        <td style="padding:10px 8px">R$ ${parseFloat(o.precoOferta||0).toFixed(2)}</td>
+                        <td style="padding:10px 8px">${o.validade ? new Date(o.validade).toLocaleString('pt-BR') : 'Sem prazo'}</td>
+                        <td style="padding:10px 8px">
+                            <span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;background:${o.ativo?'#d4edda':'#f8d7da'};color:${o.ativo?'#155724':'#721c24'}">
+                                ${o.ativo ? 'Ativa' : 'Inativa'}
+                            </span>
+                        </td>
+                        <td style="padding:10px 8px;white-space:nowrap">
+                            <button class="btn-admin" onclick="abrirModalOferta(${i})">✏️ Editar</button>
+                            <button class="btn-admin excluir" onclick="excluirOferta(${i})">🗑️ Excluir</button>
+                        </td>
+                    </tr>`).join('');
+            });
+        }
+
+        // --- Modal oferta ---
+        function abrirModalOferta(idx) {
+            const modal = document.getElementById('modalOferta');
+            if (!modal) return;
+            // Preenche select de produtos
+            const sel = document.getElementById('ofProduto');
+            if (sel) {
+                sel.innerHTML = '<option value="">Selecione um produto...</option>' +
+                    products.map(p => `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}">${p.name}</option>`).join('');
+            }
+            document.getElementById('ofId').value = idx === null ? '' : idx;
+            if (idx === null) {
+                document.getElementById('modalOfertaTitulo').textContent = '🔥 Nova Oferta';
+                ['ofProduto','ofPrecoOriginal','ofPrecoOferta','ofValidade'].forEach(f => {
+                    const el = document.getElementById(f); if (el) el.value = '';
+                });
+                const atEl = document.getElementById('ofStatus'); if (atEl) atEl.value = 'ativa';
+            } else {
+                const o = getOfertas()[idx];
+                document.getElementById('modalOfertaTitulo').textContent = '✏️ Editar Oferta';
+                const selEl = document.getElementById('ofProduto');
+                if (selEl) selEl.value = o.produtoId || '';
+                const poEl = document.getElementById('ofPrecoOriginal');
+                if (poEl) poEl.value = o.precoOriginal || '';
+                const pofEl = document.getElementById('ofPrecoOferta');
+                if (pofEl) pofEl.value = o.precoOferta || '';
+                const vEl = document.getElementById('ofValidade');
+                if (vEl) vEl.value = o.validade || '';
+                const atEl = document.getElementById('ofStatus');
+                if (atEl) atEl.value = o.ativo ? 'ativa' : 'inativa';
+            }
+            modal.style.display = 'flex';
+        }
+        function fecharModalOferta() {
+            const modal = document.getElementById('modalOferta');
+            if (modal) modal.style.display = 'none';
+        }
+        function preencherDadosProdutoOferta() {
+            const sel = document.getElementById('ofProduto');
+            if (!sel || !sel.value) return;
+            const opt = sel.options[sel.selectedIndex];
+            const price = opt.getAttribute('data-price');
+            const poEl = document.getElementById('ofPrecoOriginal');
+            if (poEl) poEl.value = parseFloat(price).toFixed(2);
+        }
+        async function salvarOferta() {
+            const sel = document.getElementById('ofProduto');
+            const precoOferta = parseFloat(document.getElementById('ofPrecoOferta').value);
+            if (!sel || !sel.value || isNaN(precoOferta)) {
+                alert('Selecione o produto e informe o preço de oferta!'); return;
+            }
+            const opt = sel.options[sel.selectedIndex];
+            const nova = {
+                produtoId:     parseInt(sel.value),
+                nomeProduto:   opt.getAttribute('data-name'),
+                precoOriginal: parseFloat(document.getElementById('ofPrecoOriginal').value) || 0,
+                precoOferta:   precoOferta,
+                validade:      document.getElementById('ofValidade').value || '',
+                ativo: document.getElementById('ofStatus').value === 'ativa',
+            };
+            const arr = getOfertas();
+            const idx = document.getElementById('ofId').value;
+            let docId = null;
+            if (idx !== '') {
+                docId = arr[parseInt(idx)].id;
+                arr[parseInt(idx)] = { ...nova, id: docId };
+            } else {
+                arr.push(nova);
+            }
+            saveOfertasLocal(arr);
+            if (window._db) {
+                try {
+                    if (docId) {
+                        await window._fsSetDoc(window._fsDoc(window._db, 'ofertas', docId), nova);
+                    } else {
+                        const ref = await window._fsAddDoc(window._fsCol(window._db, 'ofertas'), nova);
+                        arr[arr.length-1].id = ref.id;
+                        saveOfertasLocal(arr);
+                    }
+                } catch(e) { console.warn('Firestore salvarOferta:', e); }
+            }
+            fecharModalOferta();
+            renderAdminOfertas();
+            renderOfertasSite();
+            showNotification('Oferta salva! 🔥', 'success');
+        }
+        async function excluirOferta(idx) {
+            if (!confirm('Excluir esta oferta?')) return;
+            const arr = getOfertas();
+            const docId = arr[idx]?.id;
+            arr.splice(idx, 1);
+            saveOfertasLocal(arr);
+            if (window._db && docId) {
+                try { await window._fsDeleteDoc(window._fsDoc(window._db, 'ofertas', docId)); }
+                catch(e) { console.warn('Firestore excluirOferta:', e); }
+            }
+            renderAdminOfertas();
+            renderOfertasSite();
+            showNotification('Oferta excluída!', 'error');
+        }
+
+        // --- Frontend: renderizar seção de ofertas ---
+        function renderOfertasSite() {
+            const arr = getOfertas().filter(o => {
+                if (!o.ativo) return false;
+                if (o.validade) { const d = new Date(o.validade); if (d < new Date()) return false; }
+                return true;
+            });
+            const section = document.getElementById('ofertasSection');
+            if (!section) return;
+            const grid = document.getElementById('ofertasGrid');
+            if (!grid) return;
+            if (!arr.length) { section.style.display = 'none'; return; }
+            section.style.display = '';
+            grid.innerHTML = arr.map(o => {
+                const prod = products.find(p => p.id === parseInt(o.produtoId));
+                const imgHtml = prod && prod.image
+                    ? `<img src="${prod.image}" alt="${o.nomeProduto}" onerror="this.style.display='none'">`
+                    : `<span class="oferta-emoji">${prod?.emoji || '🐾'}</span>`;
+                const pct = o.precoOriginal > 0
+                    ? Math.round((1 - o.precoOferta / o.precoOriginal) * 100) : 0;
+                const timerHtml = o.validade
+                    ? `<span class="oferta-timer" id="timer_${o.produtoId}">⏱ carregando...</span>` : '';
+                return `
+                <div class="oferta-card">
+                    ${pct > 0 ? `<span class="oferta-badge">-${pct}%</span>` : ''}
+                    ${timerHtml}
+                    <div class="oferta-img-wrap">${imgHtml}</div>
+                    <div class="oferta-body">
+                        <div class="oferta-name">${o.nomeProduto}</div>
+                        ${o.precoOriginal > 0 ? `<div class="oferta-preco-de">De: R$ ${parseFloat(o.precoOriginal).toFixed(2)}</div>` : ''}
+                        <div class="oferta-preco-por">R$ ${parseFloat(o.precoOferta).toFixed(2)}</div>
+                        <button class="oferta-btn" onclick="addToCartOffer(${o.produtoId}, ${o.precoOferta})">🛒 Adicionar ao carrinho</button>
+                    </div>
+                </div>`;
+            }).join('');
+            // Inicializa timers de contagem regressiva
+            arr.filter(o => o.validade).forEach(o => {
+                const el = document.getElementById('timer_' + o.produtoId);
+                if (!el) return;
+                function tick() {
+                    const diff = new Date(o.validade) - new Date();
+                    if (diff <= 0) { el.textContent = '⏱ Encerrada'; return; }
+                    const h = Math.floor(diff/3600000);
+                    const m = Math.floor((diff%3600000)/60000);
+                    const s = Math.floor((diff%60000)/1000);
+                    el.textContent = `⏱ ${h}h ${m}m ${s}s`;
+                    setTimeout(tick, 1000);
+                }
+                tick();
+            });
+        }
+        function addToCartOffer(produtoId, precoOferta) {
+            const prod = products.find(p => p.id === parseInt(produtoId));
+            if (!prod) return;
+            const itemOferta = { ...prod, price: parseFloat(precoOferta) };
+            if (typeof addToCart === 'function') addToCart(itemOferta);
+            else showNotification('Produto adicionado! 🛒', 'success');
+        }
+
+        // ════════════════════════════════════════════
+        // ██  DESTAQUES  ██████████████████████████████
+        // ════════════════════════════════════════════
+
+        function getDestaques() {
+            return JSON.parse(localStorage.getItem('caotelli_destaques') || '[]');
+        }
+        function saveDestaquesLocal(arr) {
+            localStorage.setItem('caotelli_destaques', JSON.stringify(arr));
+        }
+        async function carregarDestaquesFirestore() {
+            if (!window._db) return;
+            try {
+                const snap = await window._fsGetDoc(window._fsDoc(window._db, 'config', 'destaques'));
+                if (snap.exists()) saveDestaquesLocal(snap.data().ids || []);
+            } catch(e) { console.warn('Firestore destaques load:', e); }
+        }
+
+        let _destaquesTemp = [];
+
+        function renderAdminDestaques() {
+            carregarDestaquesFirestore().then(() => {
+                _destaquesTemp = [...getDestaques()];
+                _renderDestaqueUI();
+            });
+        }
+        function _renderDestaqueUI() {
+            // Slots selecionados
+            const slotsEl = document.getElementById('destaquesSlots');
+            if (slotsEl) {
+                if (!_destaquesTemp.length) {
+                    slotsEl.innerHTML = '<p style="color:#aaa;font-size:0.9rem">Nenhum produto em destaque. Selecione abaixo.</p>';
+                } else {
+                    slotsEl.innerHTML = _destaquesTemp.map((id, i) => {
+                        const p = products.find(x => x.id === id);
+                        if (!p) return '';
+                        const img = p.image ? `<img src="${p.image}" alt="${p.name}" onerror="this.style.display='none'">` : `<div class="prod-emoji" style="font-size:2rem">${p.emoji||'🐾'}</div>`;
+                        return `<div class="destaque-slot preenchido">
+                            ${img}
+                            <div class="slot-nome">${p.name}</div>
+                            <button class="slot-remover" onclick="_removerDestaque(${i})">✕</button>
+                        </div>`;
+                    }).join('');
+                }
+            }
+            // Lista de produtos para selecionar
+            const listaEl = document.getElementById('listaProdutosDestaque');
+            if (listaEl) {
+                const filtro = (document.getElementById('buscaDestaque')?.value || '').toLowerCase();
+                const prods = products.filter(p => p.name.toLowerCase().includes(filtro));
+                listaEl.innerHTML = prods.map(p => {
+                    const sel = _destaquesTemp.includes(p.id);
+                    const img = p.image ? `<img src="${p.image}" alt="${p.name}" onerror="this.style.display='none'">` : `<div class="prod-emoji">${p.emoji||'🐾'}</div>`;
+                    return `<div class="prod-destaque-item ${sel?'selecionado':''}" onclick="_toggleDestaque(${p.id})">
+                        ${img}
+                        <span>${p.name}</span>
+                    </div>`;
+                }).join('');
+            }
+        }
+        function _toggleDestaque(id) {
+            const idx = _destaquesTemp.indexOf(id);
+            if (idx >= 0) _destaquesTemp.splice(idx, 1);
+            else _destaquesTemp.push(id);
+            _renderDestaqueUI();
+        }
+        function _removerDestaque(i) {
+            _destaquesTemp.splice(i, 1);
+            _renderDestaqueUI();
+        }
+        function filtrarProdutosDestaque() { _renderDestaqueUI(); }
+        async function salvarDestaques() {
+            saveDestaquesLocal(_destaquesTemp);
+            if (window._db) {
+                try {
+                    await window._fsSetDoc(window._fsDoc(window._db, 'config', 'destaques'), { ids: _destaquesTemp });
+                } catch(e) { console.warn('Firestore salvarDestaques:', e); }
+            }
+            showNotification('Destaques salvos! ⭐', 'success');
+        }
+
+        // ════════════════════════════════════════════
+        // ██  MANUTENÇÃO  █████████████████████████████
+        // ════════════════════════════════════════════
+
+        async function renderAdminConfiguracoes() {
+            const btn = document.getElementById('btnManutencao');
+            const status = document.getElementById('manutencaoStatus');
+            if (!btn) return;
+            let ativo = false;
+            if (window._db) {
+                try {
+                    const snap = await window._fsGetDoc(window._fsDoc(window._db, 'config', 'manutencao'));
+                    ativo = snap.exists() ? (snap.data().ativo || false) : false;
+                } catch(e) { console.warn('Firestore manutencao load:', e); }
+            }
+            _atualizarBtnManutencao(ativo);
+        }
+        function _atualizarBtnManutencao(ativo) {
+            const btn = document.getElementById('btnManutencao');
+            const status = document.getElementById('manutencaoStatus');
+            if (btn) {
+                btn.textContent = ativo ? '🟢 Desativar Manutenção' : '🔴 Ativar Manutenção';
+                btn.style.background = ativo ? '#28a745' : '#D6324A';
+            }
+            if (status) {
+                status.textContent = ativo ? '⚠️ Site em manutenção — visitantes veem tela de aviso.' : '✅ Site online — visitantes acessam normalmente.';
+                status.style.color = ativo ? '#856404' : '#155724';
+                status.style.background = ativo ? '#fff3cd' : '#d4edda';
+            }
+        }
+        async function toggleManutencao() {
+            const btn = document.getElementById('btnManutencao');
+            if (!btn) return;
+            const estaAtivo = btn.textContent.includes('Desativar');
+            const novoEstado = !estaAtivo;
+            if (window._db) {
+                try {
+                    await window._fsSetDoc(window._fsDoc(window._db, 'config', 'manutencao'), { ativo: novoEstado });
+                } catch(e) { alert('Erro ao atualizar manutenção: ' + e.message); return; }
+            }
+            _atualizarBtnManutencao(novoEstado);
+            showNotification(novoEstado ? '🔴 Manutenção ativada!' : '🟢 Site online!', novoEstado ? 'error' : 'success');
+        }
+        // Verificação no carregamento (mostra tela de manutenção para não-admins)
+        async function verificarManutencao() {
+            if (!window._db) return;
+            try {
+                const snap = await window._fsGetDoc(window._fsDoc(window._db, 'config', 'manutencao'));
+                if (!snap.exists() || !snap.data().ativo) return;
+                // Verifica se é admin
+                const user = window._fbUser;
+                const admins = ['liezerlad21@gmail.com','caotelli@gmail.com'];
+                if (user && admins.includes(user.email)) return;
+                // Mostra tela de manutenção
+                document.body.innerHTML = `
+                    <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a2340,#0088C2);color:#fff;text-align:center;padding:40px">
+                        <div style="font-size:5rem;margin-bottom:24px">🐾</div>
+                        <h1 style="font-size:2rem;font-weight:800;margin-bottom:12px">CãoTelli em Manutenção</h1>
+                        <p style="font-size:1.1rem;opacity:0.85;max-width:400px;line-height:1.6">
+                            Estamos atualizando o site para melhor atendê-lo.<br>
+                            Voltamos em breve! Para urgências, fale pelo WhatsApp.
+                        </p>
+                        <a href="https://wa.me/5551997655755" style="margin-top:32px;padding:14px 32px;background:#25D366;border-radius:12px;color:#fff;font-weight:700;text-decoration:none;font-size:1rem">
+                            📲 Falar pelo WhatsApp
+                        </a>
+                    </div>`;
+            } catch(e) { console.warn('Firestore verificarManutencao:', e); }
+        }
+
+        // ════════════════════════════════════════════
+        // ██  IMPORTAR/EXPORTAR  ██████████████████████
+        // ════════════════════════════════════════════
+
+        function importarClientesExcel(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    if (typeof XLSX === 'undefined') {
+                        alert('Biblioteca Excel não carregada. Recarregue a página e tente novamente.');
+                        return;
+                    }
+                    const wb = XLSX.read(e.target.result, { type: 'array' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+                    if (!rows.length) { alert('Planilha vazia!'); return; }
+                    let importados = 0, erros = 0;
+                    const clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+                    for (const row of rows) {
+                        const nome  = (row['Nome'] || row['nome'] || row['NOME'] || '').toString().trim();
+                        const email = (row['Email'] || row['email'] || row['E-mail'] || '').toString().trim();
+                        const tel   = (row['Telefone'] || row['telefone'] || row['Tel'] || '').toString().trim();
+                        if (!nome && !email) { erros++; continue; }
+                        const novo = { nome, email, telefone: tel, dataCadastro: new Date().toLocaleDateString('pt-BR'), origem: 'importação' };
+                        clientes.push(novo);
+                        if (window._db && email) {
+                            try {
+                                await window._fsSetDoc(window._fsDoc(window._db, 'clientes', email), novo);
+                            } catch(fe) { console.warn('Firestore import cliente:', fe); }
+                        }
+                        importados++;
+                    }
+                    localStorage.setItem('caotelli_clientes', JSON.stringify(clientes));
+                    renderAdminClientes();
+                    renderAdminStats();
+                    showNotification(`✅ ${importados} clientes importados${erros ? `, ${erros} ignorados` : ''}!`, 'success');
+                } catch(err) {
+                    alert('Erro ao ler planilha: ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            input.value = '';
+        }
+
+        function exportarCSV(tipo) {
+            let data, filename, headers;
+            if (tipo === 'clientes') {
+                data = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+                headers = ['Nome','Email','Telefone','Data Cadastro'];
+                filename = 'clientes_caotelli.csv';
+                data = data.map(c => [c.nome||'', c.email||'', c.telefone||'', c.dataCadastro||'']);
+            } else if (tipo === 'pedidos') {
+                data = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+                headers = ['Data','Cliente','Total','Status','Itens'];
+                filename = 'pedidos_caotelli.csv';
+                data = data.map(p => [p.data||'', p.cliente||'', 'R$ '+(p.total||0).toFixed(2), p.status||'', (p.itens||[]).map(i => `${i.name}(x${i.qty})`).join('; ')]);
+            } else return;
+            const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+            const csv = [headers.map(esc).join(','), ...data.map(r => r.map(esc).join(','))].join('\n');
+            const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename; a.click();
+            URL.revokeObjectURL(url);
+            showNotification(`📥 ${filename} baixado!`, 'success');
+        }
+
     </script>
 
     <!-- MODAL CARRINHO -->
@@ -4539,6 +5168,10 @@
     <span class="floating-cart-badge" id="floatingCartBadge">0</span>
 </div>
 
+
+<!-- SheetJS para importar Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <!-- FIREBASE AUTH SDK -->
 <script type="module">
   import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -4619,4 +5252,17 @@
       }
     }
   });
-<
+</script>
+
+<a class="floating-wa" href="https://wa.me/5551997655755" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+<a class="floating-reviews" href="https://www.google.com/search?sca_esv=11c72b9740f8d846&hl=pt-BR&q=C%C3%A3oTelli+%7C+Pet+Shop+Coment%C3%A1rios&sa=X&ved=2ahUKEwjJrYTa36WUAxXpGLkGHUKXCH0Q0bkNegQIJhAH" target="_blank"><img class="frv-logo" src="logo_caotelli.png" alt="CaoTelli"><div class="frv-divider"></div><div class="frv-right"><div class="frv-google-row"><svg viewBox="0 0 24 24" width="15" height="15"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg><span class="frv-google-text">Google</span></div><div class="frv-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><div class="frv-info"><strong>5,0</strong> &middot; 1.800 avaliacoes</div></div></a>
+<script>
+  // Verificar modo manutenção após auth inicializar
+  setTimeout(function() {
+    if (typeof verificarManutencao === 'function') verificarManutencao();
+    if (typeof carregarOfertasFirestore === 'function') carregarOfertasFirestore().then(() => renderOfertasSite());
+    if (typeof carregarDestaquesFirestore === 'function') carregarDestaquesFirestore();
+  }, 1200);
+</script>
+</body>
+</html>
