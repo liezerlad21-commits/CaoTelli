@@ -195,6 +195,24 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 03/06/2026
+
+### Discussão sobre integração Mercado Pago
+
+**O que foi discutido:**
+
+- Levantada a necessidade de um backend para integração real do Mercado Pago (o Access Token não pode ficar exposto no HTML estático do GitHub Pages)
+- Duas opções apresentadas ao Liézer:
+  - **Opção 1 — Link fixo do MP (simples):** Zero servidor, funciona hoje. O valor total é passado corretamente, mas os itens do carrinho aparecem de forma genérica no MP (detalhamento fica só no WhatsApp). Ideal se o cliente não precisar ver os itens listados dentro do MP.
+  - **Opção 2 — Vercel + API (completo):** Itens do carrinho aparecem dentro do Mercado Pago. Requer criar conta na Vercel (gratuito) e fazer deploy de uma API mínima (1 arquivo).
+- Pendente: Liézer vai consultar o cliente (CãoTelli) sobre qual opção prefere e buscar as credenciais do Mercado Pago.
+
+**Próxima ação:** Quando o cliente decidir e as credenciais chegarem, implementar a opção escolhida.
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 20/05/2026
 
 ### Edição de perfil, recuperação de senha e gestão de clientes no admin ✅
