@@ -440,7 +440,8 @@
             border-bottom: 3px solid var(--primary-purple);
             animation: fadeIn 1s ease-in;
             position: relative;
-            overflow: hidden;
+            overflow: clip;
+            overflow-clip-margin: 0px;
         }
         .hero::before {
             content: '';
@@ -746,6 +747,7 @@
             cursor: pointer;
             transition: all 0.3s;
             font-size: 14px;
+            margin-top: auto;
         }
 
         .add-to-cart-btn:hover {
@@ -1219,6 +1221,10 @@
 
             .product-card {
                 padding: 15px;
+            }
+
+            .product-img-wrap {
+                height: 130px;
             }
 
             .product-emoji {
