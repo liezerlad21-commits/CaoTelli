@@ -195,7 +195,30 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 03/06/2026
+**Data:** 03/06/2026 (tarde/noite)
+
+### Funcionalidades do cliente implementadas + logo escurecido ✅
+
+**O que foi feito:**
+
+- **Remédios → Medicamentos** — substituído em todas as 29 ocorrências do site
+- **Seção de Ofertas** — nova seção entre o hero e os produtos (`#ofertasSection`), com cards, badge de desconto, timer de contagem regressiva e botão adicionar ao carrinho. Aparece automaticamente quando há ofertas ativas.
+- **Admin: Aba "🔥 Ofertas"** — tabela de ofertas, modal para criar/editar (produto, preço original, preço oferta, validade, status ativa/inativa), salva no Firestore (`collection: ofertas`)
+- **Admin: Aba "⭐ Destaques"** — seleção visual de produtos para destaque, slots visuais, salva no Firestore (`config/destaques`)
+- **Admin: Aba "⚙️ Config":**
+  - **Modo Manutenção** — botão que ativa/desativa; visitantes veem tela de aviso com link WhatsApp; admins passam direto. Salva em Firestore (`config/manutencao`)
+  - **Importar clientes via Excel** — lê `.xlsx` com SheetJS (CDN), importa colunas nome/email/telefone para Firestore
+  - **Exportar CSV** — baixa clientes ou pedidos como `.csv` (formato Excel-compatível com BOM UTF-8)
+- **Logo escurecido** — o azul do logo estava embutido como base64 no HTML (não é o arquivo externo). Cor original `#1A80E6` escurecida para ~`#010F1C` (azul marinho escuro). Arquivo `logo_caotelli.png` na pasta foi alterado mas **o que vale para o site é o base64 dentro do index.html**.
+- **Checkpoint git:** `d145cc0` criado antes das modificações (ponto de rollback seguro)
+
+**IMPORTANTE — Para subir ao GitHub:**
+- Não é possível remover locks do sandbox. Rodar **`PushCaoTelli.bat`** no Windows (já remove locks automaticamente).
+
+**Próxima sessão — continuar de:**
+- Verificar se todas as abas do admin funcionam corretamente no site publicado
+- Integração de pagamento real via PagBank (cliente usa PagBank, não Mercado Pago) — pendente credenciais do cliente
+- Possível domínio .com.br
 
 ### Discussão sobre integração Mercado Pago
 
