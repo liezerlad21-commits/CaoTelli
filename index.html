@@ -557,16 +557,22 @@
             transform: translateY(-10px);
         }
 
+        .product-img-wrap {
+            width: 100%;
+            height: 208px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
         .product-emoji {
             font-size: 60px;
-            margin-bottom: 15px;
             animation: float 3s ease-in-out infinite;
         }
         .product-img {
             width: 100%;
-            height: 208px;
+            height: 100%;
             object-fit: contain;
-            margin-bottom: 12px;
             border-radius: 0;
             background: transparent;
             padding: 8px;
@@ -2436,21 +2442,21 @@
         const products = [
             // ─── RAÇÃO ───
             { id:1,  name:"PRIMOGATO PREMIUM ORIGINAL 10,1KG",                  category:"racao",     price:89.90,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/61KPn8S6NBL._AC_SX679_.jpg", description:"Ração super premium com alto teor de proteína animal, vitaminas e minerais. Formulada para gatos adultos exigentes que merecem o melhor." },
-            { id:2,  name:"Monello Cães Adulto Tradicional Frango 17kg",          category:"racao",     price:115.00, emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/1636563542196.jpg", description:"Sabor irresistível de frango que os cães adoram! Nutrição completa para cães adultos de todas as raças, com ingredientes selecionados." },
-            { id:3,  name:"GOLDEN SPECIAL ADULTO 15KG",                          category:"racao",     price:98.90,  emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/10002310000076_1775762750885.jpg", description:"Fórmula balanceada com proteínas nobres, Ômega 3 e 6 para pelagem brilhante e saúde óssea. Ideal para cães adultos ativos." },
+            { id:2,  name:"Monello Cães Adulto Tradicional Frango 17kg",          category:"racao",     price:115.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/71fG2AWMWTL._AC_SX679_.jpg", description:"Sabor irresistível de frango que os cães adoram! Nutrição completa para cães adultos de todas as raças, com ingredientes selecionados." },
+            { id:3,  name:"GOLDEN SPECIAL ADULTO 15KG",                          category:"racao",     price:98.90,  emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/61VkUgdhFkL._AC_SX679_.jpg", description:"Fórmula balanceada com proteínas nobres, Ômega 3 e 6 para pelagem brilhante e saúde óssea. Ideal para cães adultos ativos." },
             { id:4,  name:"Birbo Tradicional Frango 15kg",                        category:"racao",     price:79.90,  emoji:"🐕", imgUrl:"https://images.tcdn.com.br/img/img_prod/1122713/birrbo_tradicional_caes_frango_15kg_1_5kg_gratis_5993_1_d1f5f89788622ad6408030506a64eb69.png", description:"Ração econômica de alta qualidade com sabor frango. Ótimo custo-benefício para cães adultos com muito apetite!" },
             { id:5,  name:"GOLDEN FORM CÃES ADULTO FRANGO MINI BITS 15KG",       category:"racao",     price:105.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/51K1+gru-3L._AC_SL1000_.jpg", description:"Grãos pequenos, nutrição gigante! Ideal para cães de porte pequeno e médio. Rico em frango, promove energia, pelagem e imunidade." },
             { id:6,  name:"APOLO CÃO ORIGINAL AMARELO 20KG",                     category:"racao",     price:89.90,  emoji:"🐕", imgUrl:"https://petzone.com.py/v1/wp-content/uploads/2021/06/5bb7b5018be8a-apolo-original.png", description:"Clássico e confiável! Ração Apolo com vitaminas A, D e E para cães saudáveis e bem nutridos. Embalagem econômica de 20kg." },
             { id:7,  name:"FINOTRATO SELECT 20KG",                               category:"racao",     price:85.00,  emoji:"🐕", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_693285-MLA97125490936_112025-F.webp", description:"Alta palatabilidade e digestibilidade. Com prebióticos para saúde intestinal e antioxidantes para fortalecer o sistema imune." },
             { id:8,  name:"BESSER NATURAL ADULTOS 25kg",                         category:"racao",     price:130.00, emoji:"🐕", imgUrl:"https://petmixsilva.com.br/wp-content/uploads/2024/09/Design-sem-nome-64.png", description:"Ração natural sem corantes artificiais, com frango desidratado, arroz e vegetais. Nutrição próxima à alimentação natural — 25kg." },
-            { id:9,  name:"PINUS 15KG",                                          category:"racao",     price:72.00,  emoji:"🐕", imgUrl:"https://ninovet.com.br/wp-content/uploads/2024/03/15138032501_Granulado20Higienico20Sanithy20Prime20Pinus20-2015kg.jpg", description:"Granulado higiênico de pinus de alta absorção para gatos. Controla odores com eficiência e facilita a limpeza da caixa." },
+            { id:9,  name:"PINUS 15KG",                                          category:"racao",     price:72.00,  emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/71d5v9tEYML._AC_SX679_.jpg", description:"Granulado higiênico de pinus de alta absorção para gatos. Controla odores com eficiência e facilita a limpeza da caixa." },
             { id:10, name:"GP CÃO CHOICE 20KG",                                  category:"racao",     price:88.00,  emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/61PqodEPfxL._AC_SX679_.jpg", description:"Fórmula especial com mix de carnes selecionadas. Excelente custo-benefício para donos que buscam qualidade e quantidade." },
             { id:11, name:"GOLDEN SENIOR ADULTO 15KG",                           category:"racao",     price:108.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/51qK45q4SZL._AC_SX679_.jpg", description:"Desenvolvida para cães a partir de 7 anos. Menor teor de fósforo, glucosamina e condroitina para articulações saudáveis na terceira idade." },
             { id:12, name:"GOLDEN FORM GATOS ADULTO CASTRADO FRANGO 10,1KG",    category:"racao",     price:95.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/513eYmdR0CL._AC_SX679_.jpg", description:"Formulada para gatos castrados com controle de peso. Baixo teor de gordura, sabor frango irresistível e suporte ao trato urinário." },
             { id:13, name:"GOLDEN SPECIAL GATOS CASTRADOS 10,1KG",               category:"racao",     price:92.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/51kbDmM3FuL._AC_SY879_.jpg", description:"Equilíbrio nutricional perfeito para gatos castrados. Controla calorias, cuida dos rins e mantém o pelo macio e brilhante." },
             { id:14, name:"PREMIER NUTR CLIN CÃES OBESIDADE PEQ. PORTE 10,1KG", category:"racao",     price:115.00, emoji:"⚖️", imgUrl:"https://m.media-amazon.com/images/I/51kgcOXulML._AC_SL1000_.jpg", description:"Dieta clínica para cães de pequeno porte com sobrepeso. Alta fibra, baixa caloria e L-carnitina para queima de gordura saudável." },
             { id:15, name:"GOLDEN SENIOR ADULTO MINI BITS 10,1KG",               category:"racao",     price:99.00,  emoji:"🐕", imgUrl:"https://down-br.img.susercontent.com/file/br-11134207-7r98o-ma4fex5qyz9jff", description:"Grãos mini ideais para cães idosos de pequeno porte. Glucosamina e condroitina para articulações, com alto teor de proteína." },
-            { id:16, name:"ROYAL CANIN MINI ADULT 7,5KG",                        category:"racao",     price:148.00, emoji:"🐕", imgUrl:"https://images.petz.com.br/fotos/10001320000127_1763123301904_mini.jpg", description:"Nutrição de alta precisão para cães adultos de raças pequenas. Grãos exclusivos desenvolvidos para o tamanho da boca de cães mini." },
+            { id:16, name:"ROYAL CANIN MINI ADULT 7,5KG",                        category:"racao",     price:148.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/41CXCXgqc-L._AC_SX679_.jpg", description:"Nutrição de alta precisão para cães adultos de raças pequenas. Grãos exclusivos desenvolvidos para o tamanho da boca de cães mini." },
             { id:17, name:"GOLDEN POWER TRAINING ADULTO 15KG",                   category:"racao",     price:100.00, emoji:"🐕", imgUrl:"https://http2.mlstatic.com/D_NQ_NP_2X_606258-MLA99823786541_112025-F.webp", description:"Alta energia para cães ativos e atletas! Rico em proteínas e aminoácidos essenciais para massa muscular e performance." },
             { id:18, name:"GOLDEN FORM GATOS ADULTO CASTRADO CARNE 10,1KG",     category:"racao",     price:95.00,  emoji:"🐱", imgUrl:"https://m.media-amazon.com/images/I/51IVMoSqxsL._AC_SX679_.jpg", description:"Sabor carne bovina que os gatos amam! Formulada para castrados com controle calórico, saúde urinária e pelagem deslumbrante." },
             { id:19, name:"GOLDEN SPECIAL ADULTO 20KG",                          category:"racao",     price:125.00, emoji:"🐕", imgUrl:"https://m.media-amazon.com/images/I/61VkUgdhFkL._AC_SX679_.jpg", description:"Embalagem família! Nutrição completa com Ômega 6, mandioca e vitaminas para cães adultos cheios de energia e saúde." },
@@ -3028,10 +3034,12 @@
 
             grid.innerHTML = filtered.map(product => `
                 <div class="product-card" draggable="true" ondragstart="startDrag(event, ${product.id})">
-                    ${product.imgUrl
-                        ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
-                        : ''}
-                    <div class="product-emoji" style="${product.imgUrl ? 'display:none' : ''}">${product.emoji}</div>
+                    <div class="product-img-wrap">
+                        ${product.imgUrl
+                            ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                            : ''}
+                        <div class="product-emoji" style="${product.imgUrl ? 'display:none' : 'display:flex'}">${product.emoji}</div>
+                    </div>
                     <h3 class="product-name">${product.name}</h3>
                     <p class="product-description">${product.description}</p>
                     <div class="product-category">${product.category.toUpperCase()}</div>
@@ -3356,10 +3364,12 @@
 
             grid.innerHTML = filtered.map(product => `
                 <div class="product-card" draggable="true" ondragstart="startDrag(event, ${product.id})">
-                    ${product.imgUrl
-                        ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
-                        : ''}
-                    <div class="product-emoji" style="${product.imgUrl ? 'display:none' : ''}">${product.emoji}</div>
+                    <div class="product-img-wrap">
+                        ${product.imgUrl
+                            ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                            : ''}
+                        <div class="product-emoji" style="${product.imgUrl ? 'display:none' : 'display:flex'}">${product.emoji}</div>
+                    </div>
                     <h3 class="product-name">${product.name}</h3>
                     <p class="product-description">${product.description}</p>
                     <div class="product-category">${product.category.toUpperCase()}</div>
@@ -3839,8 +3849,10 @@
                                 const grid = document.getElementById('productsGrid');
                                 grid.innerHTML = filtrados.map(product => `
                                     <div class="product-card" draggable="true" ondragstart="startDrag(event, ${product.id})">
-                                        ${product.imgUrl ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` : ''}
-                                        <div class="product-emoji" style="${product.imgUrl?'display:none':''}">${product.emoji}</div>
+                                        <div class="product-img-wrap">
+                                            ${product.imgUrl ? `<img class="product-img" src="${product.imgUrl}" alt="${product.name}" onclick="openLightbox(${product.id})" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+                                            <div class="product-emoji" style="${product.imgUrl?'display:none':'display:flex'}">${product.emoji}</div>
+                                        </div>
                                         <h3 class="product-name">${product.name}</h3>
                                         <p class="product-description">${product.description}</p>
                                         <div class="product-category">${product.category.toUpperCase()}</div>
@@ -4576,6 +4588,4 @@
 </script>
 
 <a class="floating-wa" href="https://wa.me/5551997655755" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
-<a class="floating-reviews" href="https://www.google.com/search?sca_esv=11c72b9740f8d846&hl=pt-BR&q=C%C3%A3oTelli+%7C+Pet+Shop+Coment%C3%A1rios&sa=X&ved=2ahUKEwjJrYTa36WUAxXpGLkGHUKXCH0Q0bkNegQIJhAH" target="_blank"><img class="frv-logo" src="logo_caotelli.png" alt="CaoTelli"><div class="frv-divider"></div><div class="frv-right"><div class="frv-google-row"><svg viewBox="0 0 24 24" width="15" height="15"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg><span class="frv-google-text">Google</span></div><div class="frv-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><div class="frv-info"><strong>5,0</strong> &middot; 1.800 avaliacoes</div></div></a>
-</body>
-</html>
+<a class="floating-reviews" href="https://www.google.com/search?sca_esv=11c72b9740f8d846&hl=pt-BR&q=C%C3%A3oTelli+%7C+Pet+Shop+Coment%C3%A1rios&sa=X&ved=2ahUKEwjJrYTa36WUAxXpGLkGHUKXCH0Q0bkNegQIJhAH" target="_blank"><img class="frv-logo" src="logo_caotelli.png" alt="CaoTelli"><div class="frv-divider"></div><div class="frv-right"><div class="frv-google-row"><svg viewBox="0 0 24 24" width="15" height="15"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.
