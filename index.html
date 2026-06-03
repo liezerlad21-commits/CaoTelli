@@ -52,12 +52,14 @@
             --text-gray: #5a6a85;
         }
 
+        html {
+            overflow-x: hidden;
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-light);
             line-height: 1.6;
-            overflow-x: hidden;
         }
 
         /* ANIMAÇÕES */
@@ -440,8 +442,6 @@
             border-bottom: 3px solid var(--primary-purple);
             animation: fadeIn 1s ease-in;
             position: relative;
-            overflow: clip;
-            overflow-clip-margin: 0px;
         }
         .hero::before {
             content: '';
