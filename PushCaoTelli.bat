@@ -10,6 +10,7 @@ cd /d "%~dp0"
 :: Remove locks se existirem
 del /f /q ".git\index.lock" 2>nul
 del /f /q ".git\config.lock" 2>nul
+del /f /q ".git\HEAD.lock" 2>nul
 
 :: Configura identidade
 git config user.email "liezerlad21@gmail.com"
@@ -41,7 +42,4 @@ if %errorlevel%==0 (
 ) else (
     echo   Erro ao enviar. Verifique sua conexao com a internet.
     echo   Lembre-se de criar o repositorio no GitHub primeiro:
-    echo   github.com/new  (nome: CaoTelli)
-)
-echo.
-pause
+    echo   github.com/new
