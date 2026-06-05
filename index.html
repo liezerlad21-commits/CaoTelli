@@ -4821,8 +4821,8 @@
             section.style.display = '';
             grid.innerHTML = arr.map(o => {
                 const prod = products.find(p => p.id === parseInt(o.produtoId));
-                const imgHtml = prod && prod.image
-                    ? `<img src="${prod.image}" alt="${o.nomeProduto}" onerror="this.style.display='none'">`
+                const imgHtml = prod && prod.imgUrl
+                    ? `<img src="${prod.imgUrl}" alt="${o.nomeProduto}" onerror="this.style.display='none'">`
                     : `<span class="oferta-emoji">${prod?.emoji || '🐾'}</span>`;
                 const pct = o.precoOriginal > 0
                     ? Math.round((1 - o.precoOferta / o.precoOriginal) * 100) : 0;
