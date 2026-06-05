@@ -204,6 +204,7 @@ ae05318 Atualizacao do site CaoTelli
 - Decidido usar **Opção 2 — Vercel + API** para integração segura com o Mercado Pago
 - Criado `api/checkout.js` — função serverless que recebe os itens do carrinho, cria preferência no MP e retorna o link de pagamento
 - Criado `vercel.json` — configuração do projeto na Vercel (CORS, rotas)
+- Criado `package.json` — declara dependência `@mercadopago/sdk-node` para a Vercel instalar automaticamente
 - Atualizado `checkout()` no `index.html`:
   - Em vez de abrir o modal Pix, agora chama a API da Vercel
   - Redireciona o usuário para a página de pagamento do MP
@@ -216,6 +217,13 @@ ae05318 Atualizacao do site CaoTelli
 - ⏳ Adicionar `MP_ACCESS_TOKEN` nas Environment Variables da Vercel (aguarda cliente criar conta no MP e fornecer o token)
 - Token de teste começa com `TEST-...`, token de produção começa com `APP_USR-...`
 - Para adicionar: vercel.com → cao-telli → Settings → Environment Variables → Add
+
+### Correções no módulo de Ofertas ✅
+
+- Corrigido bug de imagem no card de oferta: código buscava `prod.image` mas o campo correto é `prod.imgUrl`
+- Adicionado campo **URL da Imagem** no modal de Nova Oferta (preenchido automaticamente ao selecionar o produto)
+- Oferta agora salva `imgUrl` no objeto, garantindo imagem mesmo se o produto for editado depois
+- Card de oferta prioriza `o.imgUrl` (da oferta) e cai para `prod.imgUrl` (do produto) como fallback
 
 **Outras pendências em aberto:**
 - ❌ Mudar foto das Categorias (circles no hero)
