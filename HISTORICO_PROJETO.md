@@ -195,6 +195,41 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 05/06/2026
+
+### Integração Mercado Pago via Vercel ✅ (estrutura pronta, aguarda token)
+
+**O que foi feito:**
+
+- Decidido usar **Opção 2 — Vercel + API** para integração segura com o Mercado Pago
+- Criado `api/checkout.js` — função serverless que recebe os itens do carrinho, cria preferência no MP e retorna o link de pagamento
+- Criado `vercel.json` — configuração do projeto na Vercel (CORS, rotas)
+- Atualizado `checkout()` no `index.html`:
+  - Em vez de abrir o modal Pix, agora chama a API da Vercel
+  - Redireciona o usuário para a página de pagamento do MP
+  - Ao retornar, exibe notificação de sucesso/falha/pendente e limpa o carrinho se aprovado
+- Conta Vercel criada (`cao-telli.vercel.app`) e repositório CaoTelli conectado
+- Deploy feito com sucesso na Vercel
+- Push dos arquivos para o GitHub via `PushCaoTelli.bat`
+
+**Pendente para ativar o pagamento:**
+- ⏳ Adicionar `MP_ACCESS_TOKEN` nas Environment Variables da Vercel (aguarda cliente criar conta no MP e fornecer o token)
+- Token de teste começa com `TEST-...`, token de produção começa com `APP_USR-...`
+- Para adicionar: vercel.com → cao-telli → Settings → Environment Variables → Add
+
+**Outras pendências em aberto:**
+- ❌ Mudar foto das Categorias (circles no hero)
+- ⚠️ Frete por CEP — aguardando bairros/regiões do cliente
+- ❌ Domínio .com.br — não registrado ainda
+
+**Próxima sessão — continuar de:**
+- Quando o token MP chegar: adicionar na Vercel e testar pagamento completo
+- Mudar fotos dos círculos de categoria no hero
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 04/06/2026
 
 ### Revisão de pendências do cliente ✅
@@ -215,22 +250,9 @@ ae05318 Atualizacao do site CaoTelli
   - ❌ Integração PagBank — **aguardando credenciais do cliente**
   - ❌ Domínio .com.br — discutido (R$40/ano no registro.br), não registrado ainda
 
-**Próxima sessão — continuar de:**
-- Frete por CEP: aguardando o cliente informar quais bairros/regiões de Porto Alegre têm frete grátis e qual o valor para fora da área
-- Mudar foto das categorias no hero
-- Integração PagBank quando credenciais chegarem
-
 ### Discussão sobre integração Mercado Pago
 
-**O que foi discutido:**
-
-- Levantada a necessidade de um backend para integração real do Mercado Pago (o Access Token não pode ficar exposto no HTML estático do GitHub Pages)
-- Duas opções apresentadas ao Liézer:
-  - **Opção 1 — Link fixo do MP (simples):** Zero servidor, funciona hoje. O valor total é passado corretamente, mas os itens do carrinho aparecem de forma genérica no MP (detalhamento fica só no WhatsApp). Ideal se o cliente não precisar ver os itens listados dentro do MP.
-  - **Opção 2 — Vercel + API (completo):** Itens do carrinho aparecem dentro do Mercado Pago. Requer criar conta na Vercel (gratuito) e fazer deploy de uma API mínima (1 arquivo).
-- Pendente: Liézer vai consultar o cliente (CãoTelli) sobre qual opção prefere e buscar as credenciais do Mercado Pago.
-
-**Próxima ação:** Quando o cliente decidir e as credenciais chegarem, implementar a opção escolhida.
+- Opção escolhida: Vercel + API (implementado na sessão 05/06/2026)
 
 ---
 
