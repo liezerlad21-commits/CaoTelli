@@ -3495,17 +3495,66 @@
             document.querySelector('.floating-cart').style.display = isOpen ? 'none' : 'flex';
         }
 
-        // CHECKOUT — abre modal Pix
-        function checkout() {
+        // CHECKOUT — redireciona para Mercado Pago
+        const MP_API_URL = 'https://caotelli.vercel.app/api/checkout';
+
+        async function checkout() {
             if (cart.length === 0) {
                 showNotification('Seu carrinho está vazio!', 'error');
                 return;
             }
-            const total = document.getElementById('total').textContent;
-            document.getElementById('pix-total').textContent = total;
-            document.getElementById('pixModal').style.display = 'flex';
-            document.querySelector('.floating-cart').style.display = 'none';
+
+            // Mostra loading no botão
+            const btn = document.querySelector('[onclick="checkout()"]');
+            const textoOriginal = btn ? btn.textContent : '';
+            if (btn) { btn.textContent = '⏳ Aguarde...'; btn.disabled = true; }
+
+            try {
+                const response = await fetch(MP_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        items: cart.map(i => ({
+                            id: i.id,
+                            name: i.name,
+                            quantity: i.quantity,
+                            price: i.price,
+                        }))
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    throw new Error(data.error || 'Erro desconhecido');
+                }
+            } catch (err) {
+                console.error('Erro no checkout:', err);
+                showNotification('Erro ao gerar pagamento. Tente novamente.', 'error');
+                if (btn) { btn.textContent = textoOriginal; btn.disabled = false; }
+            }
         }
+
+        // Trata retorno do Mercado Pago
+        (function verificarRetornoMP() {
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get('pagamento');
+            if (status === 'sucesso') {
+                cart = [];
+                localStorage.removeItem('caotelli_carrinho');
+                updateCart();
+                showNotification('✅ Pagamento confirmado! Obrigado pela compra!', 'success');
+                window.history.replaceState({}, '', window.location.pathname);
+            } else if (status === 'falha') {
+                showNotification('❌ Pagamento não aprovado. Tente novamente.', 'error');
+                window.history.replaceState({}, '', window.location.pathname);
+            } else if (status === 'pendente') {
+                showNotification('⏳ Pagamento pendente. Você receberá uma confirmação em breve.', 'info');
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        })();
 
         function fecharPixModal() {
             document.getElementById('pixModal').style.display = 'none';
