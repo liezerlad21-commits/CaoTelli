@@ -2455,6 +2455,10 @@
                 </select>
             </div>
             <div class="form-group" style="margin-bottom:14px">
+                <label style="font-weight:600;font-size:0.85rem;color:#5a6a85;display:block;margin-bottom:6px">URL da Imagem <span style="color:#aaa;font-weight:400">(opcional — preenchido automaticamente)</span></label>
+                <input type="url" id="ofImgUrl" placeholder="https://..." style="width:100%;padding:10px;border:1px solid #dde3ee;border-radius:8px;font-size:0.95rem">
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
                 <label style="font-weight:600;font-size:0.85rem;color:#5a6a85;display:block;margin-bottom:6px">Preço Original (R$)</label>
                 <input type="number" id="ofPrecoOriginal" step="0.01" style="width:100%;padding:10px;border:1px solid #dde3ee;border-radius:8px;font-size:0.95rem" readonly>
             </div>
@@ -4713,12 +4717,12 @@
             const sel = document.getElementById('ofProduto');
             if (sel) {
                 sel.innerHTML = '<option value="">Selecione um produto...</option>' +
-                    products.map(p => `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}">${p.name}</option>`).join('');
+                    products.map(p => `<option value="${p.id}" data-price="${p.price}" data-name="${p.name}" data-imgurl="${p.imgUrl || ''}">${p.name}</option>`).join('');
             }
             document.getElementById('ofId').value = idx === null ? '' : idx;
             if (idx === null) {
                 document.getElementById('modalOfertaTitulo').textContent = '🔥 Nova Oferta';
-                ['ofProduto','ofPrecoOriginal','ofPrecoOferta','ofValidade'].forEach(f => {
+                ['ofProduto','ofImgUrl','ofPrecoOriginal','ofPrecoOferta','ofValidade'].forEach(f => {
                     const el = document.getElementById(f); if (el) el.value = '';
                 });
                 const atEl = document.getElementById('ofStatus'); if (atEl) atEl.value = 'ativa';
@@ -4731,6 +4735,8 @@
                 if (poEl) poEl.value = o.precoOriginal || '';
                 const pofEl = document.getElementById('ofPrecoOferta');
                 if (pofEl) pofEl.value = o.precoOferta || '';
+                const imgEl = document.getElementById('ofImgUrl');
+                if (imgEl) imgEl.value = o.imgUrl || '';
                 const vEl = document.getElementById('ofValidade');
                 if (vEl) vEl.value = o.validade || '';
                 const atEl = document.getElementById('ofStatus');
@@ -4747,8 +4753,11 @@
             if (!sel || !sel.value) return;
             const opt = sel.options[sel.selectedIndex];
             const price = opt.getAttribute('data-price');
+            const imgUrl = opt.getAttribute('data-imgurl');
             const poEl = document.getElementById('ofPrecoOriginal');
             if (poEl) poEl.value = parseFloat(price).toFixed(2);
+            const imgEl = document.getElementById('ofImgUrl');
+            if (imgEl && imgUrl) imgEl.value = imgUrl;
         }
         async function salvarOferta() {
             const sel = document.getElementById('ofProduto');
@@ -4760,6 +4769,7 @@
             const nova = {
                 produtoId:     parseInt(sel.value),
                 nomeProduto:   opt.getAttribute('data-name'),
+                imgUrl:        document.getElementById('ofImgUrl').value || opt.getAttribute('data-imgurl') || '',
                 precoOriginal: parseFloat(document.getElementById('ofPrecoOriginal').value) || 0,
                 precoOferta:   precoOferta,
                 validade:      document.getElementById('ofValidade').value || '',
@@ -4821,8 +4831,9 @@
             section.style.display = '';
             grid.innerHTML = arr.map(o => {
                 const prod = products.find(p => p.id === parseInt(o.produtoId));
-                const imgHtml = prod && prod.imgUrl
-                    ? `<img src="${prod.imgUrl}" alt="${o.nomeProduto}" onerror="this.style.display='none'">`
+                const imgSrc = o.imgUrl || (prod && prod.imgUrl) || '';
+                const imgHtml = imgSrc
+                    ? `<img src="${imgSrc}" alt="${o.nomeProduto}" onerror="this.style.display='none'">`
                     : `<span class="oferta-emoji">${prod?.emoji || '🐾'}</span>`;
                 const pct = o.precoOriginal > 0
                     ? Math.round((1 - o.precoOferta / o.precoOriginal) * 100) : 0;
