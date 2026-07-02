@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
   try {
-    const { items, total } = req.body;
+    const { items, total } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'Carrinho vazio' });
