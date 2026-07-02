@@ -5327,4 +5327,8 @@
   setTimeout(function() {
     if (typeof verificarManutencao === 'function') verificarManutencao();
     if (typeof carregarOfertasFirestore === 'function') carregarOfertasFirestore().then(() => renderOfertasSite());
-    if (typeof carregarDestaquesFirestore =
+    if (typeof carregarDestaquesFirestore === 'function') carregarDestaquesFirestore();
+  }, 1200);
+</script>
+</body>
+</html>

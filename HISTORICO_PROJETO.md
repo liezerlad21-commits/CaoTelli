@@ -195,6 +195,72 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 02/07/2026
+
+### Checkout com Mock QR Code — Fluxo Completo Funcional ✅
+
+**O que foi feito:**
+
+- **Corrigida URL da API** — `caotelli.vercel.app` → `cao-telli.vercel.app` (com hífen)
+  - Motivo: domínio registrado na Vercel estava com hífen, mas código tinha sem
+  - Resultado: POST para `/api/checkout` agora é encontrado (sem mais 404)
+
+- **Teste do token PagBank real** — Cliente (Diogo) gerou dois tokens na interface do PagBank:
+  - `18285bc1-e0ba-4c7f-b35f-0f79085c020e50fc9ee640cabc1ac9b784e6149d9a310329-3e2d-4c0b-93ab-0fbf9e4d9ae8` (carrinho/e-commerce) — **USADO**
+  - `adb8b0f9-33f3-4c79-b8d8-724daaa84e585a62995d48c48244aa58604da6919b9248c4-30d5-420c-9beb-c9df849a632d` (geral) — reservado
+  - Token foi adicionado na Vercel → Environment Variables → Production → `PAGBANK_TOKEN`
+  - Resultado: API retorna 500 (token pode estar inválido ou expirado; integração real com PagBank ainda em investigação)
+
+- **Implementado Mock QR Code para testes** (versão 2 de `api/checkout.js`):
+  - Remove dependência do PagBank real durante os testes
+  - Gera QR code fictício com dados fake: `00020126360014br.gov.bcb.brcode0136...`
+  - Usa serviço `qrserver.com` para gerar imagem PNG do QR code
+  - Retorna: `{ orderId, qrText, qrImageUrl, total }`
+  - **Fluxo de checkout agora funciona 100%:** carrinho → finalizar → modal PIX com QR → copiar chave → enviar por WhatsApp
+
+- **Corrigido bug crítico de oscilação do carrinho**:
+  - **Problema:** após fechar o modal PIX (clicando X), o carrinho ficava em estado inconsistente e oscilava (aparecia/desaparecia rapidamente)
+  - **Causa:** mistura de `classList.toggle()` (no `toggleCart()`) e `style.display` diretamente (em `checkout()` e `fecharPixModal()`)
+  - **Solução:** garantir que `fecharPixModal()` sempre remove a classe `active` do cartModal:
+    ```javascript
+    function fecharPixModal() {
+        document.getElementById('pixModal').style.display = 'none';
+        document.getElementById('cartModal').classList.remove('active');  // ← NOVO
+        document.querySelector('.floating-cart').style.display = 'flex';
+    }
+    ```
+
+**Fluxo testado e validado:**
+1. ✅ Adicionar produto ao carrinho
+2. ✅ Abrir modal do carrinho
+3. ✅ Clicar "Finalizar Compra"
+4. ✅ Modal PIX aparece com QR code (mock)
+5. ✅ Botão "Copiar" funciona (copia chave PIX)
+6. ✅ Botão "Enviar Comprovante pelo WhatsApp" funciona
+7. ✅ Botão X (fechar modal PIX) funciona sem oscilação
+8. ✅ Carrinho reabre normalmente após fechar PIX
+
+**Commits desta sessão:**
+- `bef2746` — Correção da URL do PagBank (caotelli → cao-telli)
+- `2d78439` — Mock QR code para testes
+- `290f6a1` — Corrige oscilação do carrinho ao fechar modal PIX
+
+**Situação ao encerrar sessão:**
+- ✅ Checkout funcionando 100% com mock QR code
+- ✅ Fluxo completo de pagamento PIX testado (copiar, enviar WhatsApp)
+- ⏳ Integração real com PagBank pausada (token pode estar inválido)
+- 🚀 Site pronto para testes de UX/fluxo de compra
+
+**Próxima sessão — continuar de:**
+1. **Investigar token PagBank real** — verificar se token gerado ainda é válido, ou gerar novo
+2. **Remover mock e integrar PagBank real** — quando token estiver 100% funcional
+3. **Testar fluxo completo com pagamento real** — gerar PIX real, validar webhook
+4. **Opcional:** registrar domínio `.com.br` ou melhorar outras funcionalidades (frete por CEP, etc)
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 01/07/2026
 
 ### Troca Mercado Pago → PagBank PIX (em andamento)
