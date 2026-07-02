@@ -3539,7 +3539,7 @@
             try {
                 // Calcula total com desconto e frete
                 const subtotal = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-                const frete = subtotal > 59.90 ? 0 : 15;
+                const frete = deliveryType === 'retirada' ? 0 : (subtotal > 59.90 ? 0 : 15);
                 let total = subtotal + frete;
                 if (appliedCoupon) {
                     total -= subtotal * (appliedCoupon.discount / 100);
