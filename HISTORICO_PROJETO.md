@@ -195,7 +195,76 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 02/07/2026
+**Data:** 02/07/2026 (CONTINUAÇÃO — TARDE/NOITE)
+
+### Seletor Retirada vs Entrega + Modal PIX Responsivo ✅ **COMPLETO**
+
+**O que foi feito:**
+
+- **Implementado seletor dinâmico "Retirada vs Entrega"** no modal do carrinho:
+  - Adiciona radio buttons com opções "Retirada" (Ret.) e "Entrega" (Ent.)
+  - Estado salvo em variável global `let deliveryType = 'entrega'`
+  - Função `updateDeliveryType()` atualiza o tipo de entrega ao mudar a seleção
+  
+- **Frete dinâmico implementado e testado**:
+  - ✅ Se subtotal **< R$ 59,90** → frete R$ 15,00 (Entrega) ou R$ 0,00 (Retirada)
+  - ✅ Se subtotal **≥ R$ 59,90** → frete R$ 0,00 (ambos grátis)
+  - Função `calculateTotal()` atualiza em tempo real baseado em `deliveryType`
+  - Teste prático com R$ 55,00 (frete apareceu) e R$ 98,90 (frete zerado) — **100% funcional**
+
+- **Modal PIX completamente reformulado para responsividade**:
+  - **Problema encontrado:** Modal estava sendo cortado em cima e embaixo na tela do notebook
+  - **Progressão de ajustes:**
+    1. Primeira tentativa: adicionou `inset:15px` com margem — cortou ainda mais
+    2. Segunda tentativa: reverteu para `inset:0` (ocupa tela inteira) — ficou sem scroll mas elemento muito grande
+    3. Terceira tentativa: adicionou `max-height:90vh; overflow-y:auto` — ficava scrollável mas grande demais
+    4. Quarta tentativa: aumentou para `max-width:450px; max-height:95vh` — ainda ficava grande
+    5. **Solução final:** Reduzir tudo drasticamente para caber na tela sem scroll:
+       - `max-width: 340px` (bem estreito, cabe em notebooks)
+       - Padding reduzido: `24px 20px` → `20px 16px`
+       - QR code de `180x180px` → `160x160px`
+       - Fonts reduzidas: títulos de `1.2rem` → `1rem`, corpo de `.78rem` → `.7rem`
+       - Espaçamentos reduzidos: `margin-bottom` de `16px` → `10-12px`
+       - Instruções simplificadas: "Tire print" em vez de "Tire print do comprovante"
+       - **Resultado:** Modal aparece **100% completo** (topo ao fundo) na tela do notebook, **sem scroll**, **sem corte**
+
+- **Botão X (fechar) do modal PIX visível e funcional**:
+  - Posicionado com `position:absolute; top:20px; right:20px; z-index:10001`
+  - Removido da div interna (que tem `position:relative`) para evitar ocultação
+  - Adicionado hover effect (fundo cinza ao passar mouse)
+
+- **Forma de Entrega exibida no modal PIX**:
+  - Elemento `#pix-delivery` mostra qual tipo foi selecionado ("Entrega" ou "Retirada")
+  - Atualiza junto com o total quando usuário muda a seleção
+
+**Fluxo testado e validado:**
+1. ✅ Adicionar produto ao carrinho
+2. ✅ Abrir modal do carrinho
+3. ✅ Clicar em "Retirada" ou "Entrega" (frete muda dinamicamente)
+4. ✅ Clicar "Finalizar Compra"
+5. ✅ Modal PIX abre **100% visível** (nenhuma parte cortada)
+6. ✅ Vê QR code, forma de entrega, valor total, chave PIX, instruções, botões
+7. ✅ Botão X visível e funciona perfeitamente
+8. ✅ Modal fecha sem oscilação do carrinho
+
+**Commits pendentes (sandbox com HEAD.lock):**
+- `feat: implementa seletor Retirada vs Entrega com frete dinâmico`
+- `fix: compacta modal PIX para caber completo na tela sem scroll`
+
+**Próxima ação:** Rodar `PushCaoTelli.bat` do Windows para fazer o push final e deploy na Vercel/GitHub Pages
+
+**Status ao encerrar sessão:**
+- ✅ Retirada vs Entrega: 100% funcional
+- ✅ Frete dinâmico: testado com números reais, funciona
+- ✅ Modal PIX: responsivo, completo, sem scroll, sem corte
+- ✅ UX melhorada: usuário vê tudo que precisa de uma vez
+- 🚀 Site **100% pronto para usar** — falta só fazer o push final
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
+**Data:** 02/07/2026 (MANHÃ)
 
 ### Checkout com Mock QR Code — Fluxo Completo Funcional ✅
 
