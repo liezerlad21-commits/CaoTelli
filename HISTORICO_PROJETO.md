@@ -152,7 +152,7 @@ CaoTelli/
 ## 7. PRÓXIMOS PASSOS (backlog priorizado)
 
 1. ~~**Autenticação de usuários**~~ ✅ — Firebase Authentication com e-mail/senha implementado (07/05/2026).
-2. **Integração de pagamento real** — PIX via Mercado Pago (API), cartão de crédito.
+2. **Integração de pagamento real** — PIX via PagBank (API em andamento), cartão de crédito.
 3. **Persistir o carrinho** em `localStorage` (para não perder ao recarregar).
 4. **Painel administrativo** — gerenciar produtos, preços, pedidos.
 5. **Histórico de pedidos por cliente.**
@@ -194,6 +194,57 @@ ae05318 Atualizacao do site CaoTelli
 ---
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
+
+**Data:** 01/07/2026
+
+### Troca Mercado Pago → PagBank PIX (em andamento)
+
+**O que foi feito:**
+
+- **Motivo:** Cliente tem PagBank (não Mercado Pago). Toda a integração foi migrada.
+- **`api/checkout.js`** — reescrito do zero para PagBank PIX API:
+  - Usa `fetch` nativo (Node 24, sem SDK)
+  - Chama `https://sandbox.api.pagseguro.com/orders` (sandbox)
+  - Cria pedido PIX com QR code + copia-e-cola
+  - Retorna `{ orderId, qrText, qrImageUrl, total }` para o frontend
+  - CORS habilitado via `res.setHeader('Access-Control-Allow-Origin', '*')`
+  - Suporta body como string ou objeto (`typeof req.body === 'string' ? JSON.parse(req.body) : req.body`)
+- **`package.json`** — removida dependência `@mercadopago/sdk-node`; Node corrigido de `18.x` → `24.x` (18.x foi descontinuado na Vercel)
+- **`vercel.json`** — adicionados `headers` CORS + `rewrites` + configuração da função
+- **`index.html`** — `checkout()` reescrita:
+  - Chama `https://caotelli.vercel.app/api/checkout` via POST
+  - Exibe QR code real do PagBank no `#pixModal`
+  - Preenche `#pix-copiacola` com `qrText` real
+  - Removida a verificação de retorno Mercado Pago (`verificarRetornoMP`)
+  - `copiarChavePix()` atualizado para copiar de `#pix-copiacola`
+  - **Fetch sem `Content-Type: application/json`** (envia como `text/plain`) para evitar CORS preflight — Vercel não encaminha OPTIONS para serverless functions
+- **Token PagBank sandbox configurado** na Vercel como `PAGBANK_TOKEN` (env var)
+  - Token expira: nunca (token de desenvolvedor PagBank não tem prazo)
+  - Para produção: trocar pelo token de produção do cliente no portal PagBank
+
+**Problema encontrado (CORS preflight):**
+- Vercel retorna 404 para requisições OPTIONS em `/api/*` — o handler JS da função nunca é chamado
+- Tentativas que não funcionaram: `vercel.json` `routes` com `methods: ["OPTIONS"]`, `headers`, `rewrites`
+- Solução implementada: remover `Content-Type` do fetch → browser não manda preflight OPTIONS → POST vai direto
+
+**Situação ao encerrar sessão:**
+- Arquivos locais (`index.html`, `api/checkout.js`, `package.json`, `vercel.json`) estão corretos e prontos
+- **Push ainda NÃO foi feito** — rodar `PushCaoTelli.bat` para enviar ao GitHub/Vercel
+- Após deploy: testar no Chrome com Network aberto (não deve aparecer OPTIONS)
+- Se funcionar: apertar Ctrl+Shift+R na página para limpar cache do GitHub Pages
+
+**Próxima sessão — continuar de:**
+1. Rodar `PushCaoTelli.bat`
+2. Aguardar Vercel ficar verde
+3. Abrir `https://liezerlad21-commits.github.io/CaoTelli/` com DevTools > Network
+4. Adicionar produto ao carrinho → clicar Finalizar Compra
+5. Verificar se POST para `/api/checkout` retorna 200 com `qrText`
+6. Se tudo funcionar: apertar Ctrl+Shift+R para garantir cache limpo
+7. Depois: restringir CORS de `*` para `https://liezerlad21-commits.github.io`
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
 
 **Data:** 05/06/2026
 
