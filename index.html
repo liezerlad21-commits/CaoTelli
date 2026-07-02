@@ -5194,19 +5194,19 @@
         <!-- BOTÃO FECHAR (fora da div interna para ficar visível) -->
         <button onclick="fecharPixModal()" style="position:absolute;top:20px;right:20px;background:#fff;border:none;font-size:1.5rem;cursor:pointer;color:#666;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:10001;transition:all 0.2s;line-height:1" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">✕</button>
 
-        <div style="background:#fff; border-radius:18px; padding:24px 20px; max-width:340px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.4); position:relative; max-height:85vh; overflow-y:auto;">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:1.8rem;">🐾</span>
+        <div style="background:#fff; border-radius:18px; padding:20px 16px; max-width:340px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.4); position:relative;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:1.6rem;">🐾</span>
                     <div style="text-align:left;">
-                        <h2 style="color:#0088C2; font-size:1.2rem; margin:0;">Pagamento via Pix</h2>
-                        <p style="color:#5a6a85; font-size:.78rem; margin:2px 0 0;">Escaneie o QR Code ou copie a chave</p>
+                        <h2 style="color:#0088C2; font-size:1rem; margin:0;">Pagamento via Pix</h2>
+                        <p style="color:#5a6a85; font-size:.7rem; margin:1px 0 0;">Escaneie o QR ou copie</p>
                     </div>
                 </div>
             </div>
 
             <!-- QR CODE PLACEHOLDER -->
-            <div id="pix-qrcode" style="width:180px; height:180px; margin:0 auto 18px; border:2px dashed #0088C2; border-radius:12px; display:flex; align-items:center; justify-content:center; background:#f0f8ff;">
+            <div id="pix-qrcode" style="width:160px; height:160px; margin:0 auto 12px; border:2px dashed #0088C2; border-radius:12px; display:flex; align-items:center; justify-content:center; background:#f0f8ff;">
                 <div style="text-align:center; color:#0088C2;">
                     <div style="font-size:2.5rem;">📱</div>
                     <div style="font-size:.75rem; margin-top:6px; font-weight:600;">QR Code Pix<br><span style="font-weight:400; color:#888;">em breve</span></div>
@@ -5214,20 +5214,20 @@
             </div>
 
             <!-- FORMA DE ENTREGA -->
-            <div style="background:#f9f9f9; border-radius:10px; padding:10px; margin-bottom:16px; font-size:.8rem;">
-                <div style="color:#5a6a85; margin-bottom:4px;">📍 Forma de Entrega</div>
+            <div style="background:#f9f9f9; border-radius:10px; padding:8px; margin-bottom:10px; font-size:.75rem;">
+                <div style="color:#5a6a85; margin-bottom:2px;">📍 Forma de Entrega</div>
                 <div id="pix-delivery" style="font-weight:600; color:#0088C2;">🚚 Entrega</div>
             </div>
 
             <!-- VALOR -->
-            <div style="background:#f0f8ff; border-radius:10px; padding:12px; margin-bottom:16px;">
-                <div style="font-size:.8rem; color:#5a6a85;">Valor total</div>
-                <div id="pix-total" style="font-size:1.6rem; font-weight:700; color:#0088C2;">R$ 0,00</div>
+            <div style="background:#f0f8ff; border-radius:10px; padding:10px; margin-bottom:10px;">
+                <div style="font-size:.75rem; color:#5a6a85;">Valor total</div>
+                <div id="pix-total" style="font-size:1.4rem; font-weight:700; color:#0088C2;">R$ 0,00</div>
             </div>
 
             <!-- PIX COPIA E COLA -->
-            <div style="background:#f4f7fb; border-radius:10px; padding:12px; margin-bottom:16px;">
-                <div style="font-size:.75rem; color:#5a6a85; margin-bottom:6px;">Pix Copia e Cola</div>
+            <div style="background:#f4f7fb; border-radius:10px; padding:10px; margin-bottom:10px;">
+                <div style="font-size:.7rem; color:#5a6a85; margin-bottom:4px;">Pix Copia e Cola</div>
                 <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
                     <span id="pix-copiacola" style="font-size:.72rem; font-weight:600; color:#1a2340; word-break:break-all; text-align:left; max-height:48px; overflow:hidden;">Gerando código PIX...</span>
                     <button onclick="copiarChavePix()" style="background:#0088C2; border:none; color:white; padding:5px 12px; border-radius:7px; font-size:.75rem; cursor:pointer; font-weight:600; flex-shrink:0;">Copiar</button>
@@ -5235,20 +5235,20 @@
             </div>
 
             <!-- INSTRUÇÕES -->
-            <div style="background:#fffbea; border:1px solid #ffd700; border-radius:10px; padding:10px 14px; margin-bottom:20px; text-align:left;">
-                <p style="font-size:.78rem; color:#7a6000; line-height:1.6;">
+            <div style="background:#fffbea; border:1px solid #ffd700; border-radius:10px; padding:8px 10px; margin-bottom:12px; text-align:left;">
+                <p style="font-size:.7rem; color:#7a6000; line-height:1.4; margin:0;">
                     <strong>📋 Após pagar:</strong><br>
-                    1. Tire print do comprovante<br>
-                    2. Clique em "Enviar Comprovante" abaixo<br>
-                    3. Aguarde confirmação do CãoTelli 🐾
+                    1. Tire print<br>
+                    2. Clique em "Enviar"<br>
+                    3. Aguarde confirmação 🐾
                 </p>
             </div>
 
             <!-- BOTÕES -->
-            <button onclick="enviarComprovante()" style="width:100%; padding:14px; background:linear-gradient(135deg,#25D366,#128C7E); border:none; color:white; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; margin-bottom:10px;">
+            <button onclick="enviarComprovante()" style="width:100%; padding:11px; background:linear-gradient(135deg,#25D366,#128C7E); border:none; color:white; border-radius:10px; font-size:.9rem; font-weight:700; cursor:pointer; margin-bottom:8px;">
                 📲 Enviar Comprovante pelo WhatsApp
             </button>
-            <button onclick="fecharPixModal()" style="width:100%; padding:12px; background:#f5f5f5; border:2px solid #ccc; color:#444; border-radius:10px; font-size:.95rem; cursor:pointer; font-weight:600;">
+            <button onclick="fecharPixModal()" style="width:100%; padding:10px; background:#f5f5f5; border:2px solid #ccc; color:#444; border-radius:10px; font-size:.85rem; cursor:pointer; font-weight:600;">
                 ✕ Cancelar pagamento
             </button>
         </div>
