@@ -2775,6 +2775,7 @@
             try { return JSON.parse(localStorage.getItem(COUPON_STORAGE_KEY)) || null; }
             catch(e) { return null; }
         })();
+        let deliveryType = 'entrega'; // 'retirada' ou 'entrega'
 
         // Salva carrinho e cupom no localStorage
         function salvarCarrinho() {
@@ -3435,7 +3436,10 @@
         // CALCULAR TOTAL
         function calculateTotal() {
             const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const frete = subtotal > 59.90 ? 0 : 15;
+            let frete = 0;
+            if (deliveryType === 'entrega') {
+                frete = subtotal > 59.90 ? 0 : 15;
+            }
             let total = subtotal + frete;
 
             const subtotalEl = document.getElementById('subtotal');
@@ -3457,6 +3461,26 @@
             }
 
             totalEl.textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        // ATUALIZAR TIPO DE ENTREGA
+        function updateDeliveryType() {
+            const selected = document.querySelector('input[name="delivery"]:checked');
+            if (selected) {
+                deliveryType = selected.value;
+                calculateTotal();
+
+                // Atualizar visual dos labels
+                const labelRetirada = document.getElementById('labelRetirada');
+                const labelEntrega = document.getElementById('labelEntrega');
+                if (deliveryType === 'retirada') {
+                    labelRetirada.style.borderColor = '#0088C2';
+                    labelEntrega.style.borderColor = '#ddd';
+                } else {
+                    labelEntrega.style.borderColor = '#0088C2';
+                    labelRetirada.style.borderColor = '#ddd';
+                }
+            }
         }
 
         // APLICAR CUPOM
@@ -3539,6 +3563,7 @@
                 if (data.qrText) {
                     // Preenche o modal com os dados reais do PagBank
                     document.getElementById('pix-total').textContent = `R$ ${Number(data.total).toFixed(2).replace('.', ',')}`;
+                    document.getElementById('pix-delivery').textContent = deliveryType === 'retirada' ? '🏪 Retirada na Loja' : '🚚 Entrega';
                     document.getElementById('pix-copiacola').textContent = data.qrText;
 
                     // QR Code
@@ -5132,6 +5157,22 @@
                     <input type="text" id="couponInput" placeholder="Digite seu cupom de desconto...">
                     <button onclick="applyCoupon()" class="btn-primary">Aplicar</button>
                 </div>
+                <!-- SELETOR DE RETIRADA/ENTREGA -->
+                <div style="background:#f9f9f9;border:1px solid #e0e0e0;border-radius:10px;padding:12px;margin:12px 0 12px 0;text-align:center">
+                    <p style="font-size:12px;color:#555;font-weight:600;margin:0 0 10px 0">📍 Forma de Entrega</p>
+                    <div style="display:flex;gap:10px;justify-content:center">
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:2px solid #ddd;border-radius:8px;background:#fff;transition:all 0.2s" id="labelRetirada">
+                            <input type="radio" name="delivery" value="retirada" onchange="updateDeliveryType()" style="cursor:pointer"> 🏪 Retirada
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:2px solid #0088C2;border-radius:8px;background:#fff;transition:all 0.2s" id="labelEntrega">
+                            <input type="radio" name="delivery" value="entrega" checked onchange="updateDeliveryType()" style="cursor:pointer"> 🚚 Entrega
+                        </label>
+                    </div>
+                </div>
+                <div class="summary-row" id="freteRow">
+                    <span>Frete:</span>
+                    <span id="frete">R$ 0,00</span>
+                </div>
             </div>
             <!-- FORMAS DE PAGAMENTO NA ENTREGA -->
             <div style="background:#f0f8ff;border:1.5px solid #c5e3f5;border-radius:12px;padding:12px 14px;margin-bottom:12px">
@@ -5172,6 +5213,12 @@
                     <div style="font-size:2.5rem;">📱</div>
                     <div style="font-size:.75rem; margin-top:6px; font-weight:600;">QR Code Pix<br><span style="font-weight:400; color:#888;">em breve</span></div>
                 </div>
+            </div>
+
+            <!-- FORMA DE ENTREGA -->
+            <div style="background:#f9f9f9; border-radius:10px; padding:10px; margin-bottom:16px; font-size:.8rem;">
+                <div style="color:#5a6a85; margin-bottom:4px;">📍 Forma de Entrega</div>
+                <div id="pix-delivery" style="font-weight:600; color:#0088C2;">🚚 Entrega</div>
             </div>
 
             <!-- VALOR -->
