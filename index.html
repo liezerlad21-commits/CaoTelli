@@ -3499,8 +3499,8 @@
             document.querySelector('.floating-cart').style.display = isOpen ? 'none' : 'flex';
         }
 
-        // CHECKOUT — redireciona para Mercado Pago
-        const MP_API_URL = 'https://caotelli.vercel.app/api/checkout';
+        // CHECKOUT — PagBank PIX
+        const PAGBANK_API_URL = 'https://caotelli.vercel.app/api/checkout';
 
         async function checkout() {
             if (cart.length === 0) {
@@ -3508,13 +3508,20 @@
                 return;
             }
 
-            // Mostra loading no botão
             const btn = document.querySelector('[onclick="checkout()"]');
             const textoOriginal = btn ? btn.textContent : '';
-            if (btn) { btn.textContent = '⏳ Aguarde...'; btn.disabled = true; }
+            if (btn) { btn.textContent = '⏳ Gerando PIX...'; btn.disabled = true; }
 
             try {
-                const response = await fetch(MP_API_URL, {
+                // Calcula total com desconto e frete
+                const subtotal = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+                const frete = subtotal > 59.90 ? 0 : 15;
+                let total = subtotal + frete;
+                if (appliedCoupon) {
+                    total -= subtotal * (appliedCoupon.discount / 100);
+                }
+
+                const response = await fetch(PAGBANK_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -3523,16 +3530,34 @@
                             name: i.name,
                             quantity: i.quantity,
                             price: i.price,
-                        }))
+                        })),
+                        total: total.toFixed(2),
                     })
                 });
 
                 const data = await response.json();
 
-                if (data.url) {
-                    window.location.href = data.url;
+                if (data.qrText) {
+                    // Preenche o modal com os dados reais do PagBank
+                    document.getElementById('pix-total').textContent = `R$ ${Number(data.total).toFixed(2).replace('.', ',')}`;
+                    document.getElementById('pix-copiacola').textContent = data.qrText;
+
+                    // QR Code
+                    const qrDiv = document.getElementById('pix-qrcode');
+                    if (data.qrImageUrl) {
+                        qrDiv.innerHTML = `<img src="${data.qrImageUrl}" style="width:160px;height:160px;border-radius:10px;object-fit:contain;" alt="QR Code PIX">`;
+                    } else {
+                        qrDiv.innerHTML = `<div style="text-align:center;color:#0088C2;padding:16px;"><div style="font-size:2.5rem;">✅</div><div style="font-size:.8rem;margin-top:8px;font-weight:600;">PIX gerado!<br>Use o código abaixo</div></div>`;
+                    }
+
+                    // Abre o modal PIX e fecha o carrinho
+                    document.getElementById('cartModal').style.display = 'none';
+                    document.getElementById('pixModal').style.display = 'flex';
+                    document.querySelector('.floating-cart').style.display = 'none';
+
+                    registrarPedido();
                 } else {
-                    throw new Error(data.error || 'Erro desconhecido');
+                    throw new Error(data.error || 'Erro ao gerar PIX');
                 }
             } catch (err) {
                 console.error('Erro no checkout:', err);
@@ -3540,25 +3565,6 @@
                 if (btn) { btn.textContent = textoOriginal; btn.disabled = false; }
             }
         }
-
-        // Trata retorno do Mercado Pago
-        (function verificarRetornoMP() {
-            const params = new URLSearchParams(window.location.search);
-            const status = params.get('pagamento');
-            if (status === 'sucesso') {
-                cart = [];
-                localStorage.removeItem('caotelli_carrinho');
-                updateCart();
-                showNotification('✅ Pagamento confirmado! Obrigado pela compra!', 'success');
-                window.history.replaceState({}, '', window.location.pathname);
-            } else if (status === 'falha') {
-                showNotification('❌ Pagamento não aprovado. Tente novamente.', 'error');
-                window.history.replaceState({}, '', window.location.pathname);
-            } else if (status === 'pendente') {
-                showNotification('⏳ Pagamento pendente. Você receberá uma confirmação em breve.', 'info');
-                window.history.replaceState({}, '', window.location.pathname);
-            }
-        })();
 
         function fecharPixModal() {
             document.getElementById('pixModal').style.display = 'none';
@@ -3586,11 +3592,11 @@
         }
 
         function copiarChavePix() {
-            const chave = document.getElementById('pix-chave').textContent;
+            const chave = document.getElementById('pix-copiacola').textContent;
             navigator.clipboard.writeText(chave).then(() => {
-                showNotification('Chave Pix copiada! ✅');
+                showNotification('Código PIX copiado! ✅');
             }).catch(() => {
-                showNotification('Copie manualmente: ' + chave);
+                showNotification('Copie manualmente o código PIX abaixo.');
             });
         }
 
@@ -5174,12 +5180,12 @@
                 <div id="pix-total" style="font-size:1.6rem; font-weight:700; color:#0088C2;">R$ 0,00</div>
             </div>
 
-            <!-- CHAVE PIX -->
+            <!-- PIX COPIA E COLA -->
             <div style="background:#f4f7fb; border-radius:10px; padding:12px; margin-bottom:16px;">
-                <div style="font-size:.75rem; color:#5a6a85; margin-bottom:6px;">Chave Pix (temporária)</div>
+                <div style="font-size:.75rem; color:#5a6a85; margin-bottom:6px;">Pix Copia e Cola</div>
                 <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
-                    <span id="pix-chave" style="font-size:.9rem; font-weight:600; color:#1a2340; letter-spacing:.5px;">caotelli@pagamento.com</span>
-                    <button onclick="copiarChavePix()" style="background:#0088C2; border:none; color:white; padding:5px 12px; border-radius:7px; font-size:.75rem; cursor:pointer; font-weight:600;">Copiar</button>
+                    <span id="pix-copiacola" style="font-size:.72rem; font-weight:600; color:#1a2340; word-break:break-all; text-align:left; max-height:48px; overflow:hidden;">Gerando código PIX...</span>
+                    <button onclick="copiarChavePix()" style="background:#0088C2; border:none; color:white; padding:5px 12px; border-radius:7px; font-size:.75rem; cursor:pointer; font-weight:600; flex-shrink:0;">Copiar</button>
                 </div>
             </div>
 

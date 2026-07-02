@@ -1,7 +1,7 @@
 {
   "name": "caotelli",
   "version": "1.0.0",
-  "dependencies": {
-    "@mercadopago/sdk-node": "^2.0.9"
+  "engines": {
+    "node": "18.x"
   }
 }
