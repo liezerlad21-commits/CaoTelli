@@ -3550,7 +3550,7 @@
                     }
 
                     // Abre o modal PIX e fecha o carrinho
-                    document.getElementById('cartModal').style.display = 'none';
+                    document.getElementById('cartModal').classList.remove('active');
                     document.getElementById('pixModal').style.display = 'flex';
                     document.querySelector('.floating-cart').style.display = 'none';
 
@@ -3567,6 +3567,7 @@
 
         function fecharPixModal() {
             document.getElementById('pixModal').style.display = 'none';
+            document.getElementById('cartModal').classList.remove('active');
             document.querySelector('.floating-cart').style.display = 'flex';
         }
 
@@ -5326,8 +5327,4 @@
   setTimeout(function() {
     if (typeof verificarManutencao === 'function') verificarManutencao();
     if (typeof carregarOfertasFirestore === 'function') carregarOfertasFirestore().then(() => renderOfertasSite());
-    if (typeof carregarDestaquesFirestore === 'function') carregarDestaquesFirestore();
-  }, 1200);
-</script>
-</body>
-</html>
+    if (typeof carregarDestaquesFirestore =
