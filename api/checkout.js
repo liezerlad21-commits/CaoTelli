@@ -1,5 +1,5 @@
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://liezerlad21-commits.github.io');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
