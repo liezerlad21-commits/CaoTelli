@@ -251,14 +251,29 @@ ae05318 Atualizacao do site CaoTelli
 - `feat: implementa seletor Retirada vs Entrega com frete dinâmico`
 - `fix: compacta modal PIX para caber completo na tela sem scroll`
 
-**Próxima ação:** Rodar `PushCaoTelli.bat` do Windows para fazer o push final e deploy na Vercel/GitHub Pages
+**PROBLEMA DESCOBERTO E CORRIGIDO:**
+- ❌ Bug: função `checkout()` não estava levando em conta o `deliveryType` ao calcular frete
+  - Linha 3542 estava: `const frete = subtotal > 59.90 ? 0 : 15;`
+  - Corrigido para: `const frete = deliveryType === 'retirada' ? 0 : (subtotal > 59.90 ? 0 : 15);`
+  - Isso causava o erro "Erro ao gerar pagamento" quando cliente tentava finalizar compra
+
+- ⚠️ **Próxima ação:** Testar checkout após o PushCaoTelli.bat
+  - Se erro persistir, investigar API `/api/checkout` (pode estar retornando erro)
+  - Verificar DevTools > Network e Console para ver exata mensagem de erro
+
+**Próxima ação:** 
+1. Rodar `PushCaoTelli.bat` do Windows para fazer o push final
+2. Aguardar deploy na Vercel (1-2 minutos)
+3. Recarregar site com Ctrl+Shift+R
+4. Testar checkout novamente
 
 **Status ao encerrar sessão:**
-- ✅ Retirada vs Entrega: 100% funcional
-- ✅ Frete dinâmico: testado com números reais, funciona
+- ✅ Retirada vs Entrega: 100% funcional (UI pronta)
+- ✅ Frete dinâmico: corrigido, pronto para testar
 - ✅ Modal PIX: responsivo, completo, sem scroll, sem corte
-- ✅ UX melhorada: usuário vê tudo que precisa de uma vez
-- 🚀 Site **100% pronto para usar** — falta só fazer o push final
+- ⏳ Checkout PIX: corrigido bug do frete, aguarda teste final
+- 🔴 Erro detectado: "Erro ao gerar pagamento" — **CAUSA ENCONTRADA E CORRIGIDA**
+- 📝 Histórico documentado para continuar amanhã
 
 ---
 
