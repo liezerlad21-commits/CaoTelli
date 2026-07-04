@@ -47,8 +47,8 @@ module.exports = async (req, res) => {
       ],
     };
 
-    // Chamar API PagBank (produção)
-    const response = await fetch('https://api.pagseguro.com/orders', {
+    // Chamar API PagBank (sandbox para testes)
+    const response = await fetch('https://sandbox.api.pagseguro.com/orders', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
