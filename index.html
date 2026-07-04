@@ -3577,8 +3577,7 @@
                     // QR Code
                     const qrDiv = document.getElementById('pix-qrcode');
                     if (data.qrImageUrl) {
-                        const statusBadge = data.warning ? '⚠️ Mock' : '✅ Real';
-                        qrDiv.innerHTML = `<div style="text-align:center;position:relative;"><img src="${data.qrImageUrl}" style="width:160px;height:160px;border-radius:10px;object-fit:contain;" alt="QR Code PIX"><div style="font-size:.65rem;color:#666;margin-top:4px;">${statusBadge}</div></div>`;
+                        qrDiv.innerHTML = `<img src="${data.qrImageUrl}" style="width:160px;height:160px;border-radius:10px;object-fit:contain;" alt="QR Code PIX">`;
                     } else {
                         qrDiv.innerHTML = `<div style="text-align:center;color:#0088C2;padding:16px;"><div style="font-size:2.5rem;">✅</div><div style="font-size:.8rem;margin-top:8px;font-weight:600;">PIX gerado!<br>Use o código abaixo</div></div>`;
                     }

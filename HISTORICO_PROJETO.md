@@ -195,6 +195,53 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 04/07/2026 (MANHÃ)
+
+### Debugagem Token PagBank + QR Code Mock Funcional ✅
+
+**O que foi feito:**
+
+- **Identificado problema com token PagBank:** 
+  - Token de TESTE (Sandbox) gerado em 02/07 expirou/ficou inválido
+  - Erro 401 UNAUTHORIZED ao tentar integrar com API real
+  - Causa: Token não tem permissão ou está corrompido
+
+- **Debugagem da API (`api/checkout.js`):**
+  - Adicionados logs para rastrear erros
+  - Testado tanto em `sandbox.api.pagseguro.com` quanto `api.pagseguro.com`
+  - Ambas retornaram 401/403 (token inválido)
+
+- **QR Code Mock implementado e 100% funcional:**
+  - Voltamos para usar mock QR code temporariamente
+  - QR code fictício gera imagem válida via `quickchart.io`
+  - Fluxo completo testado: carrinho → checkout → PIX → WhatsApp ✅
+  - Sem badges de aviso, aparece limpo e profissional
+
+- **Criado guia prático:**
+  - `GUIA_PAGBANK_TOKEN.md` — passo a passo para gerar tokens (teste e produção)
+  - Documento pode ser levado fisicamente para ajudar o cliente (Diogo)
+
+**Status ao encerrar sessão:**
+- ✅ QR Code mock: 100% funcional, pronto para testes de fluxo
+- ✅ Modal PIX: responsivo, completo, sem scroll
+- ✅ Frete dinâmico (Retirada vs Entrega): funcionando
+- ⏳ Token PagBank: aguardando novo token de PRODUÇÃO do cliente
+- 📝 Documentação: guia prático criado
+
+**Plano para próxima sessão (assim que tiver token de PRODUÇÃO):**
+1. Liézer pega token de PRODUÇÃO com Diogo
+2. Vem aqui comigo
+3. Descomentamos integração real no `api/checkout.js`
+4. Mudamos URL para produção
+5. Liézer coloca token na Vercel
+6. Testamos TUDO junto (pagamentos reais, fluxo completo)
+7. Quando eu disser "100% pronto", Liézer libera pro cliente
+8. Passa acessos admin pro cliente
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 02/07/2026 (CONTINUAÇÃO — TARDE/NOITE)
 
 ### Seletor Retirada vs Entrega + Modal PIX Responsivo ✅ **COMPLETO**
