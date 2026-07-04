@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
     // MOCK QR CODE — Remove quando PagBank estiver funcionando
     const mockOrderId = `CAOTELLI-${Date.now()}`;
     const mockQrText = `00020126360014br.gov.bcb.brcode0136123e4567-e12b-12d1-a456-426655440000520400005303986540510.005802BR5913CAOTELLI6009SAO PAULO62410503***63041D3F`;
-    const mockQrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(mockQrText)}`;
+    const mockQrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(mockQrText)}&size=160`;
 
     return res.status(200).json({
       orderId: mockOrderId,
