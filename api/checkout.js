@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Erro PagBank API:', data);
+      console.error('❌ Erro PagBank - Status:', response.status, 'Resposta:', data);
       // Fallback para mock se API falhar
       const mockOrderId = `CAOTELLI-${Date.now()}`;
       const mockQrText = `00020126360014br.gov.bcb.brcode0136123e4567-e12b-12d1-a456-426655440000520400005303986540510.005802BR5913CAOTELLI6009SAO PAULO62410503***63041D3F`;
@@ -70,7 +70,7 @@ module.exports = async (req, res) => {
         qrText: mockQrText,
         qrImageUrl: mockQrImageUrl,
         total: Number(total),
-        warning: 'QR Code mock (API PagBank falhou)',
+        warning: `QR Code mock (API falhou: ${response.status} - ${data.message || 'erro desconhecido'})`,
       });
     }
 

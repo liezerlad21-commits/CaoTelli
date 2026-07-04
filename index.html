@@ -3562,8 +3562,12 @@
 
                 if (data.qrText) {
                     console.log('✅ QR Code recebido:', data);
-                    console.log('📋 qrText completo:', data.qrText);
-                    console.log('⚠️ É mock?', data.warning || 'Não, é real do PagBank!');
+                    console.log('📋 qrText:', data.qrText.substring(0, 50) + '...');
+                    if (data.warning) {
+                        console.warn('⚠️ AVISO:', data.warning);
+                    } else {
+                        console.log('✅ PIX REAL do PagBank!');
+                    }
 
                     // Preenche o modal com os dados reais do PagBank
                     document.getElementById('pix-total').textContent = `R$ ${Number(data.total).toFixed(2).replace('.', ',')}`;
