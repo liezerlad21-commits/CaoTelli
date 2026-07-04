@@ -3561,6 +3561,10 @@
                 const data = await response.json();
 
                 if (data.qrText) {
+                    console.log('✅ QR Code recebido:', data);
+                    console.log('📋 qrText completo:', data.qrText);
+                    console.log('⚠️ É mock?', data.warning || 'Não, é real do PagBank!');
+
                     // Preenche o modal com os dados reais do PagBank
                     document.getElementById('pix-total').textContent = `R$ ${Number(data.total).toFixed(2).replace('.', ',')}`;
                     document.getElementById('pix-delivery').textContent = deliveryType === 'retirada' ? '🏪 Retirada na Loja' : '🚚 Entrega';
@@ -3569,7 +3573,8 @@
                     // QR Code
                     const qrDiv = document.getElementById('pix-qrcode');
                     if (data.qrImageUrl) {
-                        qrDiv.innerHTML = `<img src="${data.qrImageUrl}" style="width:160px;height:160px;border-radius:10px;object-fit:contain;" alt="QR Code PIX">`;
+                        const statusBadge = data.warning ? '⚠️ Mock' : '✅ Real';
+                        qrDiv.innerHTML = `<div style="text-align:center;position:relative;"><img src="${data.qrImageUrl}" style="width:160px;height:160px;border-radius:10px;object-fit:contain;" alt="QR Code PIX"><div style="font-size:.65rem;color:#666;margin-top:4px;">${statusBadge}</div></div>`;
                     } else {
                         qrDiv.innerHTML = `<div style="text-align:center;color:#0088C2;padding:16px;"><div style="font-size:2.5rem;">✅</div><div style="font-size:.8rem;margin-top:8px;font-weight:600;">PIX gerado!<br>Use o código abaixo</div></div>`;
                     }
