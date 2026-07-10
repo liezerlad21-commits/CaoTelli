@@ -23,20 +23,7 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Token PagBank não configurado' });
     }
 
-    // ⚠️ MODO TESTE — usando QR code mock
-    // Remova este comentário e ative a integração real quando tiver um token válido do PagBank
-    const mockOrderId = `CAOTELLI-${Date.now()}`;
-    const mockQrText = `00020126360014br.gov.bcb.brcode0136123e4567-e12b-12d1-a456-426655440000520400005303986540510.005802BR5913CAOTELLI6009SAO PAULO62410503***63041D3F`;
-    const mockQrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(mockQrText)}&size=160`;
-
-    return res.status(200).json({
-      orderId: mockOrderId,
-      qrText: mockQrText,
-      qrImageUrl: mockQrImageUrl,
-      total: Number(total),
-    });
-
-    /* INTEGRAÇÃO REAL DO PAGBANK — DESCOMENTE QUANDO TOKEN FOR VÁLIDO
+    // INTEGRAÇÃO REAL DO PAGBANK — ATIVADA ✅
     // Preparar pedido para PagBank
     const pedido = {
       reference_id: `CAOTELLI-${Date.now()}`,
@@ -63,8 +50,8 @@ module.exports = async (req, res) => {
       ],
     };
 
-    // Chamar API PagBank (sandbox para testes)
-    const response = await fetch('https://sandbox.api.pagseguro.com/orders', {
+    // Chamar API PagBank (produção)
+    const response = await fetch('https://api.pagseguro.com/orders', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
