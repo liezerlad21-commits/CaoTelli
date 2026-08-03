@@ -3533,8 +3533,51 @@
             document.querySelector('.floating-cart').style.display = isOpen ? 'none' : 'flex';
         }
 
-        // CHECKOUT — Mercado Pago (Checkout Pro)
+        // CHECKOUT — Mercado Pago PIX API (QR code direto no site)
         const CHECKOUT_API_URL = 'https://cao-telli.vercel.app/api/checkout';
+
+        // Coleta dados do pagador (do Firebase se logado, ou do cliente salvo, ou prompt)
+        function coletarDadosPagador() {
+            // 1. Tenta pegar do usuário logado no Firebase
+            const user = window._fbUser;
+            const email = user ? user.email : (localStorage.getItem('caotelli_last_email') || '');
+
+            // 2. Tenta pegar dados extras do cliente salvo
+            let nome = '', cpf = '';
+            try {
+                const clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+                const cliente = clientes.find(c => c.email === email);
+                if (cliente) {
+                    nome = cliente.nome || '';
+                    cpf = cliente.cpf || '';
+                }
+            } catch(e) {}
+
+            // 3. Se faltar algo essencial, pede via prompt
+            let emailFinal = email;
+            if (!emailFinal) {
+                emailFinal = prompt('Seu e-mail para o comprovante PIX:', '');
+                if (!emailFinal) return null;
+                localStorage.setItem('caotelli_last_email', emailFinal);
+            }
+            if (!nome) {
+                nome = prompt('Seu nome completo:', '') || 'Cliente';
+            }
+            if (!cpf) {
+                cpf = prompt('Seu CPF (só números):', '') || '';
+            }
+
+            const partes = nome.trim().split(/\s+/);
+            const firstName = partes[0] || 'Cliente';
+            const lastName = partes.slice(1).join(' ') || 'CaoTelli';
+
+            return {
+                email: emailFinal,
+                first_name: firstName,
+                last_name: lastName,
+                cpf: (cpf || '').replace(/\D/g, ''),
+            };
+        }
 
         async function checkout() {
             if (cart.length === 0) {
@@ -3542,12 +3585,17 @@
                 return;
             }
 
+            const dadosPagador = coletarDadosPagador();
+            if (!dadosPagador) {
+                showNotification('E-mail é obrigatório pra gerar o PIX.', 'error');
+                return;
+            }
+
             const btn = document.querySelector('[onclick="checkout()"]');
             const textoOriginal = btn ? btn.textContent : '';
-            if (btn) { btn.textContent = '⏳ Redirecionando...'; btn.disabled = true; }
+            if (btn) { btn.textContent = '⏳ Gerando PIX...'; btn.disabled = true; }
 
             try {
-                // Calcula total com desconto e frete
                 const subtotal = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
                 const frete = deliveryType === 'retirada' ? 0 : (subtotal > 59.90 ? 0 : 15);
                 let total = subtotal + frete;
@@ -3565,33 +3613,39 @@
                             price: i.price,
                         })),
                         total: total.toFixed(2),
+                        payer: dadosPagador,
                     })
                 });
 
                 const data = await response.json();
 
-                if (data.initPoint) {
-                    console.log('✅ Preferência MP criada:', data.preferenceId);
+                if (data.qrText) {
+                    console.log('✅ PIX gerado — payment:', data.paymentId);
 
-                    // Registra pedido antes de redirecionar
+                    document.getElementById('pix-total').textContent = `R$ ${Number(data.total).toFixed(2).replace('.', ',')}`;
+                    document.getElementById('pix-delivery').textContent = deliveryType === 'retirada' ? '🏪 Retirada na Loja' : '🚚 Entrega';
+                    document.getElementById('pix-copiacola').textContent = data.qrText;
+
+                    const qrDiv = document.getElementById('pix-qrcode');
+                    if (data.qrImageBase64) {
+                        qrDiv.innerHTML = `<img src="${data.qrImageBase64}" style="width:180px;height:180px;border-radius:10px;object-fit:contain;background:#fff;padding:6px" alt="QR Code PIX">`;
+                    } else {
+                        const encoded = encodeURIComponent(data.qrText);
+                        qrDiv.innerHTML = `<img src="https://quickchart.io/qr?text=${encoded}&size=180" style="width:180px;height:180px;border-radius:10px;object-fit:contain;" alt="QR Code PIX">`;
+                    }
+
+                    document.getElementById('cartModal').classList.remove('active');
+                    document.getElementById('pixModal').style.display = 'flex';
+                    document.querySelector('.floating-cart').style.display = 'none';
+
                     registrarPedido();
-
-                    // Salva snapshot do carrinho pra confirmar no retorno
-                    localStorage.setItem('caotelli_pending_order', JSON.stringify({
-                        items: cart,
-                        total: total,
-                        deliveryType: deliveryType,
-                        timestamp: Date.now()
-                    }));
-
-                    // Redireciona pro Checkout Pro do Mercado Pago
-                    window.location.href = data.initPoint;
                 } else {
-                    throw new Error(data.error || data.detail || 'Erro ao gerar pagamento');
+                    throw new Error(data.error || data.detail || 'Erro ao gerar PIX');
                 }
             } catch (err) {
                 console.error('Erro no checkout:', err);
-                showNotification('Erro ao gerar pagamento. Tente novamente.', 'error');
+                showNotification('Erro ao gerar PIX. Tente novamente.', 'error');
+            } finally {
                 if (btn) { btn.textContent = textoOriginal; btn.disabled = false; }
             }
         }
@@ -3602,24 +3656,19 @@
             document.querySelector('.floating-cart').style.display = 'flex';
         }
 
-        // Verifica retorno do Mercado Pago via URL params
+        // Mantido por compatibilidade — não usado nesse fluxo (PIX API direto)
         function verificarRetornoMP() {
             const urlParams = new URLSearchParams(window.location.search);
             const pagamento = urlParams.get('pagamento');
             if (!pagamento) return;
 
             if (pagamento === 'success') {
-                showNotification('Pagamento aprovado! 🎉 Em breve entraremos em contato.', 'success');
+                showNotification('Pagamento aprovado! 🎉', 'success');
                 cart = [];
                 appliedCoupon = null;
-                const couponInput = document.getElementById('couponInput');
-                if (couponInput) couponInput.value = '';
                 updateCart();
-                localStorage.removeItem('caotelli_pending_order');
-            } else if (pagamento === 'pending') {
-                showNotification('⏳ Pagamento pendente. Aguardando confirmação.', 'info');
             } else if (pagamento === 'failure') {
-                showNotification('❌ Pagamento não aprovado. Tente novamente.', 'error');
+                showNotification('❌ Pagamento não aprovado.', 'error');
             }
 
             // Limpa a URL pra não repetir a notificação em reload

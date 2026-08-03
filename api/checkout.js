@@ -1,4 +1,5 @@
-const { MercadoPagoConfig, Preference } = require('mercadopago');
+// MP PIX API direta — gera QR code no próprio site (sem redirect)
+const crypto = require('crypto');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -9,18 +10,16 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
   try {
-    const { items, total } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { items, total, payer } = body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'Carrinho vazio' });
     }
 
     const token = process.env.MP_ACCESS_TOKEN;
-
-    console.log('🔐 Token MP:', token ? `${token.substring(0, 15)}...` : 'NÃO ENCONTRADO');
-
     if (!token) {
-      console.error('❌ MP_ACCESS_TOKEN não configurado nas env vars');
+      console.error('❌ MP_ACCESS_TOKEN não configurado');
       return res.status(500).json({ error: 'Token Mercado Pago não configurado' });
     }
 
@@ -29,51 +28,81 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Total inválido' });
     }
 
-    const siteUrl = 'https://liezerlad21-commits.github.io/CaoTelli';
+    // Dados do pagador — se não vier do frontend, usa placeholder válido
+    const payerEmail = (payer && payer.email) || 'cliente@caotelli.com.br';
+    const payerFirstName = (payer && payer.first_name) || 'Cliente';
+    const payerLastName = (payer && payer.last_name) || 'CaoTelli';
+    // CPF: MP exige formato válido. Se não vier, usa CPF genérico de teste (não é validado como real).
+    const payerCpf = ((payer && payer.cpf) || '19119119100').replace(/\D/g, '');
 
-    // Um único item com o total final (frete + desconto já aplicados no frontend).
-    // Descrição lista os produtos do carrinho.
     const descricao = items
       .map(i => `${i.name} x${i.quantity}`)
       .join(', ')
       .substring(0, 250);
 
-    const client = new MercadoPagoConfig({ accessToken: token });
-    const preference = new Preference(client);
+    const idempotencyKey = crypto.randomUUID();
 
-    const preferenceBody = {
-      items: [
-        {
-          id: `CAOTELLI-${Date.now()}`,
-          title: `Pedido CãoTelli (${items.length} ${items.length === 1 ? 'item' : 'itens'})`,
-          description: descricao,
-          quantity: 1,
-          unit_price: Number(totalNum.toFixed(2)),
-          currency_id: 'BRL',
+    const paymentBody = {
+      transaction_amount: Number(totalNum.toFixed(2)),
+      description: `Pedido CãoTelli - ${descricao}`,
+      payment_method_id: 'pix',
+      payer: {
+        email: payerEmail,
+        first_name: payerFirstName,
+        last_name: payerLastName,
+        identification: {
+          type: 'CPF',
+          number: payerCpf,
         },
-      ],
-      back_urls: {
-        success: `${siteUrl}/?pagamento=success`,
-        failure: `${siteUrl}/?pagamento=failure`,
-        pending: `${siteUrl}/?pagamento=pending`,
       },
-      auto_return: 'approved',
-      statement_descriptor: 'CAOTELLI',
       external_reference: `CAOTELLI-${Date.now()}`,
     };
 
-    const result = await preference.create({ body: preferenceBody });
+    console.log('📤 Criando pagamento PIX...', { total: totalNum, payer: payerEmail });
 
-    console.log('✅ Preferência criada:', result.id);
+    const response = await fetch('https://api.mercadopago.com/v1/payments', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'X-Idempotency-Key': idempotencyKey,
+      },
+      body: JSON.stringify(paymentBody),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error(`❌ Erro MP ${response.status}:`, JSON.stringify(data).substring(0, 300));
+      return res.status(response.status).json({
+        error: 'Erro ao gerar PIX no Mercado Pago',
+        detail: data.message || data.error || JSON.stringify(data).substring(0, 200),
+      });
+    }
+
+    const poi = data.point_of_interaction;
+    const txData = poi && poi.transaction_data;
+    const qrText = (txData && txData.qr_code) || '';
+    const qrBase64 = (txData && txData.qr_code_base64) || '';
+
+    if (!qrText) {
+      console.error('❌ MP não retornou QR code:', JSON.stringify(data).substring(0, 300));
+      return res.status(500).json({ error: 'MP não retornou QR code', detail: 'Resposta sem qr_code' });
+    }
+
+    console.log('✅ PIX gerado — payment ID:', data.id);
 
     return res.status(200).json({
-      preferenceId: result.id,
-      initPoint: result.init_point,
+      paymentId: data.id,
+      qrText,
+      qrImageBase64: qrBase64 ? `data:image/png;base64,${qrBase64}` : null,
       total: totalNum,
+      status: data.status,
+      expiresAt: (txData && txData.expiration_date) || null,
     });
 
   } catch (err) {
-    console.error('❌ Erro interno checkout MP:', err);
+    console.error('❌ Erro interno checkout MP PIX:', err);
     return res.status(500).json({
       error: 'Erro ao processar pagamento. Tente novamente.',
       detail: err.message,
