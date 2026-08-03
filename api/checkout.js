@@ -1,3 +1,5 @@
+const { MercadoPagoConfig, Preference } = require('mercadopago');
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -13,87 +15,68 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Carrinho vazio' });
     }
 
-    const totalCents = Math.round(Number(total) * 100);
-    const token = process.env.PAGBANK_TOKEN;
+    const token = process.env.MP_ACCESS_TOKEN;
 
-    console.log('🔐 Token obtido:', token ? `${token.substring(0, 20)}...` : 'NÃO ENCONTRADO');
+    console.log('🔐 Token MP:', token ? `${token.substring(0, 15)}...` : 'NÃO ENCONTRADO');
 
     if (!token) {
-      console.error('❌ PAGBANK_TOKEN não configurado nas env vars');
-      return res.status(500).json({ error: 'Token PagBank não configurado' });
+      console.error('❌ MP_ACCESS_TOKEN não configurado nas env vars');
+      return res.status(500).json({ error: 'Token Mercado Pago não configurado' });
     }
 
-    // INTEGRAÇÃO REAL DO PAGBANK — ATIVADA ✅
-    // Preparar pedido para PagBank
-    const pedido = {
-      reference_id: `CAOTELLI-${Date.now()}`,
-      customer: {
-        name: 'Cliente CãoTelli',
-        email: 'contato@caotelli.com.br',
-        tax_id: '00000000000000',
-      },
-      items: items.map(item => ({
-        name: item.name,
-        quantity: item.quantity,
-        unit_amount: Math.round(item.price * 100),
-      })),
-      amount: {
-        value: totalCents,
-        currency: 'BRL',
-      },
-      qr_codes: [
+    const totalNum = Number(total);
+    if (!totalNum || totalNum <= 0) {
+      return res.status(400).json({ error: 'Total inválido' });
+    }
+
+    const siteUrl = 'https://liezerlad21-commits.github.io/CaoTelli';
+
+    // Um único item com o total final (frete + desconto já aplicados no frontend).
+    // Descrição lista os produtos do carrinho.
+    const descricao = items
+      .map(i => `${i.name} x${i.quantity}`)
+      .join(', ')
+      .substring(0, 250);
+
+    const client = new MercadoPagoConfig({ accessToken: token });
+    const preference = new Preference(client);
+
+    const preferenceBody = {
+      items: [
         {
-          amount: {
-            value: totalCents,
-          },
+          id: `CAOTELLI-${Date.now()}`,
+          title: `Pedido CãoTelli (${items.length} ${items.length === 1 ? 'item' : 'itens'})`,
+          description: descricao,
+          quantity: 1,
+          unit_price: Number(totalNum.toFixed(2)),
+          currency_id: 'BRL',
         },
       ],
+      back_urls: {
+        success: `${siteUrl}/?pagamento=success`,
+        failure: `${siteUrl}/?pagamento=failure`,
+        pending: `${siteUrl}/?pagamento=pending`,
+      },
+      auto_return: 'approved',
+      statement_descriptor: 'CAOTELLI',
+      external_reference: `CAOTELLI-${Date.now()}`,
     };
 
-    // Chamar API PagBank (produção)
-    const response = await fetch('https://api.pagseguro.com/orders', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(pedido),
-    });
+    const result = await preference.create({ body: preferenceBody });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      const errorMsg = data.message || data.error_description || JSON.stringify(data).substring(0, 100);
-      console.error(`❌ Erro PagBank ${response.status}:`, errorMsg);
-
-      // Fallback para mock se API falhar
-      const mockOrderId = `CAOTELLI-${Date.now()}`;
-      const mockQrText = `00020126360014br.gov.bcb.brcode0136123e4567-e12b-12d1-a456-426655440000520400005303986540510.005802BR5913CAOTELLI6009SAO PAULO62410503***63041D3F`;
-      const mockQrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(mockQrText)}&size=160`;
-      return res.status(200).json({
-        orderId: mockOrderId,
-        qrText: mockQrText,
-        qrImageUrl: mockQrImageUrl,
-        total: Number(total),
-        warning: `QR Code mock (API falhou: ${response.status} - ${errorMsg})`,
-      });
-    }
-
-    // Extrair QR code real da resposta
-    const qrCode = data.qr_codes && data.qr_codes[0];
-    const qrText = qrCode?.text || '';
-    const qrImageUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrText)}&size=160`;
+    console.log('✅ Preferência criada:', result.id);
 
     return res.status(200).json({
-      orderId: data.id,
-      qrText: qrText,
-      qrImageUrl: qrImageUrl,
-      total: Number(total),
-      status: data.status,
+      preferenceId: result.id,
+      initPoint: result.init_point,
+      total: totalNum,
     });
 
   } catch (err) {
-    console.error('Erro interno checkout:', err);
-    return res.status(500).json({ error: 'Erro ao processar pagamento. Tente novamente.' });
+    console.error('❌ Erro interno checkout MP:', err);
+    return res.status(500).json({
+      error: 'Erro ao processar pagamento. Tente novamente.',
+      detail: err.message,
+    });
   }
 };

@@ -195,6 +195,197 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 30/07/2026 (DOCUMENTAÇÃO TÉCNICA PRO SUPORTE PAGBANK — SEM ALTERAÇÕES DE CÓDIGO)
+
+### Contexto
+- Diogo entrou em contato com o suporte PagBank (0800-728-2001) pra resolver a whitelist.
+- Suporte pediu dois artefatos técnicos ao longo do atendimento.
+
+### Artefatos produzidos
+
+**1. `SUPORTE_PAGBANK_REQUEST_RESPONSE.md` + `.pdf`**
+- Documento contendo request/response da integração:
+  - **REQUEST:** `POST https://api.pagseguro.com/orders` com headers (Bearer token + Content-Type) e body JSON completo (reference_id, customer, items, amount, qr_codes)
+  - **RESPONSE atual (403):** `{"error_messages":[{"code":"ACCESS_DENIED","description":"whitelist access required..."}]}`
+  - **RESPONSE esperada (200):** formato completo com `id`, `qr_codes[0].text` (PIX copia-e-cola)
+- Base: `api/checkout.js` (função serverless Vercel)
+
+**2. `SUPORTE_PAGBANK_INSTRUCOES_ACESSO.pdf`**
+- Resposta à pergunta "quais as instruções de acesso ao seu ambiente para validarmos os testes"
+- **Opção A** — teste pelo frontend: `https://liezerlad21-commits.github.io/CaoTelli/` (adicionar produto → carrinho → Finalizar Compra, sem login)
+- **Opção B** — teste direto na API via cURL: `POST https://cao-telli.vercel.app/api/checkout` com body `{ items, total }`
+- Reforçado: token seguro em env var da Vercel; IPs de origem dinâmicos (serverless); solicitação de liberação irrestrita por IP para o token do vendedor
+- Oferecido apoio ativo (endpoint dedicado, logs específicos) se o time precisar
+
+### Status ao encerrar
+- ✅ Documentação técnica formal entregue ao Diogo (2 PDFs)
+- ✅ Diogo confirmou que **enviou os documentos ao suporte PagBank**
+- ⏳ Aguardando resposta do suporte com liberação da whitelist
+- 🔧 Nenhuma alteração de código nesta sessão
+- 📋 Backlog imediato pós-liberação: testar PIX real → implementar cartão de crédito (frontend + backend) → persistir carrinho no localStorage
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
+**Data:** 29/07/2026 (PLANEJAMENTO + TENTATIVA MP DESCARTADA — SEM ALTERAÇÕES DE CÓDIGO)
+
+### Parte 1 — Consultoria/alinhamento sobre PagBank
+
+**O que foi discutido:**
+
+- **OAuth 2.0 Connect vs Token direto** — esclarecido que **não precisamos** migrar pra OAuth 2.0 (Client ID + Client Secret). Esse fluxo serve pra apps que atuam em nome de vários vendedores (marketplaces/plataformas). Como a CãoTelli é loja única (Diogo é dono da conta e da loja), o **token direto** continua sendo o modelo correto. O 403 não é problema de tipo de credencial — é whitelist mesmo.
+
+- **Confirmação do domínio `cao-telli.vercel.app`** — verificado no código-fonte:
+  - `index.html` linha 3527: `const PAGBANK_API_URL = 'https://cao-telli.vercel.app/api/checkout';`
+  - Domínio com hífen está correto e consistente com o histórico (correção foi feita em 02/07)
+
+- **Detalhe técnico sobre validação PagBank** — quem chama a API do PagBank **não é o navegador** no domínio `cao-telli.vercel.app`, é a **função serverless da Vercel no backend**. O PagBank valida por IP de origem (IPs dinâmicos da Vercel). Se o suporte pedir IP específico, o pedido correto ao PagBank é liberar **"origem irrestrita" / "qualquer IP"** pra essa aplicação.
+
+- **Mensagem técnica pronta pro Diogo repassar ao suporte PagBank:**
+  ```
+  Olá, sou lojista PagBank e estou com bloqueio na integração da minha API em produção.
+
+  Erro retornado:
+  403 ACCESS_DENIED — "whitelist access required. Contact PagSeguro..."
+
+  Endpoint chamado: POST https://api.pagseguro.com/orders (criação de pedido PIX)
+  Ambiente: Produção
+  Token: já validado (não é erro de autenticação — é permissão de acesso)
+  Domínio da minha aplicação: cao-telli.vercel.app (hospedada na Vercel)
+
+  Preciso que vocês liberem o acesso da minha aplicação/domínio para consumir
+  a API /orders em produção. Podem me orientar onde libero isso no painel,
+  ou fazer a liberação pelo lado de vocês?
+  ```
+
+- **Roadmap de cartão de crédito** — quando o Diogo destravar a whitelist, a **mesma API `/orders`** aceita PIX e cartão. Falta implementar do nosso lado:
+  - **Frontend:** formulário de cartão (número, validade, CVV, nome, CPF) + **SDK de tokenização do PagBank** (obrigatório — evita PCI compliance) + tela de "processando" (cartão demora 3–15s)
+  - **Backend (`api/checkout.js`):** adicionar bloco `charges` no payload com `payment_method.type = "CREDIT_CARD"` + token do cartão + tratamento de aprovado/recusado/em análise antifraude + suporte a **3DS**
+  - **Custo:** cartão ~3–5% + R$0,40 por venda (vs. ~1% do PIX)
+  - **Sequência:** primeiro validar PIX real (código já pronto), depois abrir a frente do cartão (~1 sessão de trabalho)
+
+### Parte 2 — Tentativa de plano B com Mercado Pago (DESCARTADA)
+
+**O que foi feito:**
+
+- Como o PagBank está travado há 3 semanas por whitelist, Liézer propôs testar via Mercado Pago (usando sua conta pessoal como POC) enquanto o Diogo não responde.
+- Liézer criou aplicação **"CaoTelli Ecommerce"** no MP Developers (nº 5340072854795886) com configuração:
+  - Pagamentos online
+  - Desenvolvimento próprio
+  - URL: `https://cao-telli.vercel.app`
+  - Solução: **Checkout Pro** (mesma que a gente já havia implementado em 05/06/2026)
+- Descobriu que credenciais de **Teste** só permitem sandbox (não dá pra fazer pagamento real).
+- Credenciais de **Produção** exigiam preencher dados de negócio (CPF/CNPJ) — não fazia sentido usar dados pessoais do Liézer pra teste de uma loja de terceiros.
+- **Pesquisa de taxas MP vs PagBank (julho/2026):**
+  - PIX: MP 0,49% vs PagBank 0,99% (MP mais barato)
+  - Débito: MP 1,99% vs PagBank 2,39% (MP mais barato)
+  - Crédito à vista: MP 4,98% vs PagBank 4,99% (empate técnico)
+  - Conclusão: **MP é ligeiramente mais barato que PagBank** em quase todas as modalidades pra e-commerce online
+
+**Resposta do Diogo:**
+> "A gente tem, mas não movimentamos ela, a taxa vai ser muito maior."
+
+- Percepção do Diogo sobre taxa maior está **desatualizada/errada** (dados públicos mostram o contrário)
+- Possíveis motivos: conta MP antiga sem negociação, confusão com taxa de maquininha física, ou preferência emocional pelo PagBank
+- **Decisão do Liézer:** respeitar a preferência do cliente e continuar aguardando o PagBank
+- **Aplicação MP excluída** do painel (limpo, sem pendência)
+
+**Status ao encerrar:**
+- ✅ Diagnóstico do 403 refinado e reconfirmado
+- ✅ Mensagem técnica formal redigida pro suporte PagBank
+- ✅ Domínio no código validado (`cao-telli.vercel.app` — correto)
+- ✅ Plano B (MP Checkout Pro) testado até o ponto de credenciais e descartado por decisão do cliente
+- ✅ Aplicação MP criada e excluída (nenhum resíduo)
+- ⏳ Aguardando Diogo levar a mensagem ao suporte PagBank (0800-728-2001) e conseguir liberação de whitelist
+- 📝 Plano de implementação do cartão documentado (pra depois de destravar whitelist)
+- 📝 Comparativo de taxas MP vs PagBank documentado (munição pra caso o Diogo mude de ideia no futuro)
+- 🔧 Nenhuma alteração de código nesta sessão
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
+**Data:** 27/07/2026 (TROCA DE TOKEN PAGBANK — WHITELIST AINDA BLOQUEANDO)
+
+### Novo token de produção registrado ✅ — mas erro 403 persiste
+
+**O que foi feito:**
+
+- **Recebido novo token de produção do PagBank** (Diogo gerou):
+  ```
+  0708419e-442a-4081-afa5-553b8a7e674d990363674cf694383cd1b0843b22dac8f750-7def-4757-a6b6-4953546909b2
+  ```
+- **Atualizada a variável `PAGBANK_TOKEN`** na Vercel (Settings → Environments → Production → Environment Variables)
+- **Redeploy feito com sucesso** (build limpo, sem cache) — Ready Latest em 7s
+- **Testado o checkout** no site em produção com DevTools/Network aberto
+- **Confirmado via Response da API:**
+  - Endpoint `/api/checkout` retorna 200 (função OK)
+  - Mas cai no fallback mock com o mesmo erro de 11/07:
+    ```
+    "warning": "QR Code mock (API falhou: 403 - {\"error_messages\":[{\"code\":\"ACCESS_DENIED\",\"description\":\"whitelist access required. Contact PagSegu...\"}]}"
+    ```
+
+**Diagnóstico:**
+- ✅ Token novo é válido — passa na autenticação (se estivesse errado voltaria 401, não 403)
+- ❌ **Bloqueio é do lado do PagBank, não do token** — whitelist ainda não foi liberada
+- Trocar o token não resolveu porque o problema é permissão de acesso da aplicação/domínio no painel PagBank
+
+**Próximo passo (ação do cliente — Diogo):**
+
+Mensagem enviada ao Diogo com o passo a passo:
+1. Acessar `minhaconta.pagseguro.uol.com.br` → login
+2. Vendas → Integrações → Permissões / Whitelist de IPs / Aplicações Autorizadas
+3. Adicionar domínio `cao-telli.vercel.app`
+4. Marcar "Aceitar de qualquer IP" (se existir)
+5. Verificar se a API Key tem permissão pra criar pedidos PIX (`/orders`)
+6. Se não achar, ligar no suporte PagBank **0800-728-2001** e informar:
+   > "Preciso liberar o acesso da minha aplicação. Estou recebendo erro 403 ACCESS_DENIED — whitelist access required ao chamar a API `/orders` em produção. Meu domínio é cao-telli.vercel.app"
+
+**Status ao encerrar:**
+- ✅ Site 100% operacional com mock (fluxo completo funciona)
+- ✅ Token de produção registrado e redeployado
+- ❌ PIX real bloqueado por whitelist (mesma pendência de 11/07)
+- ⏳ Aguardando Diogo liberar acesso no painel PagBank
+- 📝 Instruções detalhadas passadas ao cliente
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
+**Data:** 11/07/2026 (DEBUGAGEM TOKEN PAGBANK)
+
+### Erro 403 ACCESS_DENIED — Whitelist PagBank ✅ IDENTIFICADO
+
+**O que foi feito:**
+- Testado checkout com token de produção do PagBank
+- DevTools Console mostrou erro específico:
+  ```
+  ⚠️ QR Code mock (API falhou: 403 - 
+  {"error_messages":[{"code":"ACCESS_DENIED","description":"whitelist access required. Contact PagSegu...
+  ```
+
+**Diagnóstico:**
+- ✅ Token está válido (passa auth básica)
+- ❌ **Erro: ACCESS_DENIED — whitelist não configurada**
+- Motivo: IP da Vercel ou domínio `cao-telli.vercel.app` não autorizado no painel PagBank
+
+**Próximo passo (ação do cliente):**
+1. Diogo acessa painel PagBank → Configurações/Integração
+2. Procura por "Whitelist de IPs" ou "Domínios Autorizados"
+3. Adiciona: `cao-telli.vercel.app` ou o IP da Vercel
+4. Libera se existir opção "Aceitar todos os IPs/domínios"
+5. Salva e testa novamente
+
+**Status ao encerrar:**
+- ✅ Site 100% operacional com mock
+- ✅ Erro identificado: não é token, é whitelist
+- 📝 Próxima ação bem definida para cliente
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 10/07/2026 (RETOMADA RÁPIDA)
 
 ### Status Verificado ✅
