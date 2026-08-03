@@ -936,19 +936,26 @@
         }
 
         .remove-item-btn {
-            background-color: rgba(191, 0, 255, 0.3);
+            background-color: var(--primary-purple);
             border: none;
-            color: var(--primary-purple);
-            padding: 5px 10px;
-            border-radius: 3px;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
             cursor: pointer;
             margin-left: 10px;
+            margin-top: 6px;
             transition: all 0.3s;
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 6px rgba(214,50,74,0.25);
         }
 
         .remove-item-btn:hover {
-            background-color: rgba(191, 0, 255, 0.6);
+            background-color: #b0263a;
+            transform: translateY(-1px);
         }
 
         .coupon-input-section {
@@ -3419,15 +3426,15 @@
                 <div class="cart-item">
                     <div class="cart-item-details">
                         <div class="cart-item-name">${item.emoji} ${item.name}</div>
-                        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-                            <button onclick="decreaseQty(${item.id})" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #0077aa;background:#fff;color:#0077aa;font-size:16px;font-weight:bold;cursor:pointer;line-height:1">−</button>
-                            <span style="font-weight:bold;font-size:15px;min-width:20px;text-align:center">${item.quantity}</span>
-                            <button onclick="increaseQty(${item.id})" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #0077aa;background:#0077aa;color:#fff;font-size:16px;font-weight:bold;cursor:pointer;line-height:1">+</button>
+                        <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+                            <button onclick="decreaseQty(${item.id})" style="width:34px;height:34px;border-radius:50%;border:1.5px solid #0077aa;background:#fff;color:#0077aa;font-size:18px;font-weight:bold;cursor:pointer;line-height:1">−</button>
+                            <span style="font-weight:bold;font-size:16px;min-width:24px;text-align:center">${item.quantity}</span>
+                            <button onclick="increaseQty(${item.id})" style="width:34px;height:34px;border-radius:50%;border:1.5px solid #0077aa;background:#0077aa;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;line-height:1">+</button>
                         </div>
                     </div>
-                    <div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
                         <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
-                        <button class="remove-item-btn" onclick="removeFromCart(${item.id})" style="font-size:11px;margin-top:4px">Remover</button>
+                        <button class="remove-item-btn" onclick="removeFromCart(${item.id})">🗑️ Remover</button>
                     </div>
                 </div>
             `).join('');
