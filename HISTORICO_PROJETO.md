@@ -195,6 +195,120 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 03/08/2026 (MIGRAÇÃO PAGBANK → MERCADO PAGO + LAYOUT CARRINHO)
+
+### Contexto
+- Diogo autorizou usar Mercado Pago (a conta da CãoTelli tem MP, decidiu não esperar mais o PagBank liberar whitelist)
+- Token de produção MP recebido: `APP_USR-8816054921809362-080310-7c53d728a02852192a64e75150597812-3106988801`
+
+### Parte 1 — Migração para MP Checkout Pro (feita, mas descartada)
+
+**O que foi feito:**
+- Reescrito `api/checkout.js` usando Checkout Pro (`Preference.create`): recebia items+total, criava preferência, retornava `init_point`
+- `checkout()` no frontend redirecionava pro MP (`window.location.href = data.initPoint`)
+- Adicionada `verificarRetornoMP()` que lê `?pagamento=success|pending|failure` no retorno e mostra notificação
+- `package.json` — adicionada dependência `mercadopago@^2.0.0`
+- Vercel Environment Variables: adicionado `MP_ACCESS_TOKEN`, removido `PAGBANK_TOKEN`
+- Deploy verde ✅, redirecionamento pro MP funcionou perfeitamente
+- Retorno pro site também funcionou (notificação "❌ Pagamento não aprovado" apareceu ao cancelar)
+
+**Problema descoberto:**
+- No fluxo "Sem conta Mercado Pago" (guest checkout) NÃO aparece PIX — apenas Cartão, Boleto e Débito CAIXA
+- PIX no Checkout Pro só aparece se o cliente logar com conta MP (regra da plataforma)
+- Diogo cadastrou chave PIX na conta dele, mas isso não muda o comportamento do guest checkout
+
+### Parte 2 — Migração para MP PIX API direta (feita, aguarda liberação da chave)
+
+**Decisão:** migrar pra Payments API (`POST /v1/payments`) com `payment_method_id: "pix"` — gera QR code direto sem redirect, aproveita o modal PIX existente.
+
+**O que foi feito:**
+- `api/checkout.js` reescrito novamente:
+  - Usa `fetch` direto pra `https://api.mercadopago.com/v1/payments`
+  - Header `X-Idempotency-Key` com `crypto.randomUUID()`
+  - Payload: `transaction_amount`, `description`, `payment_method_id: 'pix'`, `payer` (email/first_name/last_name/CPF)
+  - Retorna `qrText` (copia-e-cola) + `qrImageBase64` (imagem PNG do QR)
+- `package.json` — removida dependência `mercadopago` (agora só usa fetch nativo, mais leve)
+- `checkout()` no frontend reescrito:
+  - Nova função `coletarDadosPagador()` — puxa email do Firebase user, dados extras do `localStorage.caotelli_clientes`, ou pede via `prompt()` se guest
+  - Volta a abrir o modal PIX (`#pixModal`) com QR code base64 direto na `<img src="data:image/png;base64,...">`
+
+**Erro encontrado ao testar:**
+```
+POST /api/checkout 400 (Bad Request)
+{"error":"Erro ao gerar PIX no Mercado Pago",
+ "detail":"Collector user without key enabled for QR render"}
+```
+
+**Diagnóstico:**
+- Diogo cadastrou chave PIX na conta MP, mas ela NÃO está habilitada pra geração de QR code via API
+- MP tem duas coisas separadas: (1) cadastrar chave PIX pra receber, (2) habilitar chave pra gerar QR code dinâmico via API
+- Falta o passo (2)
+
+**Ação pendente do cliente (Diogo):**
+1. Entrar em `mercadopago.com.br` → login
+2. **Sua conta** → **Meu negócio** → **Cobrar com PIX** (ou **PIX** → **Chaves**)
+3. Ativar "Habilitar para gerar QR Code" / "QR Code dinâmico" na chave cadastrada
+4. Alternativa: app MP → menu → PIX → Minhas chaves → tocar na chave → "Ativar cobrança por QR Code"
+5. Se não achar: ligar suporte MP **0800-637-8888** e informar:
+   > "Preciso habilitar minha chave PIX pra renderização de QR code na API de pagamentos. Estou recebendo o erro 'Collector user without key enabled for QR render'."
+
+### Parte 3 — Melhorias de UX do carrinho (concluídas)
+
+**Balão do Google reviews movido pro lado esquerdo:**
+- `.floating-reviews`: `right:20px` → `left:20px` (linha 1722)
+
+**Botão Remover repaginado:**
+- Antes: rosa transparente pequeno (`padding:5px 10px; font-size:12px`)
+- Agora: vermelho sólido grande (`padding:8px 14px; font-size:13px; font-weight:600`), com ícone 🗑️ e sombra
+- Hover com `transform:translateY(-1px)`
+
+**Botões +/- do carrinho maiores:**
+- De 28px → 34px (mais fáceis de clicar)
+- Fonte de 16px → 18px
+
+**Layout do cart-item corrigido:**
+- Removido `max-height: 300px` do `.cart-items` (deixa `.cart-content` fazer o scroll global)
+- Adicionado `min-height: 84px` no `.cart-item` pra garantir espaço pros botões
+
+### Commits desta sessão
+```
+b2e2889 balão Google reviews pra esquerda
+45228b5 layout carrinho (botões grandes + min-height)
+cc379ca migração PagBank → MP Checkout Pro
+```
+(mais commits depois: MP PIX API direta + package.json limpo)
+
+### Status ao encerrar
+
+**✅ Feito:**
+- Migração completa PagBank → Mercado Pago
+- Código MP PIX API direta pronto e deployado
+- `MP_ACCESS_TOKEN` configurado na Vercel (Production)
+- `PAGBANK_TOKEN` removido
+- Layout do carrinho corrigido (botões, min-height, balão Google)
+- Retorno de pagamento (verificarRetornoMP) mantido por compatibilidade
+
+**⏳ Bloqueado aguardando Diogo:**
+- Habilitar chave PIX para QR Code na conta MP
+- Depois: testar geração de PIX real end-to-end
+
+**📋 Backlog imediato pós-liberação:**
+1. Testar PIX real (com dados de pagador reais — CPF válido, email real)
+2. Substituir `prompt()` de coleta de dados por modal HTML bonito (mesmo padrão dos outros modais do site)
+3. Implementar cartão de crédito (frontend + backend com SDK tokenização MP)
+4. Persistir carrinho no `localStorage` (ainda não feito)
+
+**🔧 Detalhes técnicos importantes:**
+- Chamada MP usa `X-Idempotency-Key` obrigatório
+- `payer.identification.type = 'CPF'` (CPF sem pontuação)
+- Se pagador não fornecer dados, usa placeholders (`cliente@caotelli.com.br`, CPF `19119119100`) — MP pode recusar em produção
+- QR code vem como base64 já formatado — não precisa mais do `quickchart.io` como fallback
+- CORS OK (mantido `Access-Control-Allow-Origin: *`)
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 30/07/2026 (DOCUMENTAÇÃO TÉCNICA PRO SUPORTE PAGBANK — SEM ALTERAÇÕES DE CÓDIGO)
 
 ### Contexto
