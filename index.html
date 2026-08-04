@@ -1888,7 +1888,7 @@
                     <span class="cart-count" id="cartCount">0</span>
                 </div>
                 <div class="header-icon" id="headerPerfilBtn" onclick="openSection('profile')" title="Entrar / Cadastrar" style="display:flex;align-items:center;gap:5px;font-size:0.85rem;font-weight:600;color:#5a6a85;cursor:pointer"><i class="fa-solid fa-circle-user" style="font-size:1.4rem;color:#b0b8c1"></i></div>
-                <div class="header-icon" id="adminBtn" onclick="openSection('admin')" title="Painel Admin"><i class="fa-solid fa-screwdriver-wrench" style="font-size:1rem"></i> Admin</div>
+                <div class="header-icon" id="adminBtn" onclick="openSection('admin')" title="Painel Admin" style="position:relative"><i class="fa-solid fa-screwdriver-wrench" style="font-size:1rem"></i> Admin<span id="badgeHeaderAdmin" style="display:none;position:absolute;top:-6px;right:-6px;background:#D6324A;color:#fff;border-radius:12px;padding:2px 7px;font-size:.7rem;font-weight:700;box-shadow:0 2px 6px rgba(214,50,74,0.4);min-width:22px;text-align:center;line-height:1.2;animation:pulse 1.5s ease-in-out infinite;">0</span></div>
                 <div class="header-icon" onclick="openSection('contact')"><i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.3rem"></i></div>
             </div>
         </div>
@@ -3831,11 +3831,28 @@
                 document.getElementById('pixModal').style.display = 'flex';
 
                 // Registra pedido com paymentId (permite polling e atualização de status)
-                await registrarPedido({
+                const resultadoRegistro = await registrarPedido({
                     paymentId: data.paymentId,
                     method: 'pix',
                     status: 'pendente',
                 });
+
+                // Se o registro falhou, mostra aviso vermelho no modal PIX pra cliente saber
+                if (resultadoRegistro && !resultadoRegistro.firestoreOk) {
+                    const modalContent = document.querySelector('#pixModal > div:last-child');
+                    if (modalContent) {
+                        const aviso = document.createElement('div');
+                        aviso.style.cssText = 'background:#fff3f3; border:1.5px solid #D6324A; border-radius:10px; padding:10px 12px; margin:10px 0; text-align:left;';
+                        aviso.innerHTML = `
+                            <div style="font-size:.8rem; color:#D6324A; font-weight:700; margin-bottom:4px;">⚠️ Anote seu Payment ID</div>
+                            <div style="font-size:.72rem; color:#7a2027; line-height:1.4; margin-bottom:6px;">
+                                Se o pagamento cair mas você não receber confirmação, envie o Payment ID
+                                <strong style="font-family:monospace;">${data.paymentId}</strong> pelo WhatsApp
+                                <a href="https://wa.me/5551997655755" style="color:#0088C2; font-weight:600;">(51) 99765-5755</a>.
+                            </div>`;
+                        modalContent.insertBefore(aviso, modalContent.firstChild);
+                    }
+                }
 
                 // Inicia polling — verifica status a cada 5s até approved/cancelled/timeout (15min)
                 iniciarPollingPagamento(data.paymentId);
@@ -3897,6 +3914,15 @@
         function exibirPagamentoAprovado(data) {
             const modal = document.getElementById('pixModal');
             const valor = data && data.amount ? `R$ ${Number(data.amount).toFixed(2).replace('.', ',')}` : '';
+            const paymentIdBox = data.paymentId ? `
+                <div style="background:#f4f7fb; border-radius:10px; padding:10px 12px; margin:0 0 12px; text-align:left;">
+                    <div style="font-size:.7rem; color:#5a6a85; margin-bottom:4px;">🧾 Payment ID (guarde esta informação)</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <code id="paymentIdText" style="flex:1; font-size:.85rem; font-weight:600; color:#1a2340; word-break:break-all;">${data.paymentId}</code>
+                        <button onclick="copiarPaymentId()" style="background:#0088C2; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:.75rem; cursor:pointer; font-weight:600; flex-shrink:0;">Copiar</button>
+                    </div>
+                </div>` : '';
+
             modal.innerHTML = `
                 <div style="background:#fff; border-radius:18px; padding:32px 24px; max-width:380px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.4);">
                     <div style="font-size:5rem; margin-bottom:8px;">✅</div>
@@ -3905,6 +3931,7 @@
                         Seu PIX de <strong>${valor}</strong> foi recebido pela CãoTelli.<br>
                         Seu pedido já está sendo preparado. 🐾
                     </p>
+                    ${paymentIdBox}
                     <div style="background:#f0f9f4; border:1px solid #22a06b; border-radius:10px; padding:12px; margin-bottom:16px; text-align:left;">
                         <div style="font-size:.75rem; color:#22a06b; font-weight:600;">📦 Próximos passos</div>
                         <p style="font-size:.82rem; color:#1a2340; margin:6px 0 0; line-height:1.5;">
@@ -4014,19 +4041,25 @@
                 }
 
                 console.log('✅ Cartão — status:', data.status);
-                exibirResultadoCartao(data.status, data);
 
-                // Registra pedido com metadata (funciona pra todos os status)
+                // Registra pedido ANTES de exibir tela de sucesso, pra passar info de erro pro modal
                 const statusPedido =
                     data.status === 'approved'   ? 'pago' :
                     data.status === 'in_process' ? 'em_analise' :
                     data.status === 'pending'    ? 'pendente' : 'recusado';
 
-                await registrarPedido({
+                const resultadoRegistro = await registrarPedido({
                     paymentId: data.paymentId,
                     method: 'card',
                     status: statusPedido,
                     installments: data.installments || parcelas,
+                });
+
+                // Passa o status do registro pra tela de sucesso (mostra aviso se falhou)
+                exibirResultadoCartao(data.status, {
+                    ...data,
+                    registroFalhou: !!(resultadoRegistro && !resultadoRegistro.firestoreOk),
+                    erroRegistro: resultadoRegistro && resultadoRegistro.erro,
                 });
 
                 if (data.status === 'approved') {
@@ -4055,7 +4088,7 @@
 
             if (status === 'approved') {
                 icon = '✅'; cls = 'approved'; titulo = 'Pagamento aprovado!';
-                msg = `Seu pedido foi confirmado. Você receberá a atualização por e-mail.<br><br><small>Payment ID: <code>${data.paymentId || '-'}</code></small>`;
+                msg = 'Seu pedido foi confirmado. Você receberá a atualização por e-mail.';
             } else if (status === 'in_process' || status === 'pending') {
                 icon = '⏳'; cls = 'pending'; titulo = 'Pagamento em análise';
                 msg = 'Seu cartão está sendo analisado. Isso pode levar até 2 dias úteis. Avisaremos por e-mail.';
@@ -4078,15 +4111,58 @@
                 msg = `${detalhe}<br><br>Você pode tentar outro cartão ou pagar via PIX.`;
             }
 
+            // Box do Payment ID com botão copiar (visível em qualquer status pra referência)
+            const paymentIdBox = data.paymentId ? `
+                <div style="background:#f4f7fb; border-radius:10px; padding:10px 12px; margin:14px 0 10px; text-align:left;">
+                    <div style="font-size:.7rem; color:#5a6a85; margin-bottom:4px;">🧾 Payment ID (guarde esta informação)</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <code id="paymentIdText" style="flex:1; font-size:.85rem; font-weight:600; color:#1a2340; word-break:break-all;">${data.paymentId}</code>
+                        <button onclick="copiarPaymentId()" style="background:#0088C2; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:.75rem; cursor:pointer; font-weight:600; flex-shrink:0;">Copiar</button>
+                    </div>
+                </div>
+            ` : '';
+
+            // Aviso de erro de registro — aparece em vermelho se o pedido não foi salvo no banco
+            const avisoRegistroFalhou = data.registroFalhou ? `
+                <div style="background:#fff3f3; border:1.5px solid #D6324A; border-radius:10px; padding:10px 12px; margin:10px 0; text-align:left;">
+                    <div style="font-size:.8rem; color:#D6324A; font-weight:700; margin-bottom:4px;">⚠️ Atenção — anote o Payment ID acima!</div>
+                    <div style="font-size:.72rem; color:#7a2027; line-height:1.4;">
+                        Seu pagamento foi processado, mas houve uma falha ao registrar o pedido no nosso sistema.
+                        Guarde o Payment ID e envie no WhatsApp
+                        <a href="https://wa.me/5551997655755" style="color:#0088C2; font-weight:600;">(51) 99765-5755</a>
+                        pra confirmarmos manualmente.
+                    </div>
+                </div>
+            ` : '';
+
             body.innerHTML = `
                 <div class="big-icon">${icon}</div>
                 <h3 class="${cls}">${titulo}</h3>
                 <p>${msg}</p>
+                ${paymentIdBox}
+                ${avisoRegistroFalhou}
                 <button class="pay-submit-btn" onclick="fecharCardResult()" style="margin-top:6px;">
                     ${status === 'approved' ? '🎉 Continuar' : '↩ Tentar novamente'}
                 </button>
             `;
             document.getElementById('cardResultModal').classList.add('active');
+        }
+
+        // Copia o Payment ID pra área de transferência
+        function copiarPaymentId() {
+            const el = document.getElementById('paymentIdText');
+            if (!el) return;
+            const texto = el.textContent.trim();
+            navigator.clipboard.writeText(texto).then(() => {
+                showNotification('Payment ID copiado! ✅');
+            }).catch(() => {
+                // fallback pra browsers antigos
+                const range = document.createRange();
+                range.selectNode(el);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                showNotification('Selecione e copie o Payment ID.');
+            });
         }
 
         function fecharCardResult() {
@@ -4894,7 +4970,15 @@
             document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById('admin' + aba.charAt(0).toUpperCase() + aba.slice(1)).classList.add('active');
             if (aba === 'produtos')       renderAdminProdutos();
-            if (aba === 'pedidos')      { renderAdminPedidos(); marcarPedidosComoVisualizados(); }
+            if (aba === 'pedidos')      {
+                // Antes de renderizar, tenta subir pra Firestore qualquer pedido que ficou na fila local
+                if (typeof reprocessarFilaPedidos === 'function') {
+                    reprocessarFilaPedidos().then(() => { renderAdminPedidos(); marcarPedidosComoVisualizados(); });
+                } else {
+                    renderAdminPedidos();
+                    marcarPedidosComoVisualizados();
+                }
+            }
             if (aba === 'clientes')       renderAdminClientes();
             if (aba === 'cupons')         renderAdminCupons();
             if (aba === 'ofertas')        renderAdminOfertas();
@@ -5048,9 +5132,11 @@
 
         // ── Badge de pedidos novos (não visualizados) ──
         // Conta pedidos com status 'pago' ou 'em_analise' que ainda não foram vistos pelo Diogo
+        // Atualiza DOIS badges: um no botão Admin do header, outro na aba Pedidos dentro do admin
         async function atualizarBadgePedidos() {
-            const badge = document.getElementById('badgePedidosNovos');
-            if (!badge) return;
+            const badgeTab    = document.getElementById('badgePedidosNovos');
+            const badgeHeader = document.getElementById('badgeHeaderAdmin');
+            if (!badgeTab && !badgeHeader) return;
             let pedidos = [];
             try {
                 if (window._db) {
@@ -5066,13 +5152,24 @@
                 const st = (p.status || '').toLowerCase();
                 return !p.visualizado && (st === 'pago' || st === 'em_analise' || st === 'pendente');
             });
-            if (novos.length > 0) {
-                badge.textContent = novos.length > 99 ? '99+' : String(novos.length);
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
+            const txt = novos.length > 99 ? '99+' : String(novos.length);
+            [badgeTab, badgeHeader].forEach(b => {
+                if (!b) return;
+                if (novos.length > 0) { b.textContent = txt; b.style.display = 'inline-block'; }
+                else { b.style.display = 'none'; }
+            });
         }
+
+        // Inicia o badge do header assim que a página carrega, e atualiza a cada 60s
+        // Só faz sentido se o usuário for admin (senão nem vê o botão)
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof atualizarBadgePedidos === 'function') {
+                    atualizarBadgePedidos();
+                    setInterval(atualizarBadgePedidos, 60000); // 1 min
+                }
+            }, 2000); // espera 2s pro Firebase inicializar
+        });
 
         // Marca todos os pedidos visíveis como visualizados (chamado ao abrir aba Pedidos)
         async function marcarPedidosComoVisualizados() {
@@ -5285,19 +5382,74 @@
 
             // Salva no Firestore (persiste entre dispositivos)
             let docId = null;
-            if (window._db) {
+            let firestoreError = null;
+            if (window._db && window._fsAddDoc && window._fsCol) {
+                // Retry até 2x com 1s de intervalo — pega falhas temporárias de rede
+                for (let tentativa = 0; tentativa < 2; tentativa++) {
+                    try {
+                        const ref = await window._fsAddDoc(window._fsCol(window._db, 'pedidos'), pedido);
+                        docId = ref && ref.id;
+                        firestoreError = null;
+                        // Mapeia paymentId → docId localmente pra permitir update via polling
+                        if (pedido.paymentId && docId) {
+                            const map = JSON.parse(localStorage.getItem('caotelli_pay_map') || '{}');
+                            map[pedido.paymentId] = docId;
+                            localStorage.setItem('caotelli_pay_map', JSON.stringify(map));
+                        }
+                        break; // sucesso, sai do loop
+                    } catch(e) {
+                        firestoreError = e;
+                        console.error(`❌ Firestore erro (tentativa ${tentativa+1}):`, e && e.code, e && e.message);
+                        if (tentativa === 0) await new Promise(r => setTimeout(r, 1000));
+                    }
+                }
+
+                // Se falhou depois dos retries, guarda em fila local pra reprocessar depois
+                if (firestoreError) {
+                    const fila = JSON.parse(localStorage.getItem('caotelli_pedidos_fila') || '[]');
+                    fila.push({ ...pedido, _erro: firestoreError.code || firestoreError.message });
+                    localStorage.setItem('caotelli_pedidos_fila', JSON.stringify(fila));
+                }
+            } else {
+                firestoreError = new Error('Firestore não inicializado');
+            }
+
+            // Atualiza o badge (aparece pro Diogo na hora, mesmo antes da confirmação)
+            if (typeof atualizarBadgePedidos === 'function') atualizarBadgePedidos();
+
+            // Retorna sucesso/falha explícito pra quem chamar (submitPix / submitCard)
+            return {
+                docId,
+                paymentId: pedido.paymentId,
+                firestoreOk: !firestoreError,
+                erro: firestoreError ? (firestoreError.code || firestoreError.message) : null,
+            };
+        }
+
+        // Tenta reprocessar pedidos que ficaram na fila local (falharam de salvar no Firestore)
+        // Chamado sempre que o admin abre o painel
+        async function reprocessarFilaPedidos() {
+            const fila = JSON.parse(localStorage.getItem('caotelli_pedidos_fila') || '[]');
+            if (!fila.length || !window._db) return;
+            const restantes = [];
+            for (const pedido of fila) {
                 try {
-                    const ref = await window._fsAddDoc(window._fsCol(window._db, 'pedidos'), pedido);
-                    docId = ref && ref.id;
-                    // Mapeia paymentId → docId localmente pra permitir update via polling
-                    if (pedido.paymentId && docId) {
+                    const { _erro, ...limpo } = pedido;
+                    const ref = await window._fsAddDoc(window._fsCol(window._db, 'pedidos'), limpo);
+                    if (pedido.paymentId && ref && ref.id) {
                         const map = JSON.parse(localStorage.getItem('caotelli_pay_map') || '{}');
-                        map[pedido.paymentId] = docId;
+                        map[pedido.paymentId] = ref.id;
                         localStorage.setItem('caotelli_pay_map', JSON.stringify(map));
                     }
-                } catch(e) { console.warn('Firestore pedidos:', e); }
+                    console.log('✅ Pedido da fila reprocessado:', ref.id);
+                } catch(e) {
+                    restantes.push(pedido);
+                }
             }
-            return { docId, paymentId: pedido.paymentId };
+            localStorage.setItem('caotelli_pedidos_fila', JSON.stringify(restantes));
+            if (restantes.length < fila.length) {
+                console.log(`📤 ${fila.length - restantes.length} pedidos da fila salvos com sucesso.`);
+            }
         }
 
         // Atualiza status de um pedido pelo paymentId (chamado pelo polling)

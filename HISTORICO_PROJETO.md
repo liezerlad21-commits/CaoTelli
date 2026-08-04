@@ -195,6 +195,128 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 04/08/2026 (RESILIÊNCIA DO REGISTRO DE PEDIDOS + FIRESTORE RULES)
+
+### Contexto
+- Após pushar todas as features (webhook, polling, cartão), o Diogo testou cartão de R$ 2 com sucesso no MP mas o pedido **NÃO apareceu no admin**
+- Hipótese confirmada: Firestore em modo restrito recusando writes de usuários não-logados (compra guest)
+- Sessão focada em: tornar o registro à prova de falhas + dar visibilidade ao cliente quando algo dá errado
+
+### Parte 1 — `registrarPedido` robusto com retry + fila local
+
+**Antes:** falhas no Firestore eram engolidas com `console.warn`, sem qualquer feedback ao chamador.
+
+**Depois:**
+- Detecção explícita de sucesso/falha (retorna `{ firestoreOk, erro, docId, paymentId }`)
+- **Retry automático** — tenta 2x com 1s de intervalo entre tentativas
+- **Fila local** em `localStorage.caotelli_pedidos_fila` — pedidos que falharam ficam guardados
+- Logs detalhados com `error.code` e `error.message` (não mais só warning)
+- Nova função `reprocessarFilaPedidos()` — tenta subir pedidos da fila quando admin abre painel de Pedidos
+
+### Parte 2 — Feedback visual pro cliente
+
+**No modal PIX:**
+- Se o registro no Firestore falhar após gerar o QR, aparece **aviso vermelho no topo do modal** com o Payment ID em destaque e link direto pro WhatsApp da CãoTelli
+
+**Na tela de sucesso do PIX (aprovação automática):**
+- Novo box com **Payment ID + botão Copiar** — cliente tem sempre a referência do pagamento
+- Copia via clipboard API com fallback pra selection manual
+
+**Na tela de resultado do Cartão:**
+- Mesmo box de Payment ID em qualquer status (aprovado/análise/recusado)
+- Se registro falhou, avisa em vermelho: "Seu pagamento foi processado, mas houve uma falha ao registrar. Guarde o Payment ID e envie no WhatsApp..."
+
+**Nova função `copiarPaymentId()`** — reusa entre PIX e Cartão.
+
+### Parte 3 — Auto-reprocessamento no admin
+
+- Quando o Diogo abre a aba **Pedidos**, o sistema **tenta reprocessar automaticamente** a fila local antes de renderizar
+- Assim, se ele mesmo comprar sem logar e o registro falhar, ao entrar no admin (que exige login) os pedidos são salvos com as credenciais dele
+- Zero pedidos "perdidos" desde que ele acesse o admin em algum momento
+
+### ⚠️ Ação necessária: Firestore Rules
+
+**Esse é o fix principal do bug do Diogo.** As rules atuais do Firestore recusam writes de usuários não-autenticados. Precisa liberar writes em `pedidos` pra qualquer um (compra guest é padrão de e-commerce).
+
+**Como fazer (Firebase Console):**
+1. `console.firebase.google.com` → projeto **caotelli-fd86c**
+2. Menu esquerdo → **Firestore Database**
+3. Aba **Rules** (topo da tela do Firestore)
+4. Substituir pelo conteúdo abaixo → **Publish**
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Produtos, ofertas, cupons, config: leitura pública, escrita só admin
+    match /produtos/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /ofertas/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /cupons/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /config/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    // Pedidos: leitura só admin, escrita permitida pra qualquer visitante (checkout guest)
+    match /pedidos/{doc} {
+      allow read: if request.auth != null;
+      allow create: if true;
+      allow update: if true;
+    }
+    // Clientes: qualquer um pode cadastrar/atualizar o próprio
+    match /clientes/{email} {
+      allow read, write: if true;
+    }
+  }
+}
+```
+
+### Status ao encerrar
+
+**✅ Feito:**
+- `registrarPedido` refatorado com retry + fila + retorno explícito
+- Feedback visual em 3 telas (modal PIX + tela sucesso PIX + resultado cartão)
+- Payment ID visível com botão copiar em todas as confirmações
+- Auto-reprocessamento da fila quando admin abre painel
+- Aviso vermelho pro cliente se registro falhar (com WhatsApp de contato)
+
+**⏳ Ação do Liézer:**
+- Atualizar Rules do Firestore (conteúdo acima) — **essencial pra que compras de visitante gravem**
+- Rodar `PushCaoTelli.bat` com mensagem `feat: resiliencia no registro de pedidos + feedback visual`
+
+**📋 Backlog imediato:**
+1. Testar cartão do Diogo após rules atualizadas — pedido tem que aparecer
+2. (opcional) Fazer webhook usar Firebase Admin SDK pra escrever server-side — belt and suspenders
+3. Persistir carrinho no localStorage
+
+**🔧 Detalhes técnicos importantes:**
+- Fila local `caotelli_pedidos_fila` tem no máximo os pedidos que falharam localmente naquele browser
+- `reprocessarFilaPedidos()` é chamada quando abre aba Pedidos — precisa estar logado como admin pra funcionar bem
+- Se a Firestore rule bloquear, pedido continua na fila até liberar
+- Retry usa exponential backoff simples (1s fixo entre tentativas — mais que isso não vale a pena)
+- `paymentIdText` usa `<code>` HTML + clipboard API com fallback pra `document.getSelection()`
+
+### Commits desta sessão (a fazer via PushCaoTelli.bat)
+```
+feat: resiliencia no registro de pedidos + feedback visual
+- retry x2 + fila local em registrarPedido
+- payment id visivel com botao copiar (pix e cartao)
+- aviso vermelho quando registro falha no firestore
+- reprocessamento automatico da fila ao abrir admin
+```
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 04/08/2026 (MODAL DE PAGAMENTO COM ABAS + CARTÃO DE CRÉDITO MP)
 
 ### Contexto
