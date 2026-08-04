@@ -279,39 +279,65 @@ service cloud.firestore {
 }
 ```
 
-### Status ao encerrar
+### Descoberta importante durante o debug
 
-**✅ Feito:**
+**Firestore estava em modo teste EXPIRADO desde 19/06/2026:**
+```
+allow read, write: if request.time < timestamp.date(2026, 6, 19);
+```
+Isso explica por que TODOS os writes estavam falhando silenciosamente há mais de um mês, não só o do Diogo. Cadastros, cupons, ofertas etc. também não estavam sendo salvos no Firestore — só ficavam no localStorage do browser de cada visitante. O admin do Liézer via a versão que estava salva antes do dia 19/06.
+
+Rules novas publicadas em 04/08/2026 (código completo acima).
+
+### Status ao encerrar (04/08/2026)
+
+**✅ Feito nesta sessão:**
 - `registrarPedido` refatorado com retry + fila + retorno explícito
 - Feedback visual em 3 telas (modal PIX + tela sucesso PIX + resultado cartão)
 - Payment ID visível com botão copiar em todas as confirmações
 - Auto-reprocessamento da fila quando admin abre painel
 - Aviso vermelho pro cliente se registro falhar (com WhatsApp de contato)
+- **Rules do Firestore atualizadas e publicadas** ✅ (bug principal resolvido)
+- Push feito: `feat: resiliencia no registro de pedidos + feedback visual` (commit 49c10a0)
 
-**⏳ Ação do Liézer:**
-- Atualizar Rules do Firestore (conteúdo acima) — **essencial pra que compras de visitante gravem**
-- Rodar `PushCaoTelli.bat` com mensagem `feat: resiliencia no registro de pedidos + feedback visual`
+**⏳ Aguardando teste:**
+- Diogo vai testar o cartão dele novamente (R$ 1 ou R$ 2)
+- Se aparecer no admin como "pago" com o Payment ID correto → **etapa fechada 100%**
+- Se não aparecer, agora temos MUITO mais visibilidade: Payment ID exposto, avisos vermelhos, log detalhado do Firestore
 
-**📋 Backlog imediato:**
-1. Testar cartão do Diogo após rules atualizadas — pedido tem que aparecer
-2. (opcional) Fazer webhook usar Firebase Admin SDK pra escrever server-side — belt and suspenders
-3. Persistir carrinho no localStorage
+**📋 Próximos passos (na ordem de prioridade):**
 
-**🔧 Detalhes técnicos importantes:**
+1. **Testar o pedido do Diogo** — validar que rules funcionam pra guest checkout
+2. **Webhook + Firebase Admin SDK (belt and suspenders)** — fazer o `/api/mp-webhook` salvar server-side com Firebase Admin. Garante que mesmo se o cliente fechar a aba antes do polling detectar aprovação, o pedido é registrado.
+3. **Persistir carrinho no localStorage** — hoje recarregar a página perde tudo do carrinho
+4. **Auto-cadastro de cliente ao finalizar compra** — o card "Clientes" fica 0 mesmo com pedidos porque comprar não cadastra
+5. **Botão "Registrar pedido manual" no admin** — pra Diogo digitar pedidos que vieram por WhatsApp/telefone
+6. **Checklist de pré-lançamento** — favicon, meta tags de SEO, testar em celular real, PWA opcional
+7. **Notificação por WhatsApp automática pro Diogo** — via API do WhatsApp Business (não urgente, e-mail nativo do MP já cobre)
+8. **Histórico de pedidos por cliente logado** — cliente ver as próprias compras
+9. **Painel de métricas do admin** — gráficos de vendas por dia/semana/mês
+10. **Configuração de frete por CEP** — Canoas + região metropolitana (aguarda lista de bairros do Diogo)
+
+**🔧 Detalhes técnicos pra lembrar:**
 - Fila local `caotelli_pedidos_fila` tem no máximo os pedidos que falharam localmente naquele browser
 - `reprocessarFilaPedidos()` é chamada quando abre aba Pedidos — precisa estar logado como admin pra funcionar bem
 - Se a Firestore rule bloquear, pedido continua na fila até liberar
 - Retry usa exponential backoff simples (1s fixo entre tentativas — mais que isso não vale a pena)
 - `paymentIdText` usa `<code>` HTML + clipboard API com fallback pra `document.getSelection()`
 
-### Commits desta sessão (a fazer via PushCaoTelli.bat)
-```
-feat: resiliencia no registro de pedidos + feedback visual
-- retry x2 + fila local em registrarPedido
-- payment id visivel com botao copiar (pix e cartao)
-- aviso vermelho quando registro falha no firestore
-- reprocessamento automatico da fila ao abrir admin
-```
+**🔐 Credenciais e URLs (referência rápida):**
+- MP Access Token (backend): `APP_USR-8816054921809362-080310-7c53d728a02852192a64e75150597812-3106988801`
+- MP Public Key (frontend, via env): `APP_USR-22a46534-776a-46cc-bb83-6a885f2da7f7`
+- API endpoints:
+  - `POST /api/checkout` (PIX + Cartão)
+  - `GET /api/payment-status?id=X` (polling)
+  - `POST /api/mp-webhook` (webhook do MP — aguarda cadastro no painel MP)
+  - `GET /api/public-key` (SDK MP.js)
+- Firebase project: `caotelli-fd86c`
+- Vercel project: `cao-telli`
+- GitHub: `liezerlad21-commits/CaoTelli`
+- Site produção: `liezerlad21-commits.github.io/CaoTelli`
+- Vercel URL: `cao-telli.vercel.app`
 
 ---
 
