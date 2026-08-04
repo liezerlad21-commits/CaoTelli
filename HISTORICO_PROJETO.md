@@ -293,11 +293,85 @@ ae05318 Atualizacao do site CaoTelli
 - `statement_descriptor: 'CAOTELLI'` aparece na fatura do cliente
 - Tratamento `status_detail` cobre: `cc_rejected_bad_filled_*`, `cc_rejected_insufficient_amount`, `cc_rejected_high_risk`, `cc_rejected_call_for_authorize`, `cc_rejected_card_disabled`, `cc_rejected_duplicated_payment`, `cc_rejected_max_attempts`
 
+### Parte 4 — Reconhecimento automático de pagamento (webhook + polling)
+
+**Motivação (pedido do Diogo):** eliminar a etapa de "cliente manda comprovante por WhatsApp".
+
+**O que foi feito:**
+
+**Backend — 2 endpoints novos:**
+- `api/payment-status.js` — GET `?id=X`. Consulta `/v1/payments/{id}` no MP e retorna `{ status, statusDetail, amount, dateApproved }`. Usado pelo polling do frontend.
+- `api/mp-webhook.js` — POST recebido do MP quando um pagamento muda de status. Trata os dois formatos (`{type:'payment', data:{id}}` v2 e `{topic, resource}` v1). Sempre consulta a MP pelo `paymentId` antes de confiar no body (evita ataque de forjar aprovação). Loga o resultado. Retorna 200 sempre pra MP não reenviar.
+
+**Frontend — polling automático + tela de sucesso:**
+- Após gerar PIX, o `submitPix()` chama `registrarPedido({ paymentId, method:'pix', status:'pendente' })` e inicia `iniciarPollingPagamento(paymentId)`.
+- Polling consulta `/api/payment-status` a cada 5 segundos por até 15 minutos.
+- Quando detecta `status === 'approved'`:
+  - `atualizarStatusPorPaymentId(paymentId, 'pago')` — atualiza localStorage + Firestore
+  - `exibirPagamentoAprovado(data)` — substitui o modal PIX pela tela "✅ Pagamento confirmado! Seu PIX de R$ X foi recebido... Seu pedido já está sendo preparado 🐾"
+  - Limpa o carrinho automaticamente
+- `fecharPixModal()` agora também para o polling
+- Cartão em `in_process` (análise antifraude) também inicia polling — cliente vê aprovação/recusa em tempo real
+
+**registrarPedido refatorado:**
+- Aceita `meta = { paymentId, method, status, installments }` — antes gravava tudo hardcoded
+- Salva `dataISO`, `deliveryType`, `visualizado: false` (pro badge do admin)
+- Mantém um mapa `paymentId → docId` no localStorage (`caotelli_pay_map`) pra permitir update via polling
+- Nova função `atualizarStatusPorPaymentId(paymentId, status)` — atualiza localStorage + Firestore (não confundir com a `atualizarStatusPedido(fsId, status)` já existente do painel admin, que usa `_fsId`)
+
+**Painel admin — badge de pedidos novos:**
+- Bolinha vermelha `#badgePedidosNovos` posicionada em cima do botão "📋 Pedidos"
+- Conta pedidos com `visualizado === false` e status em `['pago', 'em_analise', 'pendente']`
+- `atualizarBadgePedidos()` refresca a contagem
+- Quando Diogo abre a aba Pedidos, `marcarPedidosComoVisualizados()` marca todos como vistos (localStorage + Firestore) e zera o badge
+- Enquanto o painel admin está aberto, o badge se atualiza sozinho a cada 30s (via `setInterval` em `_badgePedidosTimer`)
+- Fecha o painel → intervalo é limpo
+
+### ⚠️ Configuração necessária no MP (Diogo)
+
+1. **Habilitar chave PIX pra QR code** (mesmo bloqueio herdado)
+2. **`MP_PUBLIC_KEY` na Vercel** (necessário pro cartão)
+3. **Cadastrar webhook no MP:**
+   - Painel MP → Suas integrações → CãoTelli Ecommerce → Webhooks → Configurar notificações
+   - URL de produção: `https://cao-telli.vercel.app/api/mp-webhook`
+   - Marcar evento: **Pagamentos** (payment)
+   - Salvar
+
+### Status ao encerrar (parte 4)
+
+**✅ Feito:**
+- Endpoint de status de pagamento (`/api/payment-status`)
+- Endpoint de webhook (`/api/mp-webhook`) — logging por enquanto, base pra escalar
+- Polling a cada 5s no modal PIX com timeout de 15min
+- Tela de "Pagamento confirmado" automática (substitui o botão "Enviar comprovante WhatsApp")
+- Firestore atualizado automaticamente com status "pago"
+- Badge de pedidos novos no painel admin com auto-refresh de 30s
+
+**⏳ Bloqueado aguardando Diogo:**
+- Cadastrar webhook no painel MP
+- Ativar chave PIX pra QR code
+- Adicionar `MP_PUBLIC_KEY` na Vercel
+
+**📋 Backlog imediato pós-liberação:**
+1. Testar fluxo completo PIX → paga no app do banco → esperar 5-30s → ver ✅ automático no site
+2. Testar cartão em análise antifraude (polling entra em ação)
+3. Persistir carrinho no `localStorage`
+4. Escalada opcional do webhook: usar Firebase Admin SDK no backend pra atualizar Firestore direto (hoje o frontend faz isso via polling — se cliente fechar antes, o pedido fica com status "pendente" até alguém abrir o painel)
+
+**🔧 Detalhes técnicos importantes:**
+- Polling só roda enquanto o modal PIX está visível — fecha modal, para polling
+- Timeout de 15min evita polling infinito se cliente esquecer aba aberta
+- `atualizarStatusPorPaymentId` ≠ `atualizarStatusPedido` — a primeira é chamada pelo polling (por paymentId), a segunda pelo admin (por docId do Firestore)
+- Webhook sempre retorna 200 (até em erro) pra MP não fazer retry infinito — os erros ficam nos logs da Vercel
+- Badge do admin considera `visualizado` como flag persistente (Firestore + localStorage), então funciona entre sessões e dispositivos
+
 ### Commits desta sessão (a fazer via PushCaoTelli.bat)
 ```
 feat: modal único com abas PIX/Cartão (substitui prompt)
 feat: cartão de crédito MP até 3x sem juros (tokenização SDK.js)
 feat: endpoint /api/public-key pra alimentar SDK.js no frontend
+feat: reconhecimento automático de pagamento (webhook + polling)
+feat: badge de pedidos novos no painel admin
 ```
 
 ---

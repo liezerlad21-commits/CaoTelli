@@ -2385,7 +2385,7 @@
         <!-- ABAS -->
         <div class="admin-tabs">
             <button class="admin-tab active" onclick="abrirAbaAdmin('produtos')">📦 Produtos</button>
-            <button class="admin-tab" onclick="abrirAbaAdmin('pedidos')">📋 Pedidos</button>
+            <button class="admin-tab" onclick="abrirAbaAdmin('pedidos')" style="position:relative;">📋 Pedidos<span id="badgePedidosNovos" style="display:none;position:absolute;top:-6px;right:-6px;background:#D6324A;color:#fff;border-radius:12px;padding:2px 7px;font-size:.7rem;font-weight:700;box-shadow:0 2px 6px rgba(214,50,74,0.4);min-width:22px;text-align:center;line-height:1.2;">0</span></button>
             <button class="admin-tab" onclick="abrirAbaAdmin('clientes')">👥 Clientes</button>
             <button class="admin-tab" onclick="abrirAbaAdmin('cupons')">🎫 Cupons</button>
             <button class="admin-tab" onclick="abrirAbaAdmin('ofertas')">🔥 Ofertas</button>
@@ -3413,6 +3413,17 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
+
+            // Quando abrir o painel admin, atualiza o badge de pedidos novos
+            // e passa a atualizar a cada 30s enquanto o admin está aberto
+            if (sectionId === 'admin' && typeof atualizarBadgePedidos === 'function') {
+                atualizarBadgePedidos();
+                if (window._badgePedidosTimer) clearInterval(window._badgePedidosTimer);
+                window._badgePedidosTimer = setInterval(atualizarBadgePedidos, 30000);
+            } else if (window._badgePedidosTimer) {
+                clearInterval(window._badgePedidosTimer);
+                window._badgePedidosTimer = null;
+            }
         }
 
         // ADICIONAR AO CARRINHO
@@ -3819,7 +3830,15 @@
                 fecharPaymentModal();
                 document.getElementById('pixModal').style.display = 'flex';
 
-                registrarPedido();
+                // Registra pedido com paymentId (permite polling e atualização de status)
+                await registrarPedido({
+                    paymentId: data.paymentId,
+                    method: 'pix',
+                    status: 'pendente',
+                });
+
+                // Inicia polling — verifica status a cada 5s até approved/cancelled/timeout (15min)
+                iniciarPollingPagamento(data.paymentId);
             } catch (err) {
                 console.error('Erro PIX:', err);
                 showNotification('Erro ao gerar PIX: ' + (err.message || 'tente novamente'), 'error');
@@ -3827,6 +3846,83 @@
                 btn.textContent = textoOriginal;
                 btn.disabled = false;
             }
+        }
+
+        // ==================== POLLING DE STATUS DE PAGAMENTO ====================
+        const PAYMENT_STATUS_URL = 'https://cao-telli.vercel.app/api/payment-status';
+        let _pollTimer = null;
+        let _pollStart = 0;
+        const POLL_INTERVAL_MS = 5000;      // 5s entre consultas
+        const POLL_TIMEOUT_MS = 15 * 60 * 1000; // 15min máximo
+
+        function iniciarPollingPagamento(paymentId) {
+            pararPollingPagamento();
+            _pollStart = Date.now();
+            const poll = async () => {
+                if (Date.now() - _pollStart > POLL_TIMEOUT_MS) {
+                    console.log('⏱ Polling PIX expirou (15min sem confirmação)');
+                    pararPollingPagamento();
+                    return;
+                }
+                try {
+                    const r = await fetch(`${PAYMENT_STATUS_URL}?id=${encodeURIComponent(paymentId)}`);
+                    const data = await r.json();
+                    if (!r.ok) throw new Error(data.error || 'Erro consultando status');
+
+                    console.log('📡 Status PIX:', data.status);
+
+                    if (data.status === 'approved') {
+                        pararPollingPagamento();
+                        await atualizarStatusPorPaymentId(paymentId, 'pago');
+                        exibirPagamentoAprovado(data);
+                    } else if (data.status === 'rejected' || data.status === 'cancelled') {
+                        pararPollingPagamento();
+                        await atualizarStatusPorPaymentId(paymentId, 'recusado');
+                    }
+                    // pending / in_process → continua tentando
+                } catch (err) {
+                    console.warn('Polling erro (continua):', err.message);
+                }
+            };
+            _pollTimer = setInterval(poll, POLL_INTERVAL_MS);
+            // Primeira consulta imediata (não espera 5s)
+            setTimeout(poll, 800);
+        }
+
+        function pararPollingPagamento() {
+            if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+        }
+
+        // Tela de sucesso quando o pagamento é confirmado automaticamente
+        function exibirPagamentoAprovado(data) {
+            const modal = document.getElementById('pixModal');
+            const valor = data && data.amount ? `R$ ${Number(data.amount).toFixed(2).replace('.', ',')}` : '';
+            modal.innerHTML = `
+                <div style="background:#fff; border-radius:18px; padding:32px 24px; max-width:380px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                    <div style="font-size:5rem; margin-bottom:8px;">✅</div>
+                    <h2 style="color:#22a06b; font-size:1.5rem; margin:0 0 8px;">Pagamento confirmado!</h2>
+                    <p style="color:#5a6a85; font-size:.95rem; line-height:1.5; margin:0 0 16px;">
+                        Seu PIX de <strong>${valor}</strong> foi recebido pela CãoTelli.<br>
+                        Seu pedido já está sendo preparado. 🐾
+                    </p>
+                    <div style="background:#f0f9f4; border:1px solid #22a06b; border-radius:10px; padding:12px; margin-bottom:16px; text-align:left;">
+                        <div style="font-size:.75rem; color:#22a06b; font-weight:600;">📦 Próximos passos</div>
+                        <p style="font-size:.82rem; color:#1a2340; margin:6px 0 0; line-height:1.5;">
+                            Você receberá atualização por e-mail. Se preferir, entre em contato pelo WhatsApp
+                            <a href="https://wa.me/5551997655755" style="color:#0088C2; font-weight:600;">(51) 99765-5755</a>.
+                        </p>
+                    </div>
+                    <button onclick="fecharPixModal()" style="width:100%; padding:13px; background:linear-gradient(135deg,#22a06b,#178a56); color:#fff; border:none; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer;">
+                        🎉 Continuar navegando
+                    </button>
+                </div>
+            `;
+            // Limpa carrinho
+            cart = [];
+            appliedCoupon = null;
+            const cupomInput = document.getElementById('couponInput');
+            if (cupomInput) cupomInput.value = '';
+            updateCart();
         }
 
         // ==================== SUBMIT CARTÃO ====================
@@ -3920,11 +4016,26 @@
                 console.log('✅ Cartão — status:', data.status);
                 exibirResultadoCartao(data.status, data);
 
+                // Registra pedido com metadata (funciona pra todos os status)
+                const statusPedido =
+                    data.status === 'approved'   ? 'pago' :
+                    data.status === 'in_process' ? 'em_analise' :
+                    data.status === 'pending'    ? 'pendente' : 'recusado';
+
+                await registrarPedido({
+                    paymentId: data.paymentId,
+                    method: 'card',
+                    status: statusPedido,
+                    installments: data.installments || parcelas,
+                });
+
                 if (data.status === 'approved') {
-                    registrarPedido();
                     cart = [];
                     appliedCoupon = null;
                     updateCart();
+                } else if (data.status === 'in_process') {
+                    // Se cair em análise antifraude, inicia polling
+                    iniciarPollingPagamento(data.paymentId);
                 }
             } catch (err) {
                 console.error('Erro cartão:', err);
@@ -3989,6 +4100,7 @@
         }
 
         function fecharPixModal() {
+            pararPollingPagamento();
             document.getElementById('pixModal').style.display = 'none';
             document.getElementById('cartModal').classList.remove('active');
             document.querySelector('.floating-cart').style.display = 'flex';
@@ -4782,7 +4894,7 @@
             document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById('admin' + aba.charAt(0).toUpperCase() + aba.slice(1)).classList.add('active');
             if (aba === 'produtos')       renderAdminProdutos();
-            if (aba === 'pedidos')        renderAdminPedidos();
+            if (aba === 'pedidos')      { renderAdminPedidos(); marcarPedidosComoVisualizados(); }
             if (aba === 'clientes')       renderAdminClientes();
             if (aba === 'cupons')         renderAdminCupons();
             if (aba === 'ofertas')        renderAdminOfertas();
@@ -4932,6 +5044,57 @@
             }
             renderAdminPedidos();
             showNotification('Status atualizado!', 'success');
+        }
+
+        // ── Badge de pedidos novos (não visualizados) ──
+        // Conta pedidos com status 'pago' ou 'em_analise' que ainda não foram vistos pelo Diogo
+        async function atualizarBadgePedidos() {
+            const badge = document.getElementById('badgePedidosNovos');
+            if (!badge) return;
+            let pedidos = [];
+            try {
+                if (window._db) {
+                    const snap = await window._fsGetDocs(window._fsCol(window._db, 'pedidos'));
+                    snap.forEach(d => pedidos.push({ _fsId: d.id, ...d.data() }));
+                } else {
+                    pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+                }
+            } catch(e) {
+                pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+            }
+            const novos = pedidos.filter(p => {
+                const st = (p.status || '').toLowerCase();
+                return !p.visualizado && (st === 'pago' || st === 'em_analise' || st === 'pendente');
+            });
+            if (novos.length > 0) {
+                badge.textContent = novos.length > 99 ? '99+' : String(novos.length);
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Marca todos os pedidos visíveis como visualizados (chamado ao abrir aba Pedidos)
+        async function marcarPedidosComoVisualizados() {
+            let pedidos = [];
+            if (window._db) {
+                try {
+                    const snap = await window._fsGetDocs(window._fsCol(window._db, 'pedidos'));
+                    snap.forEach(d => pedidos.push({ _fsId: d.id, ...d.data() }));
+                } catch(e) { pedidos = []; }
+            }
+            const naoVistos = pedidos.filter(p => !p.visualizado);
+            for (const p of naoVistos) {
+                try {
+                    await window._fsUpdateDoc(window._fsDoc(window._db, 'pedidos', p._fsId), { visualizado: true });
+                } catch(e) {}
+            }
+            // Também no localStorage
+            const localPedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+            let mudou = false;
+            localPedidos.forEach(p => { if (!p.visualizado) { p.visualizado = true; mudou = true; } });
+            if (mudou) localStorage.setItem('caotelli_pedidos', JSON.stringify(localPedidos));
+            atualizarBadgePedidos();
         }
 
         // ── Clientes ──────────────────────────────────
@@ -5088,27 +5251,71 @@
         });
 
         // ── Salvar pedido ao fazer checkout ──────────
-        const _origCheckout = typeof checkout === 'function' ? checkout : null;
-        async function registrarPedido() {
-            if (!window.cart || !window.cart.length) return;
-            const total  = window.cart.reduce((s,i) => s + i.price * i.quantity, 0);
+        // meta = { paymentId, method: 'pix'|'card', status: 'pendente'|'pago'|'em_analise'|'recusado', installments? }
+        async function registrarPedido(meta = {}) {
+            if (!window.cart || !window.cart.length) return null;
+            const subtotal = window.cart.reduce((s,i) => s + i.price * i.quantity, 0);
+            const total = typeof _currentTotal === 'number' && _currentTotal > 0 ? _currentTotal : subtotal;
+            const emailCliente = (window._fbUser && window._fbUser.email)
+                || (document.getElementById('payerEmail') && document.getElementById('payerEmail').value)
+                || localStorage.getItem('caotelli_last_email')
+                || 'Visitante';
+
             const pedido = {
-                data:    new Date().toLocaleString('pt-BR'),
-                cliente: window._fbUser ? window._fbUser.email : 'Visitante',
-                itens:   window.cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price })),
-                total:   total,
-                status:  'pendente',
+                data:         new Date().toLocaleString('pt-BR'),
+                dataISO:      new Date().toISOString(),
+                cliente:      emailCliente,
+                itens:        window.cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price })),
+                total:        Number(total.toFixed(2)),
+                deliveryType: window.deliveryType || 'entrega',
+                status:       meta.status || 'pendente',
+                paymentId:    meta.paymentId ? String(meta.paymentId) : null,
+                method:       meta.method || 'pix',
+                installments: meta.installments || null,
+                visualizado:  false, // pra badge do admin (Diogo marca como visto)
             };
             // Salva no localStorage (fallback local)
             const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
             pedidos.push(pedido);
             localStorage.setItem('caotelli_pedidos', JSON.stringify(pedidos));
+
             // Salva no Firestore (persiste entre dispositivos)
+            let docId = null;
             if (window._db) {
                 try {
-                    await window._fsAddDoc(window._fsCol(window._db, 'pedidos'), pedido);
+                    const ref = await window._fsAddDoc(window._fsCol(window._db, 'pedidos'), pedido);
+                    docId = ref && ref.id;
+                    // Mapeia paymentId → docId localmente pra permitir update via polling
+                    if (pedido.paymentId && docId) {
+                        const map = JSON.parse(localStorage.getItem('caotelli_pay_map') || '{}');
+                        map[pedido.paymentId] = docId;
+                        localStorage.setItem('caotelli_pay_map', JSON.stringify(map));
+                    }
                 } catch(e) { console.warn('Firestore pedidos:', e); }
             }
+            return { docId, paymentId: pedido.paymentId };
+        }
+
+        // Atualiza status de um pedido pelo paymentId (chamado pelo polling)
+        async function atualizarStatusPorPaymentId(paymentId, novoStatus) {
+            if (!paymentId) return;
+            // localStorage
+            const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+            const idx = pedidos.findIndex(p => p.paymentId === String(paymentId));
+            if (idx >= 0 && pedidos[idx].status !== novoStatus) {
+                pedidos[idx].status = novoStatus;
+                localStorage.setItem('caotelli_pedidos', JSON.stringify(pedidos));
+            }
+            // Firestore (via map paymentId → docId)
+            const map = JSON.parse(localStorage.getItem('caotelli_pay_map') || '{}');
+            const docId = map[String(paymentId)];
+            if (docId && window._db && window._fsUpdateDoc) {
+                try {
+                    await window._fsUpdateDoc(window._fsDoc(window._db, 'pedidos', docId), { status: novoStatus });
+                } catch(e) { console.warn('Firestore update status:', e); }
+            }
+            // Atualiza badge do admin se estiver aberto
+            if (typeof atualizarBadgePedidos === 'function') atualizarBadgePedidos();
         }
         // ════════════════════════════════════════════
         // ██  OFERTAS  ████████████████████████████████
