@@ -35,6 +35,10 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+    <!-- SDK Mercado Pago (tokenização de cartão no frontend, sem PCI compliance) -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
     <style>
         * {
             margin: 0;
@@ -1797,6 +1801,60 @@
         .admin-modal input,.admin-modal select,.admin-modal textarea { width:100%;border:1.5px solid #dde3ee;border-radius:8px;padding:9px 12px;font-size:0.92rem;outline:none;transition:.2s; }
         .admin-modal input:focus,.admin-modal select:focus { border-color:#0088C2; }
         .admin-modal-btns { display:flex;gap:10px;margin-top:20px;justify-content:flex-end; }
+
+        /* ============= MODAL DE PAGAMENTO (PIX/Cartão) ============= */
+        .pay-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:9998; align-items:center; justify-content:center; padding:16px; overflow-y:auto; }
+        .pay-overlay.active { display:flex; }
+        .pay-modal { background:#fff; border-radius:18px; width:100%; max-width:460px; max-height:95vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.4); position:relative; }
+        .pay-modal-header { padding:18px 22px 12px; border-bottom:1px solid #eef1f7; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:#fff; border-radius:18px 18px 0 0; z-index:2; }
+        .pay-modal-header h2 { color:#0088C2; font-size:1.15rem; margin:0; display:flex; align-items:center; gap:8px; }
+        .pay-close-btn { background:#f5f5f5; border:none; width:34px; height:34px; border-radius:50%; font-size:1.1rem; cursor:pointer; color:#5a6a85; display:flex; align-items:center; justify-content:center; line-height:1; transition:.2s; }
+        .pay-close-btn:hover { background:#e4eaf3; color:#D6324A; }
+        .pay-modal-body { padding:18px 22px 22px; }
+        .pay-total-box { background:linear-gradient(135deg,#f0f8ff,#e4eaf3); border-radius:12px; padding:12px 14px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
+        .pay-total-box .lbl { font-size:.78rem; color:#5a6a85; font-weight:600; }
+        .pay-total-box .val { font-size:1.5rem; font-weight:700; color:#0088C2; }
+        .pay-section-title { font-size:.85rem; font-weight:700; color:#1a2340; margin:14px 0 8px; text-transform:uppercase; letter-spacing:0.5px; }
+        .pay-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .pay-form-grid .full { grid-column:1/-1; }
+        .pay-field { display:flex; flex-direction:column; gap:4px; }
+        .pay-field label { font-size:.75rem; font-weight:600; color:#5a6a85; }
+        .pay-field input, .pay-field select { border:1.5px solid #dde3ee; border-radius:8px; padding:9px 11px; font-size:.9rem; outline:none; transition:.2s; background:#fff; }
+        .pay-field input:focus, .pay-field select:focus { border-color:#0088C2; box-shadow:0 0 0 3px rgba(0,136,194,0.1); }
+        .pay-field input.invalid { border-color:#D6324A; }
+        .pay-tabs { display:flex; gap:0; margin:18px 0 14px; border-bottom:2px solid #eef1f7; }
+        .pay-tab { flex:1; padding:12px 8px; background:transparent; border:none; font-size:.95rem; font-weight:600; color:#5a6a85; cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:.2s; display:flex; align-items:center; justify-content:center; gap:6px; }
+        .pay-tab.active { color:#0088C2; border-bottom-color:#0088C2; }
+        .pay-tab:hover:not(.active) { color:#1a2340; }
+        .pay-tab-content { display:none; }
+        .pay-tab-content.active { display:block; animation:payFadeIn .25s ease; }
+        @keyframes payFadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+        .pay-submit-btn { width:100%; padding:14px; background:linear-gradient(135deg,#0088C2,#005f8a); color:#fff; border:none; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; margin-top:14px; transition:.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .pay-submit-btn:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 18px rgba(0,136,194,0.3); }
+        .pay-submit-btn:disabled { opacity:.6; cursor:not-allowed; }
+        .pay-pix-info { background:#f0f8ff; border-radius:10px; padding:14px; text-align:center; }
+        .pay-pix-info .icon { font-size:2.5rem; margin-bottom:6px; }
+        .pay-pix-info p { font-size:.85rem; color:#5a6a85; margin:0; line-height:1.5; }
+        .pay-loading { display:none; position:absolute; inset:0; background:rgba(255,255,255,0.95); border-radius:18px; align-items:center; justify-content:center; flex-direction:column; gap:12px; z-index:5; }
+        .pay-loading.active { display:flex; }
+        .pay-loading .spinner { width:48px; height:48px; border:4px solid #e4eaf3; border-top-color:#0088C2; border-radius:50%; animation:paySpin .8s linear infinite; }
+        @keyframes paySpin { to { transform:rotate(360deg); } }
+        .pay-loading p { font-weight:600; color:#1a2340; }
+        .pay-loading small { color:#5a6a85; font-size:.8rem; }
+        .pay-card-brand { position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:1.4rem; pointer-events:none; }
+        .pay-field.with-brand { position:relative; }
+        .pay-result { text-align:center; padding:24px 12px; }
+        .pay-result .big-icon { font-size:4rem; margin-bottom:8px; }
+        .pay-result h3 { color:#1a2340; margin-bottom:6px; font-size:1.3rem; }
+        .pay-result p { color:#5a6a85; font-size:.9rem; line-height:1.5; margin-bottom:16px; }
+        .pay-result .approved { color:#22a06b; }
+        .pay-result .rejected { color:#D6324A; }
+        .pay-result .pending { color:#f4a516; }
+        @media (max-width:480px) {
+            .pay-form-grid { grid-template-columns:1fr; }
+            .pay-modal-body { padding:14px 16px 18px; }
+            .pay-tab { font-size:.85rem; padding:10px 4px; }
+        }
     </style>
 </head>
 <body>
@@ -3533,120 +3591,400 @@
             document.querySelector('.floating-cart').style.display = isOpen ? 'none' : 'flex';
         }
 
-        // CHECKOUT — Mercado Pago PIX API (QR code direto no site)
+        // ================================================================
+        // CHECKOUT — Mercado Pago (PIX + Cartão)
+        // ================================================================
         const CHECKOUT_API_URL = 'https://cao-telli.vercel.app/api/checkout';
+        const PUBLIC_KEY_URL  = 'https://cao-telli.vercel.app/api/public-key';
 
-        // Coleta dados do pagador (do Firebase se logado, ou do cliente salvo, ou prompt)
-        function coletarDadosPagador() {
-            // 1. Tenta pegar do usuário logado no Firebase
+        let _mpInstance = null;         // instância global do MercadoPago SDK
+        let _mpPublicKey = null;
+        let _currentTotal = 0;          // total já calculado (com frete/cupom)
+        let _mpInitPromise = null;
+
+        // Inicializa SDK MP.js (idempotente — só busca public key uma vez)
+        async function initMercadoPagoSDK() {
+            if (_mpInstance) return _mpInstance;
+            if (_mpInitPromise) return _mpInitPromise;
+            _mpInitPromise = (async () => {
+                try {
+                    const res = await fetch(PUBLIC_KEY_URL);
+                    const data = await res.json();
+                    if (!data.publicKey) throw new Error('Public key não retornada');
+                    _mpPublicKey = data.publicKey;
+                    if (typeof MercadoPago === 'undefined') {
+                        console.error('SDK MP.js não carregou');
+                        return null;
+                    }
+                    _mpInstance = new MercadoPago(_mpPublicKey, { locale: 'pt-BR' });
+                    return _mpInstance;
+                } catch (err) {
+                    console.error('Falha ao inicializar MP:', err);
+                    return null;
+                }
+            })();
+            return _mpInitPromise;
+        }
+
+        // ==================== MÁSCARAS ====================
+        function mascaraCPF(el) {
+            let v = el.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+            else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+            else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+            el.value = v;
+        }
+        function mascaraTel(el) {
+            let v = el.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 10) v = v.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            else if (v.length > 6) v = v.replace(/(\d{2})(\d{4})(\d{1,4})/, '($1) $2-$3');
+            else if (v.length > 2) v = v.replace(/(\d{2})(\d{1,5})/, '($1) $2');
+            el.value = v;
+        }
+        function mascaraValidade(el) {
+            let v = el.value.replace(/\D/g, '').slice(0, 4);
+            if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
+            el.value = v;
+        }
+
+        // Detecta bandeira do cartão pelos primeiros dígitos
+        function detectarBandeira(numero) {
+            const n = (numero || '').replace(/\D/g, '');
+            if (/^4/.test(n))                       return { id:'visa',       icon:'💳', label:'Visa' };
+            if (/^(5[1-5]|2[2-7])/.test(n))         return { id:'master',     icon:'💳', label:'Master' };
+            if (/^3[47]/.test(n))                   return { id:'amex',       icon:'💳', label:'Amex' };
+            if (/^(4011|4312|4389|4514|4573|5041|5066|5067|509|6277|6362|6363|6504|6505|6506|6507|6509|6516|6550)/.test(n))
+                                                     return { id:'elo',        icon:'💳', label:'Elo' };
+            if (/^(606282|3841)/.test(n))           return { id:'hipercard',  icon:'💳', label:'Hipercard' };
+            return null;
+        }
+        function onCardNumberInput(el) {
+            let v = el.value.replace(/\D/g, '').slice(0, 19);
+            v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+            el.value = v;
+            const brand = detectarBandeira(v);
+            const icon = document.getElementById('cardBrandIcon');
+            if (brand) { icon.textContent = brand.icon; icon.title = brand.label; }
+            else { icon.textContent = ''; icon.title = ''; }
+        }
+
+        // ==================== ABRIR MODAL PAGAMENTO ====================
+        function calcularTotalPedido() {
+            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            const frete = deliveryType === 'retirada' ? 0 : (subtotal > 59.90 ? 0 : 15);
+            let total = subtotal + frete;
+            if (appliedCoupon) total -= subtotal * (appliedCoupon.discount / 100);
+            return total;
+        }
+
+        // Pré-preenche o form com dados do Firebase ou localStorage
+        function preencherDadosPagador() {
             const user = window._fbUser;
             const email = user ? user.email : (localStorage.getItem('caotelli_last_email') || '');
-
-            // 2. Tenta pegar dados extras do cliente salvo
-            let nome = '', cpf = '';
+            let nome = '', cpf = '', tel = '';
             try {
                 const clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
                 const cliente = clientes.find(c => c.email === email);
                 if (cliente) {
                     nome = cliente.nome || '';
                     cpf = cliente.cpf || '';
+                    tel = cliente.telefone || '';
                 }
             } catch(e) {}
-
-            // 3. Se faltar algo essencial, pede via prompt
-            let emailFinal = email;
-            if (!emailFinal) {
-                emailFinal = prompt('Seu e-mail para o comprovante PIX:', '');
-                if (!emailFinal) return null;
-                localStorage.setItem('caotelli_last_email', emailFinal);
+            if (email) document.getElementById('payerEmail').value = email;
+            if (nome)  document.getElementById('payerName').value = nome;
+            if (cpf) {
+                const el = document.getElementById('payerCpf');
+                el.value = cpf;
+                mascaraCPF(el);
             }
-            if (!nome) {
-                nome = prompt('Seu nome completo:', '') || 'Cliente';
+            if (tel) {
+                const el = document.getElementById('payerPhone');
+                el.value = tel;
+                mascaraTel(el);
             }
-            if (!cpf) {
-                cpf = prompt('Seu CPF (só números):', '') || '';
+        }
+
+        function abrirPaymentModal() {
+            _currentTotal = calcularTotalPedido();
+            document.getElementById('payTotalValue').textContent = `R$ ${_currentTotal.toFixed(2).replace('.', ',')}`;
+            document.getElementById('payDeliveryLabel').textContent = deliveryType === 'retirada' ? '🏪 Retirada na Loja' : '🚚 Entrega';
+            preencherDadosPagador();
+            trocarAbaPagamento('pix');
+            document.getElementById('paymentModal').classList.add('active');
+            document.getElementById('cartModal').classList.remove('active');
+            document.querySelector('.floating-cart').style.display = 'none';
+            // dispara init do SDK em paralelo (não bloqueia UI)
+            initMercadoPagoSDK();
+        }
+
+        function fecharPaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+            document.getElementById('payLoading').classList.remove('active');
+            document.querySelector('.floating-cart').style.display = 'flex';
+        }
+
+        function trocarAbaPagamento(tab) {
+            document.getElementById('tab-pix').classList.toggle('active', tab === 'pix');
+            document.getElementById('tab-card').classList.toggle('active', tab === 'card');
+            document.getElementById('content-pix').classList.toggle('active', tab === 'pix');
+            document.getElementById('content-card').classList.toggle('active', tab === 'card');
+        }
+
+        // Valida dados do pagador (comum PIX e Cartão). Retorna objeto ou null.
+        function validarDadosPagador() {
+            const nome  = document.getElementById('payerName').value.trim();
+            const email = document.getElementById('payerEmail').value.trim();
+            const cpf   = document.getElementById('payerCpf').value.replace(/\D/g, '');
+            const tel   = document.getElementById('payerPhone').value.replace(/\D/g, '');
+
+            const invalidos = [];
+            if (!nome || nome.split(/\s+/).length < 2) invalidos.push('payerName');
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) invalidos.push('payerEmail');
+            if (cpf.length !== 11) invalidos.push('payerCpf');
+
+            ['payerName','payerEmail','payerCpf','payerPhone'].forEach(id => {
+                document.getElementById(id).classList.toggle('invalid', invalidos.includes(id));
+            });
+
+            if (invalidos.length) {
+                showNotification('Preencha corretamente: nome completo, e-mail e CPF (11 dígitos).', 'error');
+                document.getElementById(invalidos[0]).focus();
+                return null;
             }
 
-            const partes = nome.trim().split(/\s+/);
-            const firstName = partes[0] || 'Cliente';
-            const lastName = partes.slice(1).join(' ') || 'CaoTelli';
+            // salva pra usos futuros
+            localStorage.setItem('caotelli_last_email', email);
 
+            const partes = nome.split(/\s+/);
             return {
-                email: emailFinal,
-                first_name: firstName,
-                last_name: lastName,
-                cpf: (cpf || '').replace(/\D/g, ''),
+                email,
+                first_name: partes[0],
+                last_name: partes.slice(1).join(' ') || 'CaoTelli',
+                cpf,
+                phone: tel,
             };
         }
 
+        // ==================== CHECKOUT (ponto de entrada) ====================
         async function checkout() {
             if (cart.length === 0) {
                 showNotification('Seu carrinho está vazio!', 'error');
                 return;
             }
+            abrirPaymentModal();
+        }
 
-            const dadosPagador = coletarDadosPagador();
-            if (!dadosPagador) {
-                showNotification('E-mail é obrigatório pra gerar o PIX.', 'error');
+        // ==================== SUBMIT PIX ====================
+        async function submitPix() {
+            const dadosPagador = validarDadosPagador();
+            if (!dadosPagador) return;
+
+            const btn = document.getElementById('pixSubmitBtn');
+            const textoOriginal = btn.textContent;
+            btn.textContent = '⏳ Gerando PIX...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(CHECKOUT_API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        method: 'pix',
+                        items: cart.map(i => ({ id:i.id, name:i.name, quantity:i.quantity, price:i.price })),
+                        total: _currentTotal.toFixed(2),
+                        payer: dadosPagador,
+                    })
+                });
+                const data = await response.json();
+
+                if (!response.ok || !data.qrText) {
+                    throw new Error(data.error || data.detail || 'Erro ao gerar PIX');
+                }
+
+                console.log('✅ PIX gerado — payment:', data.paymentId);
+
+                document.getElementById('pix-total').textContent = `R$ ${Number(data.total).toFixed(2).replace('.', ',')}`;
+                document.getElementById('pix-delivery').textContent = deliveryType === 'retirada' ? '🏪 Retirada na Loja' : '🚚 Entrega';
+                document.getElementById('pix-copiacola').textContent = data.qrText;
+
+                const qrDiv = document.getElementById('pix-qrcode');
+                if (data.qrImageBase64) {
+                    qrDiv.innerHTML = `<img src="${data.qrImageBase64}" style="width:180px;height:180px;border-radius:10px;object-fit:contain;background:#fff;padding:6px" alt="QR Code PIX">`;
+                } else {
+                    const encoded = encodeURIComponent(data.qrText);
+                    qrDiv.innerHTML = `<img src="https://quickchart.io/qr?text=${encoded}&size=180" style="width:180px;height:180px;border-radius:10px;object-fit:contain;" alt="QR Code PIX">`;
+                }
+
+                // fecha payment modal, abre pix modal
+                fecharPaymentModal();
+                document.getElementById('pixModal').style.display = 'flex';
+
+                registrarPedido();
+            } catch (err) {
+                console.error('Erro PIX:', err);
+                showNotification('Erro ao gerar PIX: ' + (err.message || 'tente novamente'), 'error');
+            } finally {
+                btn.textContent = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        // ==================== SUBMIT CARTÃO ====================
+        async function submitCard() {
+            const dadosPagador = validarDadosPagador();
+            if (!dadosPagador) return;
+
+            // Valida campos do cartão
+            const numero = document.getElementById('cardNumber').value.replace(/\D/g, '');
+            const nomeCartao = document.getElementById('cardHolder').value.trim();
+            const validade = document.getElementById('cardExpiry').value;
+            const cvv = document.getElementById('cardCvv').value;
+            const parcelas = parseInt(document.getElementById('cardInstallments').value, 10) || 1;
+
+            const invalidos = [];
+            if (numero.length < 13 || numero.length > 19) invalidos.push('cardNumber');
+            if (!nomeCartao || nomeCartao.length < 2) invalidos.push('cardHolder');
+            if (!/^\d{2}\/\d{2}$/.test(validade)) invalidos.push('cardExpiry');
+            if (cvv.length < 3) invalidos.push('cardCvv');
+
+            ['cardNumber','cardHolder','cardExpiry','cardCvv'].forEach(id => {
+                document.getElementById(id).classList.toggle('invalid', invalidos.includes(id));
+            });
+
+            if (invalidos.length) {
+                showNotification('Preencha corretamente os dados do cartão.', 'error');
+                document.getElementById(invalidos[0]).focus();
                 return;
             }
 
-            const btn = document.querySelector('[onclick="checkout()"]');
-            const textoOriginal = btn ? btn.textContent : '';
-            if (btn) { btn.textContent = '⏳ Gerando PIX...'; btn.disabled = true; }
+            const bandeira = detectarBandeira(numero);
+            if (!bandeira) {
+                showNotification('Bandeira do cartão não reconhecida. Aceitamos Visa, Master, Elo, Amex e Hipercard.', 'error');
+                document.getElementById('cardNumber').focus();
+                return;
+            }
+
+            // Inicializa SDK MP.js
+            const mp = await initMercadoPagoSDK();
+            if (!mp) {
+                showNotification('Erro ao carregar processador de pagamento. Recarregue a página.', 'error');
+                return;
+            }
+
+            // Loading overlay
+            const loading = document.getElementById('payLoading');
+            const loadingText = document.getElementById('payLoadingText');
+            loadingText.textContent = 'Validando cartão...';
+            loading.classList.add('active');
 
             try {
-                const subtotal = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-                const frete = deliveryType === 'retirada' ? 0 : (subtotal > 59.90 ? 0 : 15);
-                let total = subtotal + frete;
-                if (appliedCoupon) {
-                    total -= subtotal * (appliedCoupon.discount / 100);
+                const [mes, ano] = validade.split('/');
+                // Tokeniza cartão com MP SDK — dados nunca chegam ao nosso backend
+                const tokenResponse = await mp.createCardToken({
+                    cardNumber: numero,
+                    cardholderName: nomeCartao,
+                    cardExpirationMonth: mes,
+                    cardExpirationYear: '20' + ano,
+                    securityCode: cvv,
+                    identificationType: 'CPF',
+                    identificationNumber: dadosPagador.cpf,
+                });
+
+                if (!tokenResponse || !tokenResponse.id) {
+                    throw new Error('Falha ao tokenizar cartão. Verifique os dados.');
                 }
+
+                loadingText.textContent = 'Processando pagamento...';
 
                 const response = await fetch(CHECKOUT_API_URL, {
                     method: 'POST',
                     body: JSON.stringify({
-                        items: cart.map(i => ({
-                            id: i.id,
-                            name: i.name,
-                            quantity: i.quantity,
-                            price: i.price,
-                        })),
-                        total: total.toFixed(2),
+                        method: 'card',
+                        items: cart.map(i => ({ id:i.id, name:i.name, quantity:i.quantity, price:i.price })),
+                        total: _currentTotal.toFixed(2),
                         payer: dadosPagador,
+                        cardToken: tokenResponse.id,
+                        installments: parcelas,
+                        paymentMethodId: bandeira.id,
                     })
                 });
-
                 const data = await response.json();
 
-                if (data.qrText) {
-                    console.log('✅ PIX gerado — payment:', data.paymentId);
+                loading.classList.remove('active');
 
-                    document.getElementById('pix-total').textContent = `R$ ${Number(data.total).toFixed(2).replace('.', ',')}`;
-                    document.getElementById('pix-delivery').textContent = deliveryType === 'retirada' ? '🏪 Retirada na Loja' : '🚚 Entrega';
-                    document.getElementById('pix-copiacola').textContent = data.qrText;
+                if (!response.ok) {
+                    exibirResultadoCartao('rejected', data);
+                    return;
+                }
 
-                    const qrDiv = document.getElementById('pix-qrcode');
-                    if (data.qrImageBase64) {
-                        qrDiv.innerHTML = `<img src="${data.qrImageBase64}" style="width:180px;height:180px;border-radius:10px;object-fit:contain;background:#fff;padding:6px" alt="QR Code PIX">`;
-                    } else {
-                        const encoded = encodeURIComponent(data.qrText);
-                        qrDiv.innerHTML = `<img src="https://quickchart.io/qr?text=${encoded}&size=180" style="width:180px;height:180px;border-radius:10px;object-fit:contain;" alt="QR Code PIX">`;
-                    }
+                console.log('✅ Cartão — status:', data.status);
+                exibirResultadoCartao(data.status, data);
 
-                    document.getElementById('cartModal').classList.remove('active');
-                    document.getElementById('pixModal').style.display = 'flex';
-                    document.querySelector('.floating-cart').style.display = 'none';
-
+                if (data.status === 'approved') {
                     registrarPedido();
-                } else {
-                    throw new Error(data.error || data.detail || 'Erro ao gerar PIX');
+                    cart = [];
+                    appliedCoupon = null;
+                    updateCart();
                 }
             } catch (err) {
-                console.error('Erro no checkout:', err);
-                showNotification('Erro ao gerar PIX. Tente novamente.', 'error');
-            } finally {
-                if (btn) { btn.textContent = textoOriginal; btn.disabled = false; }
+                console.error('Erro cartão:', err);
+                loading.classList.remove('active');
+                const detail = (err.message || '').toLowerCase();
+                let msg = 'Erro ao processar o cartão. Verifique os dados e tente novamente.';
+                if (detail.includes('invalid') || detail.includes('cardholder')) {
+                    msg = 'Dados do cartão inválidos. Confira número, validade e CVV.';
+                }
+                showNotification(msg, 'error');
+            }
+        }
+
+        function exibirResultadoCartao(status, data) {
+            const body = document.getElementById('cardResultBody');
+            let icon, cls, titulo, msg;
+
+            if (status === 'approved') {
+                icon = '✅'; cls = 'approved'; titulo = 'Pagamento aprovado!';
+                msg = `Seu pedido foi confirmado. Você receberá a atualização por e-mail.<br><br><small>Payment ID: <code>${data.paymentId || '-'}</code></small>`;
+            } else if (status === 'in_process' || status === 'pending') {
+                icon = '⏳'; cls = 'pending'; titulo = 'Pagamento em análise';
+                msg = 'Seu cartão está sendo analisado. Isso pode levar até 2 dias úteis. Avisaremos por e-mail.';
+            } else {
+                icon = '❌'; cls = 'rejected'; titulo = 'Pagamento recusado';
+                const motivos = {
+                    'cc_rejected_bad_filled_card_number': 'Número do cartão inválido.',
+                    'cc_rejected_bad_filled_date':        'Data de validade inválida.',
+                    'cc_rejected_bad_filled_security_code':'Código de segurança inválido.',
+                    'cc_rejected_bad_filled_other':       'Verifique os dados do cartão.',
+                    'cc_rejected_insufficient_amount':    'Cartão sem limite disponível.',
+                    'cc_rejected_high_risk':              'Pagamento recusado por segurança. Tente outro cartão.',
+                    'cc_rejected_call_for_authorize':     'Ligue para o banco emissor para autorizar o pagamento.',
+                    'cc_rejected_card_disabled':          'Cartão bloqueado. Contate o banco.',
+                    'cc_rejected_duplicated_payment':     'Pagamento duplicado. Aguarde alguns minutos.',
+                    'cc_rejected_max_attempts':           'Muitas tentativas. Tente outro cartão.',
+                    'cc_rejected_other_reason':           'Cartão recusado pelo banco.',
+                };
+                const detalhe = motivos[data.statusDetail] || data.detail || 'Cartão não autorizado.';
+                msg = `${detalhe}<br><br>Você pode tentar outro cartão ou pagar via PIX.`;
+            }
+
+            body.innerHTML = `
+                <div class="big-icon">${icon}</div>
+                <h3 class="${cls}">${titulo}</h3>
+                <p>${msg}</p>
+                <button class="pay-submit-btn" onclick="fecharCardResult()" style="margin-top:6px;">
+                    ${status === 'approved' ? '🎉 Continuar' : '↩ Tentar novamente'}
+                </button>
+            `;
+            document.getElementById('cardResultModal').classList.add('active');
+        }
+
+        function fecharCardResult() {
+            const modal = document.getElementById('cardResultModal');
+            modal.classList.remove('active');
+            // Se foi aprovado, também fecha o modal de pagamento
+            const body = document.getElementById('cardResultBody');
+            if (body.querySelector('.approved')) {
+                fecharPaymentModal();
             }
         }
 
@@ -5266,6 +5604,123 @@
                 </div>
             </div>
             <button id="checkoutBtn" class="checkout-btn" onclick="checkout()" disabled>Finalizar Pedido 💳</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE PAGAMENTO (PIX + Cartão com abas) -->
+    <div id="paymentModal" class="pay-overlay" role="dialog" aria-modal="true" aria-labelledby="payModalTitle">
+        <div class="pay-modal">
+            <div class="pay-modal-header">
+                <h2 id="payModalTitle">🐾 Finalizar Pedido</h2>
+                <button class="pay-close-btn" onclick="fecharPaymentModal()" aria-label="Fechar">✕</button>
+            </div>
+
+            <div class="pay-modal-body">
+                <!-- Total e forma de entrega -->
+                <div class="pay-total-box">
+                    <div>
+                        <div class="lbl">Total do pedido</div>
+                        <div id="payDeliveryLabel" style="font-size:.7rem; color:#5a6a85; margin-top:2px;">🚚 Entrega</div>
+                    </div>
+                    <div class="val" id="payTotalValue">R$ 0,00</div>
+                </div>
+
+                <!-- Dados do pagador (comum PIX e Cartão) -->
+                <div class="pay-section-title">Seus dados</div>
+                <div class="pay-form-grid">
+                    <div class="pay-field full">
+                        <label for="payerName">Nome completo *</label>
+                        <input type="text" id="payerName" placeholder="Ex: Maria Silva" autocomplete="name" />
+                    </div>
+                    <div class="pay-field full">
+                        <label for="payerEmail">E-mail *</label>
+                        <input type="email" id="payerEmail" placeholder="voce@email.com" autocomplete="email" />
+                    </div>
+                    <div class="pay-field">
+                        <label for="payerCpf">CPF *</label>
+                        <input type="text" id="payerCpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" oninput="mascaraCPF(this)" />
+                    </div>
+                    <div class="pay-field">
+                        <label for="payerPhone">Telefone</label>
+                        <input type="tel" id="payerPhone" placeholder="(51) 99999-9999" inputmode="numeric" maxlength="16" autocomplete="tel" oninput="mascaraTel(this)" />
+                    </div>
+                </div>
+
+                <!-- Abas -->
+                <div class="pay-tabs" role="tablist">
+                    <button class="pay-tab active" role="tab" onclick="trocarAbaPagamento('pix')" id="tab-pix">
+                        <span style="font-size:1.1rem;">⚡</span> PIX
+                    </button>
+                    <button class="pay-tab" role="tab" onclick="trocarAbaPagamento('card')" id="tab-card">
+                        <span style="font-size:1.1rem;">💳</span> Cartão
+                    </button>
+                </div>
+
+                <!-- ABA PIX -->
+                <div class="pay-tab-content active" id="content-pix">
+                    <div class="pay-pix-info">
+                        <div class="icon">⚡</div>
+                        <p><strong>Pagamento instantâneo via PIX.</strong><br>
+                        Ao clicar em gerar, você receberá o QR Code na hora.</p>
+                    </div>
+                    <button class="pay-submit-btn" onclick="submitPix()" id="pixSubmitBtn">
+                        ⚡ Gerar QR Code PIX
+                    </button>
+                </div>
+
+                <!-- ABA CARTÃO -->
+                <div class="pay-tab-content" id="content-card">
+                    <div class="pay-form-grid">
+                        <div class="pay-field full with-brand">
+                            <label for="cardNumber">Número do cartão *</label>
+                            <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" inputmode="numeric" maxlength="23" autocomplete="cc-number" oninput="onCardNumberInput(this)" />
+                            <span class="pay-card-brand" id="cardBrandIcon"></span>
+                        </div>
+                        <div class="pay-field full">
+                            <label for="cardHolder">Nome impresso no cartão *</label>
+                            <input type="text" id="cardHolder" placeholder="COMO ESTÁ NO CARTÃO" autocomplete="cc-name" oninput="this.value = this.value.toUpperCase()" />
+                        </div>
+                        <div class="pay-field">
+                            <label for="cardExpiry">Validade (MM/AA) *</label>
+                            <input type="text" id="cardExpiry" placeholder="12/28" inputmode="numeric" maxlength="5" autocomplete="cc-exp" oninput="mascaraValidade(this)" />
+                        </div>
+                        <div class="pay-field">
+                            <label for="cardCvv">CVV *</label>
+                            <input type="text" id="cardCvv" placeholder="123" inputmode="numeric" maxlength="4" autocomplete="cc-csc" oninput="this.value=this.value.replace(/\D/g,'')" />
+                        </div>
+                        <div class="pay-field full">
+                            <label for="cardInstallments">Parcelas</label>
+                            <select id="cardInstallments">
+                                <option value="1">À vista</option>
+                                <option value="2">2x sem juros</option>
+                                <option value="3">3x sem juros</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="pay-submit-btn" onclick="submitCard()" id="cardSubmitBtn">
+                        💳 Pagar com Cartão
+                    </button>
+                    <p style="font-size:.7rem; color:#8895ac; text-align:center; margin-top:10px;">
+                        🔒 Dados processados diretamente pelo Mercado Pago. A CãoTelli não armazena seus dados de cartão.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Overlay de loading (processando cartão) -->
+            <div class="pay-loading" id="payLoading">
+                <div class="spinner"></div>
+                <p id="payLoadingText">Processando pagamento...</p>
+                <small>Isso pode levar até 15 segundos</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RESULTADO CARTÃO (aprovado/recusado) -->
+    <div id="cardResultModal" class="pay-overlay" role="dialog" aria-modal="true">
+        <div class="pay-modal">
+            <div class="pay-modal-body pay-result" id="cardResultBody">
+                <!-- preenchido dinamicamente -->
+            </div>
         </div>
     </div>
 

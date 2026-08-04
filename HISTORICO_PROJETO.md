@@ -195,6 +195,115 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 04/08/2026 (MODAL DE PAGAMENTO COM ABAS + CARTÃO DE CRÉDITO MP)
+
+### Contexto
+- Sessão focada nos itens 2 e 3 do backlog: substituir `prompt()` por modal HTML + implementar cartão de crédito
+- PIX real ainda depende da liberação da chave PIX pra QR na conta MP do Diogo (item bloqueado desde 03/08)
+- Decisões de design: **modal único com abas** (PIX | Cartão) + **cartão até 3x sem juros**
+
+### Parte 1 — Backend estendido pra cartão (`api/checkout.js`)
+
+**O que foi feito:**
+- Endpoint `/api/checkout` agora aceita campo `method`: `'pix'` (default) ou `'card'`
+- Quando `method='card'`, recebe `cardToken` (tokenizado no frontend), `installments` (1-3, travado), `paymentMethodId` (visa/master/amex/elo/hipercard)
+- Payload MP pra cartão: `POST /v1/payments` com `token`, `installments`, `payment_method_id`, `statement_descriptor: 'CAOTELLI'`
+- Retorna `{ paymentId, status, statusDetail, installments }` — status pode ser `approved`, `in_process`, `rejected`
+- PIX segue funcionando idêntico (mantida compatibilidade)
+
+**Novo endpoint:** `api/public-key.js`
+- Expõe `MP_PUBLIC_KEY` da env pro SDK MP.js do frontend (public key é segura de expor — só permite tokenizar cartão, não fazer pagamentos)
+- Cache HTTP de 1h
+
+### Parte 2 — Modal de pagamento com abas (frontend)
+
+**HTML novo (`#paymentModal`):**
+- Cabeçalho com total + forma de entrega
+- Form comum de dados do pagador: **nome, e-mail, CPF, telefone** (auto-preenchido se logado no Firebase ou já cadastrado no localStorage)
+- Abas [⚡ PIX | 💳 Cartão]
+- Aba PIX: informativo + botão "Gerar QR Code PIX"
+- Aba Cartão: form completo (número, titular, validade, CVV, parcelas 1x/2x/3x sem juros) + selo "Dados processados diretamente pelo MP"
+- Overlay de loading (spinner) durante processamento do cartão (3-15s)
+
+**Modal separado `#cardResultModal`:**
+- Exibe resultado do cartão: ✅ aprovado, ⏳ em análise, ❌ recusado
+- Traduz códigos `status_detail` da MP em mensagens PT-BR (número inválido, sem limite, alto risco, ligar pro banco, etc.)
+
+**CSS:** ~50 linhas novas com classes `.pay-*` (overlay, modal, tabs, form-grid, loading, result). Responsivo (celular vira 1 coluna).
+
+### Parte 3 — JavaScript refatorado
+
+**SDK Mercado Pago:**
+- Script `<script src="https://sdk.mercadopago.com/js/v2"></script>` adicionado no `<head>`
+- `initMercadoPagoSDK()` — fetch da public key + `new MercadoPago(publicKey, { locale: 'pt-BR' })`, idempotente e lazy (só executa quando cartão é usado)
+
+**Funções novas:**
+- `mascaraCPF()`, `mascaraTel()`, `mascaraValidade()`, `onCardNumberInput()` — máscaras em tempo real
+- `detectarBandeira()` — regex nos primeiros dígitos (Visa/Master/Amex/Elo/Hipercard)
+- `calcularTotalPedido()`, `preencherDadosPagador()` (auto-fill), `abrirPaymentModal()`, `fecharPaymentModal()`, `trocarAbaPagamento()`
+- `validarDadosPagador()` — validação com feedback visual (borda vermelha), notificação em PT-BR
+- `submitPix()` — chama API, mostra modal PIX existente (reusa `#pixModal`)
+- `submitCard()` — tokeniza com `mp.createCardToken()` → POST `/api/checkout` → `exibirResultadoCartao()`
+- `exibirResultadoCartao(status, data)` — modal com ícone + mensagem traduzida + botão
+
+**Funções removidas:**
+- ❌ `coletarDadosPagador()` — substituída pelo form + `validarDadosPagador()`
+- ❌ Todos os `prompt()` do checkout foram eliminados
+
+**`checkout()` agora só faz:** valida carrinho vazio → `abrirPaymentModal()`. Toda a lógica está nas funções específicas de cada método.
+
+### ⚠️ Ações pendentes do cliente (Diogo) antes de testar
+
+1. **Habilitar chave PIX pra QR code** (mesmo bloqueio de 03/08) — pra que o PIX real funcione
+2. **Gerar e configurar `MP_PUBLIC_KEY` na Vercel:**
+   - Painel MP → Suas integrações → App "CãoTelli Ecommerce" → Credenciais de produção → copiar **Public Key** (começa com `APP_USR-...` mas é diferente do access token)
+   - Vercel → Project cao-telli → Settings → Environment Variables → Add:
+     - Name: `MP_PUBLIC_KEY`
+     - Value: `[public key do MP]`
+     - Environment: **Production**
+   - Redeploy pra pegar a env var nova
+
+### Status ao encerrar
+
+**✅ Feito:**
+- Backend suporta PIX e Cartão em um endpoint só (`method` flag)
+- Novo endpoint `/api/public-key` pra alimentar o SDK
+- Modal HTML/CSS/JS completo com abas
+- SDK MP.js integrado (tokenização client-side, sem PCI compliance)
+- Máscaras, validações, feedback visual em PT-BR
+- Modal de resultado com tradução de todos os códigos comuns do MP
+- Auto-preenchimento a partir do Firebase user + `caotelli_clientes` (localStorage)
+
+**⏳ Bloqueado aguardando Diogo:**
+- Chave PIX habilitada pra QR (necessário pra PIX real)
+- `MP_PUBLIC_KEY` na Vercel (necessário pro cartão funcionar — hoje `initMercadoPagoSDK()` retorna null e mostra erro amigável)
+
+**📋 Backlog imediato pós-liberação:**
+1. Testar PIX real end-to-end
+2. Testar cartão com dados de teste MP (número teste: `4235 6477 2802 5682`, CVV `123`, val `11/30`)
+3. Testar cartão real (Liézer/Diogo)
+4. Persistir carrinho no `localStorage` (item 4 do backlog original)
+5. Registrar `paymentId` no Firestore junto com o pedido (rastreabilidade)
+
+**🔧 Detalhes técnicos importantes:**
+- `MP_PUBLIC_KEY` é PÚBLICA — pode ficar no cliente sem risco (só permite gerar tokens, não processar pagamentos)
+- Detecção de bandeira é regex simples nos primeiros 6 dígitos (BIN) — cobre 95%+ dos cartões brasileiros; se falhar, exibir mensagem "bandeira não reconhecida"
+- Card token do MP expira em ~7 minutos — se o usuário demorar, precisa gerar novo (não há retry automático)
+- Parcelas travadas em 1-3x sem juros no backend (`Math.max(1, Math.min(3, ...))`)
+- `statement_descriptor: 'CAOTELLI'` aparece na fatura do cliente
+- Tratamento `status_detail` cobre: `cc_rejected_bad_filled_*`, `cc_rejected_insufficient_amount`, `cc_rejected_high_risk`, `cc_rejected_call_for_authorize`, `cc_rejected_card_disabled`, `cc_rejected_duplicated_payment`, `cc_rejected_max_attempts`
+
+### Commits desta sessão (a fazer via PushCaoTelli.bat)
+```
+feat: modal único com abas PIX/Cartão (substitui prompt)
+feat: cartão de crédito MP até 3x sem juros (tokenização SDK.js)
+feat: endpoint /api/public-key pra alimentar SDK.js no frontend
+```
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 03/08/2026 (MIGRAÇÃO PAGBANK → MERCADO PAGO + LAYOUT CARRINHO)
 
 ### Contexto

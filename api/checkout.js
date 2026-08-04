@@ -1,4 +1,4 @@
-// MP PIX API direta — gera QR code no próprio site (sem redirect)
+// MP Payments API — gera PIX (QR code) ou processa CARTÃO DE CRÉDITO (até 3x sem juros)
 const crypto = require('crypto');
 
 module.exports = async (req, res) => {
@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const { items, total, payer } = body;
+    const { items, total, payer, method, cardToken, installments, paymentMethodId } = body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'Carrinho vazio' });
@@ -32,7 +32,6 @@ module.exports = async (req, res) => {
     const payerEmail = (payer && payer.email) || 'cliente@caotelli.com.br';
     const payerFirstName = (payer && payer.first_name) || 'Cliente';
     const payerLastName = (payer && payer.last_name) || 'CaoTelli';
-    // CPF: MP exige formato válido. Se não vier, usa CPF genérico de teste (não é validado como real).
     const payerCpf = ((payer && payer.cpf) || '19119119100').replace(/\D/g, '');
 
     const descricao = items
@@ -42,7 +41,70 @@ module.exports = async (req, res) => {
 
     const idempotencyKey = crypto.randomUUID();
 
-    const paymentBody = {
+    // ================= CARTÃO DE CRÉDITO =================
+    if (method === 'card') {
+      if (!cardToken) {
+        return res.status(400).json({ error: 'Token do cartão não recebido' });
+      }
+      const installmentsNum = Math.max(1, Math.min(3, Number(installments) || 1)); // trava em 1-3x sem juros
+
+      const cardPaymentBody = {
+        transaction_amount: Number(totalNum.toFixed(2)),
+        token: cardToken,
+        description: `Pedido CãoTelli - ${descricao}`,
+        installments: installmentsNum,
+        payment_method_id: paymentMethodId, // visa, master, elo, hipercard, amex...
+        payer: {
+          email: payerEmail,
+          first_name: payerFirstName,
+          last_name: payerLastName,
+          identification: {
+            type: 'CPF',
+            number: payerCpf,
+          },
+        },
+        external_reference: `CAOTELLI-CARD-${Date.now()}`,
+        statement_descriptor: 'CAOTELLI',
+      };
+
+      console.log('💳 Processando cartão...', { total: totalNum, installments: installmentsNum, brand: paymentMethodId });
+
+      const response = await fetch('https://api.mercadopago.com/v1/payments', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': idempotencyKey,
+        },
+        body: JSON.stringify(cardPaymentBody),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error(`❌ Erro MP Cartão ${response.status}:`, JSON.stringify(data).substring(0, 300));
+        return res.status(response.status).json({
+          error: 'Erro ao processar cartão',
+          detail: data.message || data.error || (data.cause && data.cause[0] && data.cause[0].description) || 'Cartão recusado',
+          status: data.status,
+          statusDetail: data.status_detail,
+        });
+      }
+
+      console.log('✅ Cartão processado — payment ID:', data.id, 'status:', data.status);
+
+      return res.status(200).json({
+        paymentId: data.id,
+        method: 'card',
+        status: data.status,             // approved, in_process, rejected, ...
+        statusDetail: data.status_detail, // accredited, cc_rejected_..., pending_review_manual, ...
+        total: totalNum,
+        installments: installmentsNum,
+      });
+    }
+
+    // ================= PIX (default) =================
+    const pixPaymentBody = {
       transaction_amount: Number(totalNum.toFixed(2)),
       description: `Pedido CãoTelli - ${descricao}`,
       payment_method_id: 'pix',
@@ -55,7 +117,7 @@ module.exports = async (req, res) => {
           number: payerCpf,
         },
       },
-      external_reference: `CAOTELLI-${Date.now()}`,
+      external_reference: `CAOTELLI-PIX-${Date.now()}`,
     };
 
     console.log('📤 Criando pagamento PIX...', { total: totalNum, payer: payerEmail });
@@ -67,7 +129,7 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json',
         'X-Idempotency-Key': idempotencyKey,
       },
-      body: JSON.stringify(paymentBody),
+      body: JSON.stringify(pixPaymentBody),
     });
 
     const data = await response.json();
@@ -94,6 +156,7 @@ module.exports = async (req, res) => {
 
     return res.status(200).json({
       paymentId: data.id,
+      method: 'pix',
       qrText,
       qrImageBase64: qrBase64 ? `data:image/png;base64,${qrBase64}` : null,
       total: totalNum,
@@ -102,7 +165,7 @@ module.exports = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('❌ Erro interno checkout MP PIX:', err);
+    console.error('❌ Erro interno checkout MP:', err);
     return res.status(500).json({
       error: 'Erro ao processar pagamento. Tente novamente.',
       detail: err.message,
