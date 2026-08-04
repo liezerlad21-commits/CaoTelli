@@ -5253,8 +5253,12 @@
         // ── Salvar pedido ao fazer checkout ──────────
         // meta = { paymentId, method: 'pix'|'card', status: 'pendente'|'pago'|'em_analise'|'recusado', installments? }
         async function registrarPedido(meta = {}) {
-            if (!window.cart || !window.cart.length) return null;
-            const subtotal = window.cart.reduce((s,i) => s + i.price * i.quantity, 0);
+            // cart é declarado com `let` no topo do script; usa direto (window.cart não funciona com let)
+            if (!cart || !cart.length) {
+                console.warn('registrarPedido: carrinho vazio, pedido não registrado');
+                return null;
+            }
+            const subtotal = cart.reduce((s,i) => s + i.price * i.quantity, 0);
             const total = typeof _currentTotal === 'number' && _currentTotal > 0 ? _currentTotal : subtotal;
             const emailCliente = (window._fbUser && window._fbUser.email)
                 || (document.getElementById('payerEmail') && document.getElementById('payerEmail').value)
@@ -5265,9 +5269,9 @@
                 data:         new Date().toLocaleString('pt-BR'),
                 dataISO:      new Date().toISOString(),
                 cliente:      emailCliente,
-                itens:        window.cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price })),
+                itens:        cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price })),
                 total:        Number(total.toFixed(2)),
-                deliveryType: window.deliveryType || 'entrega',
+                deliveryType: (typeof deliveryType !== 'undefined' ? deliveryType : 'entrega'),
                 status:       meta.status || 'pendente',
                 paymentId:    meta.paymentId ? String(meta.paymentId) : null,
                 method:       meta.method || 'pix',
