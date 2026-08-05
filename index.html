@@ -190,6 +190,47 @@
             padding: 40px 20px;
             font-size: 16px;
         }
+        /* ═══════════════ SUGESTÕES NO CARRINHO ═══════════════ */
+        /* Sidebar à esquerda do carrinho (desktop) */
+        .cart-sidebar { position:fixed;top:50%;right:420px;z-index:9998;width:250px;max-height:82vh;background:#fff;border:1.5px solid #f4dee2;border-right:none;border-radius:14px 0 0 14px;box-shadow:-6px 0 20px rgba(0,0,0,.12);padding:14px 12px;display:flex;flex-direction:column;gap:10px;opacity:0;transform:translate(-15px,-50%);transition:opacity .4s ease .15s,transform .5s cubic-bezier(.22,1,.36,1) .15s;pointer-events:none; }
+        .cart-modal.active .cart-sidebar { opacity:1;transform:translate(0,-50%);pointer-events:auto; }
+        .cart-sidebar-header { padding-bottom:8px;border-bottom:1.5px solid #f4dee2;transition:opacity .35s ease; }
+        .cart-sidebar-title { font-size:.9rem;font-weight:700;color:#1a2340;display:flex;align-items:center;gap:6px;line-height:1.25; }
+        .cart-sidebar-sub { font-size:.72rem;color:#5a6a85;margin-top:3px;line-height:1.25; }
+        .cart-sidebar-sub strong { color:#D6324A;font-weight:700; }
+        .cart-sidebar-list { display:flex;flex-direction:column;gap:7px;overflow-y:auto;padding-right:3px;transition:opacity .35s ease; }
+        .cart-suggestions { transition:opacity .35s ease; }
+        .cart-sidebar-list::-webkit-scrollbar { width:5px; }
+        .cart-sidebar-list::-webkit-scrollbar-thumb { background:#D6324A;border-radius:3px; }
+        .cart-sidebar-item { display:flex;align-items:center;gap:8px;padding:6px;border-radius:8px;border:1px solid #e4eaf3;background:#fff;transition:.2s;cursor:pointer; }
+        .cart-sidebar-item:hover { border-color:#0088C2;background:#f0f9ff;transform:translateX(-2px); }
+        .cart-sidebar-item img,.cart-sidebar-emoji { width:44px;height:44px;object-fit:contain;border-radius:6px;background:#f4f7fb;flex-shrink:0; }
+        .cart-sidebar-emoji { display:flex;align-items:center;justify-content:center;font-size:1.6rem; }
+        .cart-sidebar-info { flex:1;min-width:0; }
+        .cart-sidebar-name { font-size:.68rem;font-weight:600;color:#1a2340;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+        .cart-sidebar-price { font-size:.78rem;font-weight:700;color:#D6324A;margin-top:2px; }
+        .cart-sidebar-add { width:28px;height:28px;border-radius:50%;background:#0088C2;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;line-height:1; }
+        .cart-sidebar-add:hover { background:#006a99;transform:scale(1.15); }
+        @media (max-width:900px) { .cart-sidebar { display:none !important; } }
+
+        /* Fallback horizontal dentro do carrinho — só no mobile */
+        .cart-suggestions { display:none;margin:14px 0;padding:12px 12px 8px;background:linear-gradient(135deg,#fff7f8 0%,#fff 100%);border:1.5px solid #f4dee2;border-radius:12px; }
+        @media (max-width:900px) { .cart-suggestions.has-items { display:block; } }
+        .cart-sug-title { font-size:.92rem;font-weight:700;color:#1a2340;margin-bottom:10px;display:flex;align-items:center;gap:6px; }
+        .cart-sug-title .cart-sug-badge { font-size:.62rem;font-weight:700;color:#fff;background:#D6324A;padding:2px 7px;border-radius:8px;letter-spacing:.3px;text-transform:uppercase; }
+        .cart-sug-scroll { display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;scrollbar-width:thin; }
+        .cart-sug-scroll::-webkit-scrollbar { height:5px; }
+        .cart-sug-scroll::-webkit-scrollbar-thumb { background:#D6324A;border-radius:3px; }
+        .cart-sug-scroll::-webkit-scrollbar-track { background:transparent; }
+        .cart-sug-card { flex:0 0 132px;background:#fff;border:1px solid #e4eaf3;border-radius:10px;padding:8px;text-align:center;display:flex;flex-direction:column;gap:5px;transition:transform .2s,box-shadow .2s,border-color .2s;cursor:pointer;scroll-snap-align:start; }
+        .cart-sug-card:hover { transform:translateY(-3px);box-shadow:0 4px 14px rgba(0,0,0,.1);border-color:#0088C2; }
+        .cart-sug-card img { width:100%;height:80px;object-fit:contain;border-radius:6px;background:#f4f7fb; }
+        .cart-sug-emoji { width:100%;height:80px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;background:#f4f7fb;border-radius:6px; }
+        .cart-sug-name { font-size:.7rem;font-weight:600;color:#1a2340;line-height:1.25;height:36px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical; }
+        .cart-sug-price { font-size:.9rem;font-weight:700;color:#D6324A;margin-top:auto; }
+        .cart-sug-btn { background:#0088C2;color:#fff;border:none;border-radius:6px;padding:6px 8px;font-size:.72rem;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:4px; }
+        .cart-sug-btn:hover { background:#006a99;transform:scale(1.03); }
+        .cart-sug-empty { text-align:center;color:#5a6a85;font-size:.8rem;padding:12px; }
         /* SEARCH HIGHLIGHT */
         #produtosSection.search-active {
             border: 2px solid var(--primary-cyan);
@@ -198,12 +239,18 @@
             box-shadow: 0 0 30px rgba(0,245,255,0.15);
         }
         .search-title {
-            text-align: center;
+            text-align: left;
             color: var(--primary-cyan);
             font-size: 18px;
-            margin-bottom: 15px;
+            margin: 0;
             animation: fadeIn 0.3s ease;
         }
+        .search-header { display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-bottom:15px;padding:10px 14px;background:#fff;border:1.5px solid #e4eaf3;border-radius:12px; }
+        /* Dropdown de ordenação no header (ao lado do botão de busca) */
+        .search-sort-inline { padding:10px 32px 10px 12px;border:2px solid var(--primary-cyan);border-radius:8px;background:var(--dark-tertiary) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230088C2'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 8px center;background-size:16px;color:var(--text-light);font-size:14px;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;transition:.2s;min-width:0;max-width:160px; }
+        .search-sort-inline:hover { background-color:#f0f9ff; }
+        .search-sort-inline:focus { outline:none;box-shadow:0 0 0 3px rgba(0,136,194,.2); }
+        @media (max-width:600px) { .search-sort-inline { max-width:none;flex:1; } }
 
         /* BARRA DE PROMOÇÃO */
         .promo-bar {
@@ -1890,7 +1937,14 @@
             </div>
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Buscar produtos...">
-                <button onclick="searchProducts()">🔍</button>
+                <button onclick="searchProducts()" title="Buscar">🔍</button>
+                <select id="sortSelectHeader" class="search-sort-inline" onchange="ordenarResultadosBusca()" title="Ordenar produtos">
+                    <option value="relevante">Relevante</option>
+                    <option value="menor">Menor Preço</option>
+                    <option value="maior">Maior Preço</option>
+                    <option value="nome">Nome (A-Z)</option>
+                    <option value="novidades">Novidades</option>
+                </select>
             </div>
             <div class="header-icons">
 <div class="header-icon" onclick="toggleCart()">
@@ -2047,7 +2101,9 @@
 
     <section class="section" id="produtosSection">
         <h2 class="section-title">📦 Nossos Produtos</h2>
-        <div id="searchResultTitle" class="search-title" style="display:none"></div>
+        <div id="searchHeader" class="search-header" style="display:none">
+            <div id="searchResultTitle" class="search-title"></div>
+        </div>
         <div class="products-grid" id="productsGrid"></div>
     </section>
 
@@ -3361,7 +3417,13 @@
         }
 
         // RENDERIZAR PRODUTOS
+        // Guarda o estado da última visão renderizada (pra re-ordenação)
+        let _ultimaCategoria  = 'todos';
+        let _ultimoPetFiltro  = null;
+
         function renderProducts(category = 'todos', petFiltro = null) {
+            _ultimaCategoria = category;
+            _ultimoPetFiltro = petFiltro;
             const grid = document.getElementById('productsGrid');
             let filtered = category === 'todos' ? products : products.filter(p => p.category === category);
 
@@ -3383,6 +3445,9 @@
                            p.emoji === '🐱' || p.emoji === '🏖️';
                 });
             }
+
+            // Aplica ordenação (se algum valor diferente do default estiver selecionado)
+            if (typeof aplicarOrdemBusca === 'function') filtered = aplicarOrdemBusca(filtered);
 
             grid.innerHTML = filtered.map(product => `
                 <div class="product-card" draggable="true" ondragstart="startDrag(event, ${product.id})">
@@ -3526,7 +3591,131 @@
             floatingBadge.style.display = total > 0 ? 'flex' : 'none';
             renderCartItems();
             calculateTotal();
+            renderCartSuggestions();
             salvarCarrinho();
+        }
+
+        // ═══════════════ SUGESTÕES CONTEXTUAIS ("Seu pet não está precisando de...") ═══════════════
+        // Temas rotativos: cada tema é uma pergunta chamativa + a categoria dos itens sugeridos.
+        // A cada rotação, um tema diferente entra em cena.
+        const SUG_TEMAS = [
+            { cat:'brinquedos',   emoji:'🎾', titulo:'Seu pet não está precisando de <strong>brinquedos</strong>?', sub:'Diversão nunca é demais 🐾' },
+            { cat:'medicamentos', emoji:'💊', titulo:'Vermífugo e <strong>antipulgas</strong> em dia?',              sub:'Prevenir é mais barato que tratar' },
+            { cat:'racao',        emoji:'🍖', titulo:'A <strong>ração</strong> está no fim?',                        sub:'Não deixa faltar comidinha' },
+            { cat:'acessorios',   emoji:'🐱', titulo:'Está faltando <strong>areia</strong> pro seu felino?',          sub:'Caixa cheia, gato feliz' },
+            { cat:'brinquedos',   emoji:'🏠', titulo:'Que tal uma <strong>casinha ou arranhador</strong>?',           sub:'Conforto e diversão em um só lugar' },
+            { cat:'medicamentos', emoji:'🐛', titulo:'Precisando renovar o <strong>Simparic</strong>?',               sub:'Proteção contra pulgas e carrapatos' },
+            { cat:'racao',        emoji:'🥩', titulo:'Que tal uma <strong>ração premium</strong>?',                   sub:'Nutrição de qualidade faz diferença' },
+            { cat:'brinquedos',   emoji:'🐭', titulo:'Seu <strong>gatinho</strong> merece brinquedos novos!',         sub:'Ratinhos, varinhas, bolinhas...' }
+        ];
+        let _sugTemaIdx = Math.floor(Math.random() * SUG_TEMAS.length);
+
+        // Timer global — troca o tema+produtos a cada 8s enquanto o carrinho estiver aberto.
+        (function iniciarRotacaoSugestoes(){
+            setInterval(function(){
+                const modal = document.getElementById('cartModal');
+                if (!modal || !modal.classList.contains('active')) return;
+                if (!Array.isArray(cart) || cart.length === 0) return;
+                const list     = document.getElementById('cartSidebarList');
+                const header   = document.getElementById('cartSidebarHeader');
+                const fallback = document.getElementById('cartSuggestions');
+                if (list)     list.style.opacity     = '0.15';
+                if (header)   header.style.opacity   = '0.15';
+                if (fallback) fallback.style.opacity = '0.15';
+                setTimeout(function(){
+                    _sugTemaIdx = (_sugTemaIdx + 1) % SUG_TEMAS.length;
+                    renderCartSuggestions();
+                    if (list)     list.style.opacity     = '';
+                    if (header)   header.style.opacity   = '';
+                    if (fallback) fallback.style.opacity = '';
+                }, 350);
+            }, 8000);
+        })();
+
+        function renderCartSuggestions() {
+            const sidebar     = document.getElementById('cartSidebar');
+            const sidebarList = document.getElementById('cartSidebarList');
+            const sidebarSub  = document.getElementById('cartSidebarSub');
+            const sidebarTit  = document.querySelector('#cartSidebarHeader .cart-sidebar-title');
+            const fallback    = document.getElementById('cartSuggestions');
+
+            if (cart.length === 0) {
+                if (sidebar) sidebar.style.display = 'none';
+                if (sidebarList) sidebarList.innerHTML = '';
+                if (fallback) { fallback.classList.remove('has-items'); fallback.innerHTML = ''; }
+                return;
+            }
+
+            const cartIds = new Set(cart.map(item => item.id));
+
+            // Escolhe um tema com produtos disponíveis (não repetidos no carrinho).
+            // Se o tema atual não tiver produtos, avança até achar um que tenha.
+            let tema = SUG_TEMAS[_sugTemaIdx];
+            let picks = [];
+            let tentativas = 0;
+            while (tentativas < SUG_TEMAS.length) {
+                tema = SUG_TEMAS[_sugTemaIdx];
+                const disponiveis = products.filter(p => p.category === tema.cat && !cartIds.has(p.id));
+                if (disponiveis.length > 0) {
+                    picks = [...disponiveis].sort(() => Math.random() - 0.5).slice(0, 6);
+                    break;
+                }
+                _sugTemaIdx = (_sugTemaIdx + 1) % SUG_TEMAS.length;
+                tentativas++;
+            }
+
+            if (picks.length === 0) {
+                if (sidebar) sidebar.style.display = 'none';
+                if (fallback) fallback.classList.remove('has-items');
+                return;
+            }
+
+            const escName = s => s.replace(/"/g,'&quot;');
+
+            // ─── SIDEBAR (desktop) — pergunta + lista vertical ───
+            if (sidebar && sidebarList) {
+                sidebar.style.display = '';
+                if (sidebarTit) sidebarTit.innerHTML = tema.emoji + ' ' + tema.titulo;
+                if (sidebarSub) sidebarSub.textContent = tema.sub;
+                sidebarList.innerHTML = picks.map(p => {
+                    const media = p.imgUrl
+                        ? '<img src="' + p.imgUrl + '" alt="' + escName(p.name) + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="cart-sidebar-emoji" style="display:none">' + p.emoji + '</div>'
+                        : '<div class="cart-sidebar-emoji">' + p.emoji + '</div>';
+                    return (
+                        '<div class="cart-sidebar-item" onclick="openLightbox(' + p.id + ')" title="' + escName(p.name) + '">' +
+                            media +
+                            '<div class="cart-sidebar-info">' +
+                                '<div class="cart-sidebar-name">' + p.name + '</div>' +
+                                '<div class="cart-sidebar-price">R$ ' + p.price.toFixed(2).replace('.',',') + '</div>' +
+                            '</div>' +
+                            '<button class="cart-sidebar-add" onclick="event.stopPropagation();addToCart(' + p.id + ')" title="Adicionar ao carrinho">+</button>' +
+                        '</div>'
+                    );
+                }).join('');
+            }
+
+            // ─── FALLBACK MOBILE — mesma pergunta + cards horizontais ───
+            if (fallback) {
+                fallback.classList.add('has-items');
+                fallback.innerHTML =
+                    '<div class="cart-sug-title">' + tema.emoji + ' ' + tema.titulo + '</div>' +
+                    '<div style="font-size:.72rem;color:#5a6a85;margin:-4px 0 8px 0">' + tema.sub + '</div>' +
+                    '<div class="cart-sug-scroll">' +
+                    picks.slice(0, 5).map(p => {
+                        const img = p.imgUrl
+                            ? '<img src="' + p.imgUrl + '" alt="' + escName(p.name) + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="cart-sug-emoji" style="display:none">' + p.emoji + '</div>'
+                            : '<div class="cart-sug-emoji">' + p.emoji + '</div>';
+                        return (
+                            '<div class="cart-sug-card" onclick="openLightbox(' + p.id + ')">' +
+                                img +
+                                '<div class="cart-sug-name">' + p.name + '</div>' +
+                                '<div class="cart-sug-price">R$ ' + p.price.toFixed(2).replace('.',',') + '</div>' +
+                                '<button class="cart-sug-btn" onclick="event.stopPropagation();addToCart(' + p.id + ')">+ Adicionar</button>' +
+                            '</div>'
+                        );
+                    }).join('') +
+                    '</div>';
+            }
         }
 
         // RENDERIZAR ITEMS DO CARRINHO
@@ -4302,41 +4491,42 @@
         }
 
         // BUSCAR PRODUTOS
-        function searchProducts() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const grid = document.getElementById('productsGrid');
-            const section = document.getElementById('produtosSection');
+        // Estado da busca (pra re-ordenar sem re-filtrar)
+        let _resultadosBusca    = [];
+        let _termoBuscaAtual    = '';
+        let _ordemBuscaAtual    = 'relevante';
 
-            if (!searchTerm) {
-                section.classList.remove('search-active');
-            document.getElementById('searchResultTitle').style.display = 'none';
-                renderProducts('todos');
-                return;
+        function aplicarOrdemBusca(lista) {
+            const sorted = [...lista];
+            switch (_ordemBuscaAtual) {
+                case 'menor':     sorted.sort((a,b) => a.price - b.price); break;
+                case 'maior':     sorted.sort((a,b) => b.price - a.price); break;
+                case 'nome':      sorted.sort((a,b) => a.name.localeCompare(b.name, 'pt-BR')); break;
+                case 'novidades': sorted.sort((a,b) => b.id - a.id); break;
+                default: /* relevante = mantém ordem do filtro */ break;
             }
+            return sorted;
+        }
 
-            const filtered = products.filter(p =>
-                p.name.toLowerCase().includes(searchTerm) ||
-                p.description.toLowerCase().includes(searchTerm) ||
-                p.category.toLowerCase().includes(searchTerm)
-            );
+        function ordenarResultadosBusca() {
+            const sel = document.getElementById('sortSelectHeader');
+            _ordemBuscaAtual = sel ? sel.value : 'relevante';
+            // Se tem busca ativa, re-renderiza os resultados; senão, re-renderiza a categoria atual
+            if (_resultadosBusca.length > 0 || _termoBuscaAtual) {
+                renderizarResultadosBusca();
+            } else {
+                renderProducts(_ultimaCategoria, _ultimoPetFiltro);
+            }
+        }
 
-            // Destaca e rola até a seção de produtos
-            section.classList.add('search-active');
-            document.getElementById('searchResultTitle').style.display = 'block';
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            // Atualiza título da busca
-            const titleEl = document.getElementById('searchResultTitle');
-            if (titleEl) titleEl.textContent = filtered.length > 0
-                ? `🔍 ${filtered.length} resultado(s) para "${searchTerm}"`
-                : `🔍 Nenhum resultado para "${searchTerm}"`;
-
-            if (filtered.length === 0) {
+        function renderizarResultadosBusca() {
+            const grid = document.getElementById('productsGrid');
+            if (_resultadosBusca.length === 0) {
                 grid.innerHTML = '<div class="empty-cart-message" style="grid-column: 1/-1;">Nenhum produto encontrado. Tente outra busca!</div>';
                 return;
             }
-
-            grid.innerHTML = filtered.map(product => `
+            const ordenados = aplicarOrdemBusca(_resultadosBusca);
+            grid.innerHTML = ordenados.map(product => `
                 <div class="product-card" draggable="true" ondragstart="startDrag(event, ${product.id})">
                     <div class="product-img-wrap">
                         ${product.imgUrl
@@ -4358,6 +4548,40 @@
                     <p class="drag-hint">🛒 Arraste para o carrinho</p>
                 </div>
             `).join('');
+        }
+
+        function searchProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const section = document.getElementById('produtosSection');
+            const header  = document.getElementById('searchHeader');
+
+            if (!searchTerm) {
+                section.classList.remove('search-active');
+                if (header) header.style.display = 'none';
+                _resultadosBusca = [];
+                _termoBuscaAtual = '';
+                renderProducts('todos');
+                return;
+            }
+
+            _termoBuscaAtual = searchTerm;
+            _resultadosBusca = products.filter(p =>
+                p.name.toLowerCase().includes(searchTerm) ||
+                p.description.toLowerCase().includes(searchTerm) ||
+                p.category.toLowerCase().includes(searchTerm)
+            );
+
+            // Destaca e rola até a seção
+            section.classList.add('search-active');
+            if (header) header.style.display = 'flex';
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            const titleEl = document.getElementById('searchResultTitle');
+            if (titleEl) titleEl.textContent = _resultadosBusca.length > 0
+                ? `🔍 ${_resultadosBusca.length} resultado(s) para "${searchTerm}"`
+                : `🔍 Nenhum resultado para "${searchTerm}"`;
+
+            renderizarResultadosBusca();
         }
 
         // SUBMIT FORMULÁRIOS
@@ -6214,6 +6438,14 @@
 
     <!-- MODAL CARRINHO -->
     <div id="cartModal" class="cart-modal">
+        <!-- SIDEBAR DE SUGESTÕES (desktop) -->
+        <aside id="cartSidebar" class="cart-sidebar" aria-label="Sugestões de produtos">
+            <div id="cartSidebarHeader" class="cart-sidebar-header">
+                <div class="cart-sidebar-title">✨ Você também pode gostar</div>
+                <div id="cartSidebarSub" class="cart-sidebar-sub">Confira sugestões pro seu pet</div>
+            </div>
+            <div id="cartSidebarList" class="cart-sidebar-list"></div>
+        </aside>
         <div class="cart-content">
             <div class="cart-header">
                 <h2>🛒 Meu Carrinho</h2>
@@ -6254,6 +6486,8 @@
                     <button onclick="applyCoupon()" class="btn-primary">Aplicar</button>
                 </div>
             </div>
+            <!-- SUGESTÕES "VOCÊ TAMBÉM PODE GOSTAR" -->
+            <div id="cartSuggestions" class="cart-suggestions" style="display:none"></div>
             <!-- FORMAS DE PAGAMENTO NA ENTREGA -->
             <div style="background:#f0f8ff;border:1.5px solid #c5e3f5;border-radius:12px;padding:12px 14px;margin-bottom:12px">
                 <p style="font-size:12px;color:#555;font-weight:600;margin-bottom:8px;text-align:center">🚚 Entrega ou retirada na loja — aceitamos:</p>
