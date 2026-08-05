@@ -1797,12 +1797,15 @@
         .frv-slide-stars { color:#FBBC05;font-size:0.95rem;letter-spacing:1px;margin-bottom:3px; }
         .frv-slide-comment { font-size:0.78rem;color:#1a2340;line-height:1.35;margin:0 0 4px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
         .frv-slide-author { font-size:0.7rem;color:#5a6a85;font-style:italic; }
+        /* Botão flutuante circular Google — só aparece no mobile */
+        .floating-reviews-mobile { display:none;position:fixed;bottom:170px;right:28px;z-index:9997;background:#fff;border-radius:50%;width:54px;height:54px;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,0.25);transition:transform .2s;text-decoration:none;border:2px solid #fff; }
+        .floating-reviews-mobile:hover,.floating-reviews-mobile:active { transform:scale(1.12); }
+        .floating-reviews-mobile svg { width:28px;height:28px; }
+        .floating-reviews-mobile .frm-badge { position:absolute;top:-4px;right:-4px;background:#FBBC05;color:#1a2340;font-size:.65rem;font-weight:800;padding:2px 6px;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,.2);line-height:1; }
+
         @media (max-width:640px) {
-            .floating-reviews { width:210px;padding:10px 12px;gap:6px; }
-            .floating-reviews:hover { transform:translate(0,-50%); }
-            .frv-logo { width:28px;height:28px; }
-            .frv-slide-comment { -webkit-line-clamp:2;font-size:0.72rem; }
-            .frv-body { min-height:60px; }
+            .floating-reviews { display:none !important; }
+            .floating-reviews-mobile { display:flex !important; }
         }
 
         /* ═══════════════ PAINEL ADMIN ═══════════════ */
@@ -1833,6 +1836,33 @@
         .admin-table tr:hover td { background:#f9fbff; }
         .admin-table img { width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid #e4eaf3; }
         .admin-table input[type=text],.admin-table input[type=number],.admin-table input[type=url] { border:1px solid #dde3ee;border-radius:6px;padding:5px 8px;font-size:0.85rem;width:100%;box-sizing:border-box; }
+
+        /* ═══════════════ ADMIN — CARDS DE TEMAS DE SUGESTÃO ═══════════════ */
+        .sug-tema-card { background:#fff;border:1.5px solid #e4eaf3;border-radius:12px;padding:16px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.03); }
+        .sug-tema-card.desativado { opacity:.55;background:#f9fbff; }
+        .sug-tema-card:hover { border-color:#0088C2;box-shadow:0 4px 12px rgba(0,0,0,.06); }
+        .sug-tema-head { display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap; }
+        .sug-tema-toggle { display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:#1a2340;cursor:pointer;user-select:none; }
+        .sug-tema-toggle input { width:16px;height:16px;accent-color:#0088C2;cursor:pointer; }
+        .sug-tema-preview { flex:1;font-size:.85rem;color:#5a6a85;font-style:italic;padding:6px 12px;background:#fff7f8;border:1px dashed #f4dee2;border-radius:8px;min-height:32px;display:flex;align-items:center; }
+        .sug-tema-preview strong { color:#D6324A;font-style:normal; }
+        .sug-tema-delete { background:#fef1f4;color:#D6324A;border:1px solid #f4dee2;border-radius:6px;padding:5px 10px;font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s; }
+        .sug-tema-delete:hover { background:#D6324A;color:#fff; }
+        .sug-tema-grid { display:grid;grid-template-columns:60px 1fr 1fr 140px;gap:10px;margin-bottom:12px; }
+        @media (max-width:700px) { .sug-tema-grid { grid-template-columns:1fr 1fr;gap:8px; } }
+        .sug-tema-field label { display:block;font-size:.72rem;font-weight:700;color:#5a6a85;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px; }
+        .sug-tema-field input,.sug-tema-field select { width:100%;border:1px solid #dde3ee;border-radius:6px;padding:7px 10px;font-size:.88rem;box-sizing:border-box;background:#fff; }
+        .sug-tema-field input:focus,.sug-tema-field select:focus { border-color:#0088C2;outline:none;box-shadow:0 0 0 2px rgba(0,136,194,.15); }
+        .sug-tema-modo { display:flex;gap:14px;align-items:center;padding:10px 12px;background:#f4f7fb;border-radius:8px;font-size:.85rem;color:#1a2340;flex-wrap:wrap; }
+        .sug-tema-modo label { display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:600; }
+        .sug-tema-modo input[type=radio] { accent-color:#0088C2;cursor:pointer; }
+        .sug-tema-produtos-lista { margin-top:10px;padding:10px;background:#f9fbff;border:1px solid #e4eaf3;border-radius:8px;max-height:220px;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px; }
+        .sug-tema-produto-item { display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:#fff;border:1px solid #eef2f7;cursor:pointer;font-size:.82rem;transition:.15s; }
+        .sug-tema-produto-item:hover { border-color:#0088C2;background:#f0f9ff; }
+        .sug-tema-produto-item input { accent-color:#0088C2;cursor:pointer;flex-shrink:0; }
+        .sug-tema-produto-item img,.sug-tema-produto-item .sug-tema-produto-emoji { width:28px;height:28px;object-fit:contain;border-radius:4px;background:#f4f7fb;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem; }
+        .sug-tema-produto-nome { flex:1;font-size:.78rem;color:#1a2340;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+        .sug-tema-produtos-info { font-size:.78rem;color:#5a6a85;margin-top:6px;font-style:italic; }
 
         .btn-admin { border:none;border-radius:7px;padding:6px 14px;font-size:0.82rem;font-weight:700;cursor:pointer;transition:.2s; }
         .btn-admin.salvar  { background:#0088C2;color:#fff; }
@@ -2473,6 +2503,7 @@
             <button class="admin-tab" onclick="abrirAbaAdmin('cupons')">🎫 Cupons</button>
             <button class="admin-tab" onclick="abrirAbaAdmin('ofertas')">🔥 Ofertas</button>
             <button class="admin-tab" onclick="abrirAbaAdmin('destaques')">⭐ Destaques</button>
+            <button class="admin-tab" onclick="abrirAbaAdmin('sugestoes')">🎯 Sugestões</button>
             <button class="admin-tab" onclick="abrirAbaAdmin('configuracoes')">⚙️ Config</button>
         </div>
 
@@ -2581,6 +2612,20 @@
             <p style="color:#5a6a85;margin-bottom:12px;font-weight:600">Selecione os produtos:</p>
             <input type="text" id="buscaDestaque" placeholder="🔍 Buscar produto..." oninput="filtrarProdutosDestaque()" style="width:100%;max-width:400px;padding:10px 14px;border:1px solid #dde3ee;border-radius:8px;margin-bottom:16px;font-size:0.95rem">
             <div id="listaProdutosDestaque" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;max-height:400px;overflow-y:auto"></div>
+        </div>
+
+        <!-- ABA SUGESTÕES DO CARRINHO -->
+        <div class="admin-tab-content" id="adminSugestoes">
+            <div style="background:#fff7f8;border:1.5px solid #f4dee2;border-radius:12px;padding:14px 16px;margin-bottom:16px">
+                <p style="color:#1a2340;font-size:.95rem;margin:0 0 4px 0;font-weight:600">🎯 Controle o que aparece nas sugestões do carrinho</p>
+                <p style="color:#5a6a85;font-size:.82rem;margin:0">Cada tema é uma pergunta chamativa que rotaciona no carrinho. Use <code style="background:#fff;padding:1px 5px;border-radius:4px">**palavra**</code> pra deixar em <strong style="color:#D6324A">vermelho negrito</strong>.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+                <button class="btn-admin novo" onclick="adicionarTemaSugestao()">+ Novo Tema</button>
+                <button class="btn-admin salvar" onclick="salvarSugestoes()">💾 Salvar Sugestões</button>
+                <button class="btn-admin" onclick="restaurarSugestoesPadrao()" style="background:#fff;color:#5a6a85;border:1px solid #dde3ee">🔄 Restaurar Padrão</button>
+            </div>
+            <div id="sugTemasList" style="display:flex;flex-direction:column;gap:12px"></div>
         </div>
 
         <!-- ABA CONFIGURAÇÕES -->
@@ -3605,19 +3650,57 @@
         }
 
         // ═══════════════ SUGESTÕES CONTEXTUAIS ("Seu pet não está precisando de...") ═══════════════
-        // Temas rotativos: cada tema é uma pergunta chamativa + a categoria dos itens sugeridos.
-        // A cada rotação, um tema diferente entra em cena.
-        const SUG_TEMAS = [
-            { cat:'brinquedos',   emoji:'🎾', titulo:'Seu pet não está precisando de <strong>brinquedos</strong>?', sub:'Diversão nunca é demais 🐾' },
-            { cat:'medicamentos', emoji:'💊', titulo:'Vermífugo e <strong>antipulgas</strong> em dia?',              sub:'Prevenir é mais barato que tratar' },
-            { cat:'racao',        emoji:'🍖', titulo:'A <strong>ração</strong> está no fim?',                        sub:'Não deixa faltar comidinha' },
-            { cat:'acessorios',   emoji:'🐱', titulo:'Está faltando <strong>areia</strong> pro seu felino?',          sub:'Caixa cheia, gato feliz' },
-            { cat:'brinquedos',   emoji:'🏠', titulo:'Que tal uma <strong>casinha ou arranhador</strong>?',           sub:'Conforto e diversão em um só lugar' },
-            { cat:'medicamentos', emoji:'🐛', titulo:'Precisando renovar o <strong>Simparic</strong>?',               sub:'Proteção contra pulgas e carrapatos' },
-            { cat:'racao',        emoji:'🥩', titulo:'Que tal uma <strong>ração premium</strong>?',                   sub:'Nutrição de qualidade faz diferença' },
-            { cat:'brinquedos',   emoji:'🐭', titulo:'Seu <strong>gatinho</strong> merece brinquedos novos!',         sub:'Ratinhos, varinhas, bolinhas...' }
+        // Temas rotativos configuráveis via admin. Cada tema tem:
+        //   { id, ativo, emoji, titulo (com **negrito**), sub, cat, modo ('auto'|'manual'), produtosManual: [ids] }
+        const SUG_TEMAS_DEFAULT = [
+            { id:'t1', ativo:true, cat:'brinquedos',   emoji:'🎾', titulo:'Seu pet não está precisando de **brinquedos**?', sub:'Diversão nunca é demais 🐾',                modo:'auto', produtosManual:[] },
+            { id:'t2', ativo:true, cat:'medicamentos', emoji:'💊', titulo:'Vermífugo e **antipulgas** em dia?',              sub:'Prevenir é mais barato que tratar',         modo:'auto', produtosManual:[] },
+            { id:'t3', ativo:true, cat:'racao',        emoji:'🍖', titulo:'A **ração** está no fim?',                        sub:'Não deixa faltar comidinha',                modo:'auto', produtosManual:[] },
+            { id:'t4', ativo:true, cat:'acessorios',   emoji:'🐱', titulo:'Está faltando **areia** pro seu felino?',          sub:'Caixa cheia, gato feliz',                   modo:'auto', produtosManual:[] },
+            { id:'t5', ativo:true, cat:'brinquedos',   emoji:'🏠', titulo:'Que tal uma **casinha ou arranhador**?',           sub:'Conforto e diversão em um só lugar',        modo:'auto', produtosManual:[] },
+            { id:'t6', ativo:true, cat:'medicamentos', emoji:'🐛', titulo:'Precisando renovar o **Simparic**?',               sub:'Proteção contra pulgas e carrapatos',       modo:'auto', produtosManual:[] },
+            { id:'t7', ativo:true, cat:'racao',        emoji:'🥩', titulo:'Que tal uma **ração premium**?',                   sub:'Nutrição de qualidade faz diferença',       modo:'auto', produtosManual:[] },
+            { id:'t8', ativo:true, cat:'brinquedos',   emoji:'🐭', titulo:'Seu **gatinho** merece brinquedos novos!',         sub:'Ratinhos, varinhas, bolinhas...',           modo:'auto', produtosManual:[] }
         ];
+
+        // Config ativa (carregada do localStorage/Firestore ou default)
+        let SUG_TEMAS = carregarSugestoesLocal();
         let _sugTemaIdx = Math.floor(Math.random() * SUG_TEMAS.length);
+
+        // Converte **palavra** em <strong>palavra</strong> (formato markdown simples)
+        function _renderTituloTema(t) {
+            const esc = (s) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            return esc(t || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        }
+
+        function carregarSugestoesLocal() {
+            try {
+                const raw = localStorage.getItem('caotelli_sug_temas');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch(e) { console.warn('carregarSugestoesLocal:', e); }
+            return JSON.parse(JSON.stringify(SUG_TEMAS_DEFAULT));  // deep clone
+        }
+
+        function salvarSugestoesLocal(arr) {
+            try { localStorage.setItem('caotelli_sug_temas', JSON.stringify(arr)); } catch(e) { console.warn('salvarSugestoesLocal:', e); }
+        }
+
+        async function carregarSugestoesFirestore() {
+            if (!window._db) return;
+            try {
+                const snap = await window._fsGetDoc(window._fsDoc(window._db, 'config', 'sugestoes'));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (Array.isArray(data.temas) && data.temas.length > 0) {
+                        SUG_TEMAS = data.temas;
+                        salvarSugestoesLocal(SUG_TEMAS);
+                    }
+                }
+            } catch(e) { console.warn('Firestore sugestoes load:', e); }
+        }
 
         // Timer global — troca o tema+produtos a cada 8s enquanto o carrinho estiver aberto.
         (function iniciarRotacaoSugestoes(){
@@ -3632,7 +3715,8 @@
                 if (header)   header.style.opacity   = '0.15';
                 if (fallback) fallback.style.opacity = '0.15';
                 setTimeout(function(){
-                    _sugTemaIdx = (_sugTemaIdx + 1) % SUG_TEMAS.length;
+                    const totalAtivos = SUG_TEMAS.filter(t => t.ativo !== false).length || 1;
+                    _sugTemaIdx = (_sugTemaIdx + 1) % totalAtivos;
                     renderCartSuggestions();
                     if (list)     list.style.opacity     = '';
                     if (header)   header.style.opacity   = '';
@@ -3657,23 +3741,40 @@
 
             const cartIds = new Set(cart.map(item => item.id));
 
-            // Escolhe um tema com produtos disponíveis (não repetidos no carrinho).
-            // Se o tema atual não tiver produtos, avança até achar um que tenha.
-            let tema = SUG_TEMAS[_sugTemaIdx];
+            // Só considera temas ativos
+            const temasAtivos = SUG_TEMAS.filter(t => t.ativo !== false);
+            if (temasAtivos.length === 0) {
+                if (sidebar) sidebar.style.display = 'none';
+                if (fallback) fallback.classList.remove('has-items');
+                return;
+            }
+
+            // Escolhe um tema ativo com produtos disponíveis (não no carrinho).
+            // Se o tema atual não tiver, avança até achar um que tenha.
+            let tema = null;
             let picks = [];
             let tentativas = 0;
-            while (tentativas < SUG_TEMAS.length) {
-                tema = SUG_TEMAS[_sugTemaIdx];
-                const disponiveis = products.filter(p => p.category === tema.cat && !cartIds.has(p.id));
+            while (tentativas < temasAtivos.length) {
+                tema = temasAtivos[_sugTemaIdx % temasAtivos.length];
+                let disponiveis;
+                if (tema.modo === 'manual' && Array.isArray(tema.produtosManual) && tema.produtosManual.length > 0) {
+                    // Modo manual: só os produtos escolhidos, exceto os já no carrinho
+                    disponiveis = tema.produtosManual
+                        .map(id => products.find(p => p.id === id))
+                        .filter(p => p && !cartIds.has(p.id));
+                } else {
+                    // Modo auto: aleatório da categoria
+                    disponiveis = products.filter(p => p.category === tema.cat && !cartIds.has(p.id));
+                }
                 if (disponiveis.length > 0) {
                     picks = [...disponiveis].sort(() => Math.random() - 0.5).slice(0, 6);
                     break;
                 }
-                _sugTemaIdx = (_sugTemaIdx + 1) % SUG_TEMAS.length;
+                _sugTemaIdx = (_sugTemaIdx + 1) % temasAtivos.length;
                 tentativas++;
             }
 
-            if (picks.length === 0) {
+            if (picks.length === 0 || !tema) {
                 if (sidebar) sidebar.style.display = 'none';
                 if (fallback) fallback.classList.remove('has-items');
                 return;
@@ -3684,8 +3785,8 @@
             // ─── SIDEBAR (desktop) — pergunta + lista vertical ───
             if (sidebar && sidebarList) {
                 sidebar.style.display = '';
-                if (sidebarTit) sidebarTit.innerHTML = tema.emoji + ' ' + tema.titulo;
-                if (sidebarSub) sidebarSub.textContent = tema.sub;
+                if (sidebarTit) sidebarTit.innerHTML = tema.emoji + ' ' + _renderTituloTema(tema.titulo);
+                if (sidebarSub) sidebarSub.textContent = tema.sub || '';
                 sidebarList.innerHTML = picks.map(p => {
                     const media = p.imgUrl
                         ? '<img src="' + p.imgUrl + '" alt="' + escName(p.name) + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="cart-sidebar-emoji" style="display:none">' + p.emoji + '</div>'
@@ -3707,8 +3808,8 @@
             if (fallback) {
                 fallback.classList.add('has-items');
                 fallback.innerHTML =
-                    '<div class="cart-sug-title">' + tema.emoji + ' ' + tema.titulo + '</div>' +
-                    '<div style="font-size:.72rem;color:#5a6a85;margin:-4px 0 8px 0">' + tema.sub + '</div>' +
+                    '<div class="cart-sug-title">' + tema.emoji + ' ' + _renderTituloTema(tema.titulo) + '</div>' +
+                    '<div style="font-size:.72rem;color:#5a6a85;margin:-4px 0 8px 0">' + (tema.sub || '') + '</div>' +
                     '<div class="cart-sug-scroll">' +
                     picks.slice(0, 5).map(p => {
                         const img = p.imgUrl
@@ -5248,7 +5349,7 @@
         // ── Abas ──────────────────────────────────────
         function abrirAbaAdmin(aba) {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            const ids = ['produtos','pedidos','clientes','cupons','ofertas','destaques','configuracoes'];
+            const ids = ['produtos','pedidos','clientes','cupons','ofertas','destaques','sugestoes','configuracoes'];
             const idx = ids.indexOf(aba);
             if (idx >= 0) document.querySelectorAll('.admin-tab')[idx].classList.add('active');
             document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
@@ -5267,6 +5368,7 @@
             if (aba === 'cupons')         renderAdminCupons();
             if (aba === 'ofertas')        renderAdminOfertas();
             if (aba === 'destaques')      renderAdminDestaques();
+            if (aba === 'sugestoes')      renderAdminSugestoes();
             if (aba === 'configuracoes')  renderAdminConfiguracoes();
         }
 
@@ -6306,6 +6408,174 @@
         }
 
         // ════════════════════════════════════════════
+        // ██  ADMIN — SUGESTÕES DO CARRINHO  ██████████
+        // ════════════════════════════════════════════
+
+        const CATEGORIAS_LABEL = {
+            racao:        'Ração',
+            medicamentos: 'Medicamentos',
+            acessorios:   'Acessórios/Areia',
+            brinquedos:   'Brinquedos/Casinha'
+        };
+
+        async function renderAdminSugestoes() {
+            // Recarrega do Firestore se disponível (sincroniza entre dispositivos)
+            await carregarSugestoesFirestore();
+            SUG_TEMAS = carregarSugestoesLocal();
+            _renderSugTemasList();
+        }
+
+        function _renderSugTemasList() {
+            const container = document.getElementById('sugTemasList');
+            if (!container) return;
+            if (!SUG_TEMAS || SUG_TEMAS.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#5a6a85;padding:40px;background:#f9fbff;border:2px dashed #dde3ee;border-radius:12px">Nenhum tema cadastrado. Clique em <strong>+ Novo Tema</strong> pra começar.</div>';
+                return;
+            }
+            container.innerHTML = SUG_TEMAS.map((t, i) => _templateSugTema(t, i)).join('');
+        }
+
+        function _templateSugTema(t, i) {
+            const catOpts = Object.keys(CATEGORIAS_LABEL).map(cat =>
+                `<option value="${cat}"${cat===t.cat?' selected':''}>${CATEGORIAS_LABEL[cat]}</option>`
+            ).join('');
+            const previewHtml = t.emoji + ' ' + _renderTituloTema(t.titulo || '(sem título)');
+            const modoAuto   = (t.modo || 'auto') === 'auto';
+            const qtdManual  = Array.isArray(t.produtosManual) ? t.produtosManual.length : 0;
+            return (
+                '<div class="sug-tema-card' + (t.ativo === false ? ' desativado' : '') + '" data-idx="' + i + '">' +
+                    '<div class="sug-tema-head">' +
+                        '<label class="sug-tema-toggle">' +
+                            '<input type="checkbox"' + (t.ativo !== false ? ' checked' : '') + ' onchange="_updateSugTema(' + i + ', \'ativo\', this.checked)"> Ativo' +
+                        '</label>' +
+                        '<div class="sug-tema-preview">' + previewHtml + '</div>' +
+                        '<button class="sug-tema-delete" onclick="_removerSugTema(' + i + ')">🗑️ Remover</button>' +
+                    '</div>' +
+                    '<div class="sug-tema-grid">' +
+                        '<div class="sug-tema-field"><label>Emoji</label><input type="text" value="' + (t.emoji || '') + '" maxlength="4" onchange="_updateSugTema(' + i + ', \'emoji\', this.value)"></div>' +
+                        '<div class="sug-tema-field"><label>Título (use **negrito**)</label><input type="text" value="' + _escAttr(t.titulo || '') + '" oninput="_updateSugTema(' + i + ', \'titulo\', this.value)"></div>' +
+                        '<div class="sug-tema-field"><label>Subtítulo</label><input type="text" value="' + _escAttr(t.sub || '') + '" onchange="_updateSugTema(' + i + ', \'sub\', this.value)"></div>' +
+                        '<div class="sug-tema-field"><label>Categoria</label><select onchange="_updateSugTemaCat(' + i + ', this.value)">' + catOpts + '</select></div>' +
+                    '</div>' +
+                    '<div class="sug-tema-modo">' +
+                        '<label><input type="radio" name="modo_' + i + '"' + (modoAuto ? ' checked' : '') + ' onchange="_updateSugTemaModo(' + i + ', \'auto\')"> 🎲 Aleatório da categoria</label>' +
+                        '<label><input type="radio" name="modo_' + i + '"' + (!modoAuto ? ' checked' : '') + ' onchange="_updateSugTemaModo(' + i + ', \'manual\')"> ✋ Escolher produtos' + (qtdManual > 0 ? ' (' + qtdManual + ')' : '') + '</label>' +
+                    '</div>' +
+                    (modoAuto ? '' : _templateProdutosManual(t, i)) +
+                '</div>'
+            );
+        }
+
+        function _templateProdutosManual(t, i) {
+            const produtosDaCat = products.filter(p => p.category === t.cat);
+            if (produtosDaCat.length === 0) return '<div class="sug-tema-produtos-info">⚠️ Nenhum produto na categoria "' + CATEGORIAS_LABEL[t.cat] + '" ainda.</div>';
+            const selecionados = new Set(t.produtosManual || []);
+            return (
+                '<div class="sug-tema-produtos-info">Marque os produtos que devem aparecer neste tema:</div>' +
+                '<div class="sug-tema-produtos-lista">' +
+                    produtosDaCat.map(p => {
+                        const checked = selecionados.has(p.id) ? ' checked' : '';
+                        const media = p.imgUrl
+                            ? '<img src="' + p.imgUrl + '" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="sug-tema-produto-emoji" style="display:none">' + p.emoji + '</div>'
+                            : '<div class="sug-tema-produto-emoji">' + p.emoji + '</div>';
+                        return (
+                            '<label class="sug-tema-produto-item">' +
+                                '<input type="checkbox" value="' + p.id + '"' + checked + ' onchange="_toggleProdutoManual(' + i + ', ' + p.id + ', this.checked)">' +
+                                media +
+                                '<span class="sug-tema-produto-nome" title="' + _escAttr(p.name) + '">' + p.name + '</span>' +
+                            '</label>'
+                        );
+                    }).join('') +
+                '</div>'
+            );
+        }
+
+        function _escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function _updateSugTema(i, campo, valor) {
+            if (!SUG_TEMAS[i]) return;
+            SUG_TEMAS[i][campo] = valor;
+            if (campo === 'ativo' || campo === 'titulo' || campo === 'emoji') {
+                // Atualiza só o preview e classe do card, sem re-renderizar tudo
+                const card = document.querySelector('.sug-tema-card[data-idx="' + i + '"]');
+                if (card) {
+                    if (campo === 'ativo') card.classList.toggle('desativado', !valor);
+                    if (campo === 'titulo' || campo === 'emoji') {
+                        const preview = card.querySelector('.sug-tema-preview');
+                        if (preview) preview.innerHTML = (SUG_TEMAS[i].emoji || '') + ' ' + _renderTituloTema(SUG_TEMAS[i].titulo || '(sem título)');
+                    }
+                }
+            }
+        }
+
+        function _updateSugTemaCat(i, valor) {
+            if (!SUG_TEMAS[i]) return;
+            SUG_TEMAS[i].cat = valor;
+            // Ao mudar categoria, zera a lista manual (produtos antigos não fazem mais sentido)
+            SUG_TEMAS[i].produtosManual = [];
+            _renderSugTemasList();
+        }
+
+        function _updateSugTemaModo(i, modo) {
+            if (!SUG_TEMAS[i]) return;
+            SUG_TEMAS[i].modo = modo;
+            _renderSugTemasList();
+        }
+
+        function _toggleProdutoManual(i, prodId, checked) {
+            if (!SUG_TEMAS[i]) return;
+            if (!Array.isArray(SUG_TEMAS[i].produtosManual)) SUG_TEMAS[i].produtosManual = [];
+            const set = new Set(SUG_TEMAS[i].produtosManual);
+            if (checked) set.add(prodId); else set.delete(prodId);
+            SUG_TEMAS[i].produtosManual = Array.from(set);
+            // Atualiza contagem no radio label
+            const card = document.querySelector('.sug-tema-card[data-idx="' + i + '"]');
+            if (card) {
+                const labels = card.querySelectorAll('.sug-tema-modo label');
+                if (labels[1]) labels[1].innerHTML = '<input type="radio" name="modo_' + i + '" checked onchange="_updateSugTemaModo(' + i + ', \'manual\')"> ✋ Escolher produtos (' + SUG_TEMAS[i].produtosManual.length + ')';
+            }
+        }
+
+        function _removerSugTema(i) {
+            if (!confirm('Remover este tema? A ação só será efetivada ao clicar em "Salvar".')) return;
+            SUG_TEMAS.splice(i, 1);
+            _renderSugTemasList();
+        }
+
+        function adicionarTemaSugestao() {
+            const novoId = 't' + Date.now();
+            SUG_TEMAS.push({
+                id: novoId, ativo: true, cat: 'racao', emoji: '✨',
+                titulo: 'Novo tema **em destaque**', sub: 'Descrição curta aqui',
+                modo: 'auto', produtosManual: []
+            });
+            _renderSugTemasList();
+            // Scroll pro card novo
+            setTimeout(function(){
+                const cards = document.querySelectorAll('.sug-tema-card');
+                if (cards.length > 0) cards[cards.length - 1].scrollIntoView({ behavior:'smooth', block:'center' });
+            }, 100);
+        }
+
+        async function salvarSugestoes() {
+            salvarSugestoesLocal(SUG_TEMAS);
+            if (window._db) {
+                try {
+                    await window._fsSetDoc(window._fsDoc(window._db, 'config', 'sugestoes'), { temas: SUG_TEMAS });
+                } catch(e) { console.warn('Firestore salvarSugestoes:', e); }
+            }
+            _sugTemaIdx = 0;  // reseta índice pra pegar o novo estado
+            showNotification('Sugestões salvas! 🎯', 'success');
+        }
+
+        function restaurarSugestoesPadrao() {
+            if (!confirm('Restaurar os 8 temas padrão? Suas customizações serão perdidas ao salvar.')) return;
+            SUG_TEMAS = JSON.parse(JSON.stringify(SUG_TEMAS_DEFAULT));
+            _renderSugTemasList();
+            showNotification('Padrão restaurado. Clique em Salvar pra confirmar.', 'success');
+        }
+
+        // ════════════════════════════════════════════
         // ██  MANUTENÇÃO  █████████████████████████████
         // ════════════════════════════════════════════
 
@@ -6512,7 +6782,7 @@
                     </div>
                 </div>
             </div>
-            <button id="checkoutBtn" class="checkout-btn" onclick="checkout()" disabled>Finalizar Pedido 💳</button>
+            <button id="checkoutBtn" class="checkout-btn" onclick="checkout()" disabled>Ir para o Pagamento 💳</button>
         </div>
     </div>
 
@@ -6812,6 +7082,7 @@
 </script>
 
 <a class="floating-wa" href="https://wa.me/5551997655755" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+<a class="floating-reviews-mobile" href="https://www.google.com/search?sca_esv=11c72b9740f8d846&hl=pt-BR&q=C%C3%A3oTelli+%7C+Pet+Shop+Coment%C3%A1rios&sa=X&ved=2ahUKEwjJrYTa36WUAxXpGLkGHUKXCH0Q0bkNegQIJhAH" target="_blank" title="Avaliações no Google"><svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg><span class="frm-badge">5,0★</span></a>
 <a class="floating-reviews" href="https://www.google.com/search?sca_esv=11c72b9740f8d846&hl=pt-BR&q=C%C3%A3oTelli+%7C+Pet+Shop+Coment%C3%A1rios&sa=X&ved=2ahUKEwjJrYTa36WUAxXpGLkGHUKXCH0Q0bkNegQIJhAH" target="_blank" title="Ver avaliações no Google">
   <div class="frv-header">
     <img class="frv-logo" src="logo_caotelli.png" alt="CaoTelli">
@@ -6864,6 +7135,7 @@
     if (typeof verificarManutencao === 'function') verificarManutencao();
     if (typeof carregarOfertasFirestore === 'function') carregarOfertasFirestore().then(() => renderOfertasSite());
     if (typeof carregarDestaquesFirestore === 'function') carregarDestaquesFirestore();
+    if (typeof carregarSugestoesFirestore === 'function') carregarSugestoesFirestore();
   }, 1200);
 </script>
 </body>
