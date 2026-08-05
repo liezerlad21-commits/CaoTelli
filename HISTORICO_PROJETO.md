@@ -195,6 +195,74 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 05/08/2026 (VALIDAÇÃO DO CARTÃO EM PRODUÇÃO + FILTROS NA ABA PEDIDOS)
+
+### Parte 1 — Validação end-to-end do cartão ✅
+
+- Diogo comprou pelo site com cartão real (Teste PGTO, R$ 1,00)
+- Pedido apareceu no admin em segundos como **#1 / pago / R$ 1,00 / caotelli@gmail.com**
+- **Confirmado:** as Firestore rules publicadas ontem destravaram o guest checkout
+- **Confirmado:** o polling do frontend + registro no Firestore estão 100% operacionais em produção
+- Bug do "modo teste expirado" fechado definitivamente
+
+**Observação importante:** todos os pedidos anteriores ao dia 05/08 estão perdidos — nunca foram salvos no Firestore por causa das rules expiradas desde 19/06/2026. O #1 do Diogo é literalmente o primeiro pedido efetivo do sistema. Não tem como recuperar.
+
+### Parte 2 — Filtros na aba Pedidos do admin
+
+**Motivação:** Diogo perguntou "não tem como ver os pedidos de outros dias?" — o admin já buscava tudo do Firestore, mas sem UX de filtragem quando começar a acumular volume, ia virar uma tabela infinita.
+
+**O que foi feito no `index.html`:**
+
+- **Barra de filtros** acima da tabela (`#pedidosFiltros`) com:
+  - Chips de período: **[Hoje] [7 dias] [30 dias] [Mês atual] [Tudo]** — Tudo é o default ativo
+  - Range personalizado: dois inputs `type=date` (De → até), mutuamente exclusivo com os chips
+  - Campo de busca livre por cliente, nº do pedido, item ou Payment ID
+  - Resumo dinâmico à direita: "X pedidos • Total R$ Y" do período filtrado
+
+- **Refatorou `renderAdminPedidos`:**
+  - Agora só busca do Firestore uma vez e guarda em `_pedidosCache` (variável de escopo do script)
+  - Delegou a renderização pra nova função `aplicarFiltrosPedidos()` — mudança de filtro é instantânea, sem network
+  - Numeração do pedido é preservada (`#1` continua sendo `#1` em qualquer filtro — usa `_pedidosCache.indexOf(p)`)
+
+- **Novas funções:**
+  - `filtrarPedidosPeriodo(periodo, btn)` — chips
+  - `filtrarPedidosPersonalizado()` — inputs de data
+  - `_pedidoDentroDoPeriodo(p)` — lógica de filtro (usa `dataISO` se existir, senão `data`)
+  - `aplicarFiltrosPedidos()` — filtra + rerenderiza + atualiza resumo
+
+- **CSS novo:** classe `.pedido-chip` (`border-radius:20px`, hover em azul, ativo em `#0088C2` sólido)
+
+### Status ao encerrar (05/08/2026)
+
+**✅ Feito nesta sessão:**
+- Cartão real validado em produção (Diogo #1 pago R$1)
+- Filtros de período + busca + range personalizado na aba Pedidos
+- Cache em memória evita bater no Firestore a cada filtro
+- Numeração original preservada
+- Push feito: `feat: filtro de data + busca na aba Pedidos do admin` (commit `a230c3c`, 125+/5−)
+
+**📋 Próximos passos (na ordem de prioridade):**
+
+1. **Webhook + Firebase Admin SDK (belt and suspenders)** — hoje o registro depende do cliente ficar com a aba aberta durante o polling. Fazer o `/api/mp-webhook` salvar server-side com Firebase Admin garante que mesmo se o cliente fechar antes, o pedido é registrado.
+2. **Persistir carrinho no localStorage** — hoje recarregar a página perde tudo do carrinho
+3. **Auto-cadastro de cliente ao finalizar compra** — o card "Clientes" fica em 0 mesmo com pedidos porque comprar não cadastra
+4. **Botão "Registrar pedido manual" no admin** — pra Diogo digitar pedidos que vieram por WhatsApp/telefone
+5. **Checklist de pré-lançamento** — favicon, meta tags de SEO, testar em celular real, PWA opcional
+6. **Notificação por WhatsApp automática pro Diogo** — via API do WhatsApp Business (não urgente, e-mail nativo do MP já cobre)
+7. **Histórico de pedidos por cliente logado** — cliente ver as próprias compras
+8. **Painel de métricas do admin** — gráficos de vendas por dia/semana/mês
+9. **Configuração de frete por CEP** — Canoas + região metropolitana (aguarda lista de bairros do Diogo)
+
+**🔧 Detalhes técnicos pra lembrar:**
+- `_pedidosCache` só é populado quando `renderAdminPedidos` roda — se abrir a aba Pedidos direto no filtro, ele precisa carregar antes
+- Chips e range personalizado se desativam mutuamente (clicar chip zera as datas, mexer numa data zera os chips)
+- Filtro "Tudo" continua sendo o padrão ao abrir a aba (não persiste seleção entre sessões)
+- Ordenação continua descendente por data (mais recente em cima)
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 04/08/2026 (RESILIÊNCIA DO REGISTRO DE PEDIDOS + FIRESTORE RULES)
 
 ### Contexto

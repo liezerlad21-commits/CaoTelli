@@ -2199,6 +2199,14 @@
                 </div>
             </div>
 
+            <!-- MINHAS COMPRAS (histórico + comprar novamente) -->
+            <div id="minhasComprasBox" style="max-width:760px;margin:28px auto 0 auto;">
+                <h3 style="color:#0088C2;margin-bottom:14px;font-size:1.15rem;text-align:center;">🛒 Minhas Compras</h3>
+                <div id="minhasComprasList" style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="text-align:center;color:#5a6a85;font-size:.9rem;padding:16px">⏳ Carregando seu histórico...</div>
+                </div>
+            </div>
+
             <!-- FORMULÁRIO DE EDIÇÃO DE DADOS -->
             <div id="formEdicaoPerfil" style="display:none;max-width:560px;margin:24px auto 0 auto;">
                 <h3 style="color:#0088C2;margin-bottom:16px;font-size:1.1rem;text-align:center;">✏️ Editar Dados Cadastrais</h3>
@@ -3441,6 +3449,11 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
+
+            // Quando abrir o perfil, atualiza "Minhas Compras"
+            if (sectionId === 'profile' && typeof renderMinhasCompras === 'function') {
+                renderMinhasCompras();
+            }
 
             // Quando abrir o painel admin, atualiza o badge de pedidos novos
             // e passa a atualizar a cada 30s enquanto o admin está aberto
@@ -5486,7 +5499,8 @@
                 data:         new Date().toLocaleString('pt-BR'),
                 dataISO:      new Date().toISOString(),
                 cliente:      emailCliente,
-                itens:        cart.map(i => ({ name: i.name, qty: i.quantity, price: i.price })),
+                // Salva id + emoji/imgUrl junto — permite "Comprar novamente" achar o produto no catálogo atual
+                itens:        cart.map(i => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price, emoji: i.emoji || '', imgUrl: i.imgUrl || '' })),
                 total:        Number(total.toFixed(2)),
                 deliveryType: (typeof deliveryType !== 'undefined' ? deliveryType : 'entrega'),
                 status:       meta.status || 'pendente',
@@ -5495,6 +5509,10 @@
                 installments: meta.installments || null,
                 visualizado:  false, // pra badge do admin (Diogo marca como visto)
             };
+            // Guarda o email pra futuros carregamentos anônimos ("meu último pedido")
+            if (emailCliente && emailCliente !== 'Visitante') {
+                localStorage.setItem('caotelli_last_email', emailCliente);
+            }
             // Salva no localStorage (fallback local)
             const pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
             pedidos.push(pedido);
@@ -5537,6 +5555,12 @@
             // Atualiza o badge (aparece pro Diogo na hora, mesmo antes da confirmação)
             if (typeof atualizarBadgePedidos === 'function') atualizarBadgePedidos();
 
+            // Auto-cadastro do cliente (item de backlog) — se ele não estiver no localStorage/Firestore ainda,
+            // cria uma entrada mínima com os dados que ele preencheu no checkout.
+            if (emailCliente && emailCliente !== 'Visitante') {
+                try { await autoCadastrarClienteDoCheckout(emailCliente); } catch(e) { console.warn('auto-cadastro:', e); }
+            }
+
             // Retorna sucesso/falha explícito pra quem chamar (submitPix / submitCard)
             return {
                 docId,
@@ -5544,6 +5568,155 @@
                 firestoreOk: !firestoreError,
                 erro: firestoreError ? (firestoreError.code || firestoreError.message) : null,
             };
+        }
+
+        // ── Minhas Compras (histórico + comprar novamente) ─────────
+        let _minhasComprasCache = [];
+
+        async function renderMinhasCompras() {
+            const box  = document.getElementById('minhasComprasBox');
+            const list = document.getElementById('minhasComprasList');
+            if (!box || !list) return;
+
+            // Descobre o email do usuário atual (Firebase user > último email usado)
+            const email = (window._fbUser && window._fbUser.email) || localStorage.getItem('caotelli_last_email') || '';
+            if (!email) {
+                box.style.display = 'none';
+                return;
+            }
+            box.style.display = '';
+            list.innerHTML = '<div style="text-align:center;color:#5a6a85;font-size:.9rem;padding:16px">⏳ Carregando seu histórico...</div>';
+
+            // Carrega pedidos do cliente — tenta Firestore, cai pro localStorage
+            let pedidos = [];
+            if (window._db) {
+                try {
+                    const snap = await window._fsGetDocs(window._fsCol(window._db, 'pedidos'));
+                    snap.forEach(d => {
+                        const p = { _fsId: d.id, ...d.data() };
+                        if ((p.cliente || '').toLowerCase() === email.toLowerCase()) pedidos.push(p);
+                    });
+                } catch(e) {
+                    console.warn('Minhas compras (Firestore):', e);
+                }
+            }
+            if (!pedidos.length) {
+                const local = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]');
+                pedidos = local.filter(p => (p.cliente || '').toLowerCase() === email.toLowerCase());
+            }
+            // Do mais recente pro mais antigo
+            pedidos.sort((a,b) => new Date(b.dataISO || b.data) - new Date(a.dataISO || a.data));
+            _minhasComprasCache = pedidos;
+
+            if (!pedidos.length) {
+                list.innerHTML = `
+                    <div style="text-align:center;padding:24px;background:#f4f7fb;border-radius:12px;color:#5a6a85">
+                        <div style="font-size:2.4rem;margin-bottom:6px">🐾</div>
+                        <div style="font-weight:600;color:#1a2340">Você ainda não tem compras por aqui.</div>
+                        <div style="font-size:.85rem;margin-top:4px">Assim que fizer a primeira, ela aparece aqui pra você repetir num clique.</div>
+                    </div>`;
+                return;
+            }
+
+            const statusCor = { pago:'#22a06b', pendente:'#f59e0b', em_analise:'#f59e0b', entregue:'#0088C2', cancelado:'#D6324A' };
+            list.innerHTML = pedidos.map((p, idx) => {
+                const st = (p.status || 'pendente').toLowerCase();
+                const cor = statusCor[st] || '#5a6a85';
+                const itensResumo = (p.itens || []).map(i => `${i.qty}× ${i.name}`).join(', ');
+                return `
+                <div style="background:#fff;border:1px solid #e4eaf3;border-radius:12px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;box-shadow:0 2px 6px rgba(0,0,0,0.03)">
+                    <div style="flex:1;min-width:240px">
+                        <div style="font-size:.78rem;color:#5a6a85;margin-bottom:2px">${p.data || '-'}</div>
+                        <div style="font-weight:600;color:#1a2340;font-size:.95rem;line-height:1.35;margin-bottom:4px">${itensResumo || 'Pedido sem itens'}</div>
+                        <div style="display:flex;gap:10px;align-items:center;font-size:.82rem">
+                            <span style="color:#0088C2;font-weight:700">R$ ${(p.total||0).toFixed(2)}</span>
+                            <span style="background:${cor}20;color:${cor};padding:2px 8px;border-radius:10px;font-weight:600;text-transform:capitalize">${(p.status||'pendente').replace('_',' ')}</span>
+                        </div>
+                    </div>
+                    <button onclick="comprarNovamente(${idx})"
+                        style="background:linear-gradient(135deg,#0088C2,#005f8a);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:.9rem;padding:10px 18px;cursor:pointer;white-space:nowrap;box-shadow:0 3px 8px rgba(0,136,194,0.25)">
+                        🔁 Comprar novamente
+                    </button>
+                </div>`;
+            }).join('');
+        }
+
+        // Adiciona todos os itens do pedido idx ao carrinho, abre o carrinho, e avisa se algum item saiu do catálogo.
+        function comprarNovamente(idx) {
+            const pedido = _minhasComprasCache[idx];
+            if (!pedido || !pedido.itens || !pedido.itens.length) {
+                showNotification('Não achei os itens deste pedido.', 'error');
+                return;
+            }
+            let adicionados = 0;
+            const faltando = [];
+            for (const item of pedido.itens) {
+                // Tenta achar por id primeiro (pedidos novos), depois por nome (retrocompat)
+                let produto = null;
+                if (item.id != null) produto = products.find(p => p.id === item.id);
+                if (!produto && item.name) produto = products.find(p => p.name === item.name);
+                if (!produto) {
+                    faltando.push(item.name);
+                    continue;
+                }
+                // Adiciona no carrinho respeitando a quantidade original
+                const existente = cart.find(c => c.id === produto.id);
+                if (existente) {
+                    existente.quantity += (item.qty || 1);
+                } else {
+                    cart.push({ ...produto, quantity: item.qty || 1 });
+                }
+                adicionados++;
+            }
+            updateCart();
+            if (adicionados) {
+                showNotification(`🎉 ${adicionados} item${adicionados > 1 ? 'ns' : ''} adicionado${adicionados > 1 ? 's' : ''} ao carrinho!`);
+                // Abre o carrinho pra o cliente conferir
+                if (typeof openCart === 'function') openCart();
+                else if (typeof toggleCart === 'function') toggleCart();
+                else { const m = document.getElementById('cartModal'); if (m) m.classList.add('active'); }
+            }
+            if (faltando.length) {
+                const nomes = faltando.slice(0,3).join(', ') + (faltando.length > 3 ? '…' : '');
+                showNotification(`⚠️ Fora do catálogo: ${nomes}`, 'error');
+            }
+        }
+
+        // Cria uma entrada mínima na coleção "clientes" a partir do form do checkout, se ainda não existir.
+        // Assim o card "Clientes" no admin acompanha o volume de vendas.
+        async function autoCadastrarClienteDoCheckout(email) {
+            const lista = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+            const jaExiste = lista.some(c => (c.email || '').toLowerCase() === email.toLowerCase());
+
+            // Puxa dados do form de pagamento se existirem (não obrigatório)
+            const nome     = (document.getElementById('payerName')?.value || '').trim();
+            const cpf      = (document.getElementById('payerCPF')?.value || '').trim();
+            const telefone = (document.getElementById('payerPhone')?.value || '').trim();
+
+            // Se está logado no Firebase e não temos nome do form, usa o displayName
+            const nomeFinal = nome || (window._fbUser && window._fbUser.displayName) || email.split('@')[0];
+
+            const dados = {
+                nome:     nomeFinal,
+                email,
+                telefone,
+                cpf,
+                endereco: '',
+                pets:     [],
+                cadastro: new Date().toLocaleDateString('pt-BR'),
+                origem:   'checkout',
+            };
+
+            if (!jaExiste) {
+                lista.push(dados);
+                localStorage.setItem('caotelli_clientes', JSON.stringify(lista));
+            }
+            // Firestore: usa email como docId → merge não sobrescreve dados anteriores se cliente já existir
+            if (window._db) {
+                try {
+                    await window._fsSetDoc(window._fsDoc(window._db, 'clientes', email), dados, { merge: true });
+                } catch(e) { console.warn('Firestore auto-cadastro:', e); }
+            }
         }
 
         // Tenta reprocessar pedidos que ficaram na fila local (falharam de salvar no Firestore)
@@ -6375,6 +6548,8 @@
         const nome = user.displayName || user.email.split('@')[0];
         document.getElementById('perfilNomeLogado').textContent  = '👋 Olá, ' + nome + '!';
         document.getElementById('perfilEmailLogado').textContent = user.email;
+        // Recarrega o histórico de compras assim que o auth muda
+        if (typeof renderMinhasCompras === 'function') { try { renderMinhasCompras(); } catch(e) {} }
       } else {
         logado.style.display    = 'none';
         deslogado.style.display = '';
