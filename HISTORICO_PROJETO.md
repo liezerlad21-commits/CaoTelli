@@ -268,36 +268,208 @@ ae05318 Atualizacao do site CaoTelli
 - **Variáveis de estado:** `_resultadosBusca`, `_termoBuscaAtual`, `_ordemBuscaAtual`, `_ultimaCategoria`, `_ultimoPetFiltro`
 - **Não incluí "Maior Desconto"** — hoje todos os produtos têm o mesmo desconto global de 10% de 1ª compra, então essa ordenação não teria efeito visível
 
+### Parte 4 — Refinamentos pós-feedback (Diogo)
+
+**Feedback do Diogo depois do primeiro push:**
+
+- **Botão do carrinho renomeado:** "Finalizar Pedido 💳" → "**Ir para o Pagamento 💳**" (mais claro sobre o que vai acontecer)
+- **Dropdown de ordenação movido:** estava no header ao lado do botão de busca, virou uma barra acima da grade de produtos alinhada à direita (padrão Mercado Livre). Card branco com sombra sutil + rótulo "Ordenar por". Removido do `.search-bar` pra não duplicar.
+- **CSS novo:** `.products-toolbar`, `.products-sort-wrap`, `.products-sort-label`
+
+### Parte 5 — Admin de sugestões: CRUD completo
+
+**Motivação:** Diogo pediu controle total sobre o que aparece nas sugestões do carrinho.
+
+**Nova aba admin `🎯 Sugestões`:**
+
+- **Cards de tema editáveis:**
+  - ☑️ Toggle Ativo/Inativo (desativado fica opaco)
+  - 👁️ Preview em tempo real da pergunta (com negrito vermelho já aplicado)
+  - Campos editáveis: Emoji, Título (usa `**palavra**` markdown que vira `<strong>` vermelho), Subtítulo, Categoria
+  - **Modo de produtos:**
+    - 🎲 **Aleatório da categoria** (default — pega random)
+    - ✋ **Escolher produtos** — mostra grid de checkboxes com todos os produtos daquela categoria; Diogo marca só os que quer
+  - 🗑️ Botão remover (com confirm)
+- **+ Novo Tema** — adiciona template em branco (id auto-gerado `t${Date.now()}`)
+- **💾 Salvar Sugestões** — persiste em localStorage + Firestore
+- **🔄 Restaurar Padrão** — volta aos 8 temas originais (com confirm)
+
+**Persistência:**
+- LocalStorage: `caotelli_sug_temas`
+- Firestore: `config/sugestoes.temas` (mesmo pattern de destaques/ofertas)
+- `carregarSugestoesFirestore()` chamado no boot da página + ao abrir a aba admin (sincroniza entre dispositivos)
+
+**Refatoração de `renderCartSuggestions()`:**
+- Só considera `t.ativo !== false`
+- Se `t.modo === 'manual'` + `produtosManual.length > 0` → só produtos escolhidos
+- Se `t.modo === 'auto'` → aleatório da categoria (como antes)
+- Pula temas sem produtos disponíveis (evita sidebar vazio)
+
+**Estrutura de um tema:**
+```js
+{
+  id: 't1', ativo: true, cat: 'brinquedos',
+  emoji: '🎾',
+  titulo: 'Seu pet não está precisando de **brinquedos**?',
+  sub: 'Diversão nunca é demais 🐾',
+  modo: 'auto',           // 'auto' | 'manual'
+  produtosManual: []      // array de IDs (só usado se modo='manual')
+}
+```
+
+**Novas funções JS:** `carregarSugestoesLocal`, `salvarSugestoesLocal`, `carregarSugestoesFirestore`, `salvarSugestoes`, `renderAdminSugestoes`, `_renderSugTemasList`, `_templateSugTema`, `_templateProdutosManual`, `_updateSugTema`, `_updateSugTemaCat`, `_updateSugTemaModo`, `_toggleProdutoManual`, `_removerSugTema`, `adicionarTemaSugestao`, `restaurarSugestoesPadrao`, `_renderTituloTema` (parser `**` → `<strong>`), `_escAttr` (escape HTML), `CATEGORIAS_LABEL` map.
+
+### Parte 6 — Balão de reviews vira botão circular Google no mobile
+
+**Motivação:** Diogo mostrou print do celular — o card lateral esquerdo estava ocupando muito espaço na tela pequena. Pediu pra virar um botão circular flutuante igual ao do WhatsApp.
+
+**Solução:**
+- **Desktop (> 640px):** mantém o card lateral rotativo (como estava)
+- **Mobile (≤ 640px):**
+  - Card `.floating-reviews` fica `display: none !important`
+  - Aparece `.floating-reviews-mobile` — botão circular 54×54px, empilhado acima do WhatsApp (`bottom: 170px; right: 28px`)
+  - SVG oficial do Google com 4 cores
+  - **Badge amarelo `5,0★`** no canto superior direito pra chamar atenção
+  - Toque abre a mesma página de reviews do Google
+  - Efeito scale no hover/tap
+
+### Parte 7 — Checkout completo: endereço + horário + forma de pagamento + troco
+
+**Motivação:** hoje o fluxo de checkout não coletava informações críticas — só ia direto pro modal PIX/Cartão. Diogo pediu:
+1. Formulário de endereço quando "Entrega" selecionada
+2. Seletor de forma de pagamento (Pix/Dinheiro/Cartão) — badges eram só decorativas
+3. Campo de troco quando Dinheiro selecionado
+4. Horários de entrega em slots de 3h
+
+**7.1 Formulário de endereço (aparece quando `deliveryType === 'entrega'`):**
+
+- Campos: **nome do destinatário*, CEP** (máscara + integração ViaCEP auto-preenche rua/bairro), **rua*, número*, complemento, bairro*, referência**
+- **Auto-preenchimento:** prioridade → localStorage → perfil do cliente (Firebase auth + `caotelli_clientes`)
+- **Persiste em:** `localStorage.caotelli_endereco_entrega`
+- **Validação:** campos obrigatórios ficam com borda vermelha + fundo rosa, notificação, scroll suave até o form
+- CSS: `.form-endereco`, `.fe-title`, `.fe-grid`, `.fe-field`, `.fe-full`, `.invalid`
+
+**7.2 Horário de entrega (aparece acima do endereço):**
+
+- **3 chips de dia:** Hoje / Amanhã / Depois de amanhã (mostra label tipo "Ter 07/08" pra depois)
+- **4 slots de 3h:**
+  - ⏰ 10:00 — 12:30
+  - ⏰ 12:30 — 15:30
+  - ⏰ 15:30 — 18:30
+  - ⏰ 18:30 — 21:30
+- **Lógica inteligente:**
+  - Slots do dia de hoje que já passaram (ou faltam menos de 1h pro início) ficam desabilitados (opacity 0.4, cursor not-allowed)
+  - Se nenhum slot sobrar hoje → aviso vermelho "⚠️ Nenhum horário disponível hoje. Escolha outro dia."
+- **Visual:** paleta amarela/dourada pra diferenciar do endereço (azul) e pagamento (rosa)
+- **Persistência:** `localStorage.caotelli_horario_entrega` (com `diaOffset` e `slotIdx`)
+- **Restauração:** se o slot salvo é de hoje e já passou, ignora
+- **Validação:** se cliente não escolheu slot ao clicar em "Ir para o Pagamento" → notificação + shake animation + scroll
+
+**7.3 Formas de pagamento selecionáveis + troco:**
+
+- Badges Pix/Dinheiro/Cartão viraram **radios clicáveis** (`.formas-pgto-item` com input radio escondido)
+- Clicando `💵 Dinheiro` expande painel: **"Precisa de troco?"** (radio Não/Sim)
+- Se Sim → input "Troco para quanto?" com máscara "R$ 000,00"
+- Persiste em `localStorage.caotelli_forma_pagamento` = `{ forma, precisaTroco, trocoValor }`
+- `restaurarFormaPagamentoLocal()` chamado ao abrir carrinho
+
+**7.4 Integração no pedido salvo:**
+
+- `registrarPedido()` agora inclui no objeto do pedido:
+  - `enderecoEntrega`: `{ nome, cep, rua, numero, complemento, bairro, referencia }` ou `null`
+  - `horarioEntrega`: `{ dataISO, dataLabel, slotStart, slotEnd }` ou `null`
+  - `formaPagamentoPref`: `{ forma, precisaTroco, trocoValor }`
+- Vai pro Firestore automaticamente na mesma coleção `pedidos`
+
+**7.5 Fluxo de validação em `checkout()`:**
+1. Se carrinho vazio → notificação + return
+2. Se entrega + horário não escolhido → notificação + shake + return
+3. Se entrega + endereço incompleto → destaca campos vermelhos + return
+4. Passou tudo → abre modal MP
+
+### Parte 8 — Modal de detalhes do pedido no admin
+
+**Motivação:** Diogo precisa ver toda essa info nova (endereço, horário, forma de pagamento, troco) em algum lugar do painel admin.
+
+- **Botão 🔍** adicionado na coluna Ação da tabela de pedidos
+- **Modal `#pedidoDetalheOverlay`** dinâmico (criado on-the-fly, removido ao fechar):
+  - Header: `📋 Pedido #N` + data + cliente
+  - **Bloco Entrega (azul):** nome, rua+número+complemento, bairro+CEP, referência com 📍
+  - **Horário destacado em amarelo** dentro do bloco entrega: "⏰ Amanhã — 12:30 às 15:30"
+  - **Bloco Forma de pagamento (rosa):** ícone + nome + se dinheiro com troco → aviso vermelho ⚠️ "Precisa de troco pra R$ X,XX"
+  - **Bloco Itens (branco):** lista com emoji + nome × qtd + subtotal, com total destacado
+  - Payment ID em `<code>` se houver
+- **Botão "📋 Copiar msg pro cliente"** (só aparece se tem nome no endereço) — copia mensagem pronta pro WhatsApp
+- Overlay fecha clicando fora ou no ✕
+- **Novas funções:** `abrirDetalhePedido(idx)`, `fecharDetalhePedido(e)`, `whatsappCliente(nomeEncoded, fsId)`
+
+### Discussão importante — LGPD/Privacidade
+
+**Diogo perguntou:** "eles conseguiam saber o nome e o telefone da pessoa que estava vendo o site mesmo sem ela ter feito cadastro — tem como?"
+
+**Resposta:** **tecnicamente não** (o navegador não expõe PII pra websites), e o que dá pra fazer com data brokers (RB2B, Clearbit, Warmly, LeadFeeder) é **ilegal no Brasil pela LGPD** — multa até 2% do faturamento, teto de R$ 50 milhões por violação.
+
+**O que "concorrentes" que alegam isso podem estar fazendo:**
+1. Retargeting via Facebook Pixel / Google Ads (loja não recebe o nome, só o Facebook mostra ad pra pessoa depois)
+2. Data brokers ilegais (risco jurídico)
+3. Marketing agressivo/mentira
+
+**Alternativas legais recomendadas ao Diogo:**
+- Widget WhatsApp flutuante
+- Pop-up exit intent com cupom em troca do e-mail (com consentimento)
+- Recuperação de carrinho abandonado (só funciona se cliente já logou/checkoutou)
+- Formulário "quero receber ofertas" no rodapé
+
+**Decisão:** não seguir esse caminho no CãoTelli.
+
 ### Status ao encerrar (05/08/2026 noite)
 
-**✅ Feito nesta sessão:**
-- Balão Google reviews virou carrossel automático com fade + slide-in animation da lateral esquerda
-- Sugestões contextuais rotativas no carrinho (sidebar desktop + fallback mobile) com 8 temas
-- Ordenação global de produtos permanente no header (funciona em busca e categoria)
-- Push feito: `feat: sugestões contextuais no carrinho + ordenação global de produtos` (commit `c90106e`, 268+/34−)
+**✅ Feito nesta sessão (partes 1-8):**
+- Balão Google reviews virou carrossel automático rotativo (desktop) + botão circular Google (mobile)
+- Sugestões contextuais no carrinho com 8 temas rotativos (sidebar desktop + fallback mobile)
+- Aba admin CRUD completa de sugestões (toggle, edição, produtos manuais, Firestore)
+- Ordenação global de produtos (5 modos) — dropdown acima da grade
+- Botão do carrinho renomeado pra "Ir para o Pagamento 💳"
+- Formulário de endereço de entrega (com ViaCEP auto-preenche)
+- Seleção de horário de entrega em 4 slots de 3h × 3 dias
+- Forma de pagamento selecionável + campo de troco pro Dinheiro
+- Modal de detalhes do pedido no admin (endereço + horário + forma pgto + troco + itens + copiar msg WhatsApp)
+- Discussão LGPD sobre rastreamento de visitantes — descartado por risco jurídico
 
-**📋 Próximos passos (mesma priorização de mais cedo):**
+**Pushes:**
+- `c90106e` — sugestões contextuais + ordenação global (partes 1-3, feito antes do meio da sessão)
+- **Push atual (pendente ao encerrar):** partes 4-8 juntas — sugestão de commit: `feat: admin sugestões CRUD + checkout completo (endereço + horário + pgto + troco) + modal detalhes admin + botão Google mobile`
 
-1. **Webhook + Firebase Admin SDK (belt and suspenders)** — hoje o registro depende do cliente ficar com a aba aberta durante o polling. Fazer o `/api/mp-webhook` salvar server-side com Firebase Admin garante que mesmo se o cliente fechar antes, o pedido é registrado.
+**📋 Próximos passos (backlog atualizado):**
+
+1. **Webhook + Firebase Admin SDK (belt and suspenders)** — hoje o registro depende do cliente ficar com a aba aberta durante o polling
 2. **Persistir carrinho no localStorage** — hoje recarregar a página perde tudo do carrinho
-3. **Auto-cadastro de cliente ao finalizar compra** — card "Clientes" fica em 0 mesmo com pedidos porque comprar não cadastra
+3. **Auto-cadastro de cliente ao finalizar compra** — usar dados do form de endereço pra popular a coleção `clientes` automaticamente
 4. **Botão "Registrar pedido manual" no admin** — pra Diogo digitar pedidos que vieram por WhatsApp/telefone
-5. **Checklist de pré-lançamento** — favicon, meta tags de SEO, testar em celular real, PWA opcional
-6. **Notificação por WhatsApp automática pro Diogo** — via API do WhatsApp Business (não urgente, e-mail nativo do MP já cobre)
-7. **Histórico de pedidos por cliente logado** — cliente ver as próprias compras
-8. **Painel de métricas do admin** — gráficos de vendas por dia/semana/mês
-9. **Configuração de frete por CEP** — Canoas + região metropolitana (aguarda lista de bairros do Diogo)
-10. **Google Places API** — puxar as avaliações reais em vez das hardcoded (opcional, paga)
-11. **Descontos por produto** — habilitar a opção "Maior Desconto" no dropdown de ordenação (hoje só tem desconto global de 10% de 1ª compra)
+5. **Painel admin de gerenciamento de horários** — bloquear feriados, ajustar slots por dia da semana (domingo etc), pausar horários específicos
+6. **Frete por CEP/bairro** — Canoas + região metropolitana (aguarda lista de bairros do Diogo)
+7. **Checklist de pré-lançamento** — favicon, meta tags de SEO, testar em celular real, PWA opcional
+8. **Notificação por WhatsApp automática pro Diogo** — via API do WhatsApp Business
+9. **Histórico de pedidos por cliente logado** — cliente ver as próprias compras
+10. **Painel de métricas do admin** — gráficos de vendas por dia/semana/mês
+11. **Google Places API** — reviews reais em vez das hardcoded (opcional, paga)
+12. **Descontos por produto** — habilitar a opção "Maior Desconto" no dropdown
 
 **🔧 Detalhes técnicos pra lembrar:**
-- Sidebar de sugestões só existe no desktop (>900px) — no mobile o CSS a esconde e usa o container horizontal dentro do carrinho
+- Sidebar de sugestões só no desktop (>900px); mobile usa container horizontal dentro do carrinho
 - Rotação de sugestões só dispara enquanto `#cartModal.active` — não consome CPU quando fechado
-- Ordenação "Relevante" mantém a ordem do filtro/categoria original (não faz nada)
-- "Novidades" usa `id` descendente — assume que ids maiores = produtos mais recentes (atualmente id 55 é o mais novo)
-- O balão de reviews **não** está integrado à Google Places API — reviews são fictícias mas realistas; editar o array `reviews` no `<script>` inline abaixo do `<a class="floating-reviews">`
-- Textos das sugestões estão no array `SUG_TEMAS` — editar direto no `<script>` do carrinho pra adicionar mais temas ou mudar o tom
-- Balão de reviews tem animação de entrada com delay 600ms — foi proposital pra não competir com o load inicial do site
+- Ordenação "Relevante" mantém a ordem do filtro original (no-op)
+- "Novidades" usa `id` descendente (assume ids maiores = produtos mais recentes)
+- Balão de reviews **não** está integrado à Google Places API — reviews são fictícias mas realistas
+- Textos das sugestões estão no array `SUG_TEMAS_DEFAULT` (padrão) e Firestore `config/sugestoes.temas` (customizado); admin usa `SUG_TEMAS` (variável mutável)
+- Título de tema usa markdown `**palavra**` → convertido em `<strong>` pelo `_renderTituloTema()`
+- Endereço tem integração automática com ViaCEP — só bate na API se CEP tiver 8 dígitos
+- Horários de entrega: slot fica disponível até 1h antes do início (buffer)
+- Slot "de hoje" já passado não é oferecido; se todos passaram, avisa e sugere outro dia
+- Modal de detalhes do pedido é criado dinamicamente e removido ao fechar (não polui o DOM)
+- Botão "Copiar msg pro cliente" usa `navigator.clipboard.writeText` — só funciona em HTTPS (produção OK)
+- `_heSlotEstaNoFuturo()` compara com data atual — o slot vira "no futuro" à meia-noite quando o dia muda
+- Balão Google no mobile empilha ACIMA do WhatsApp (bottom: 170px vs bottom: 102px do WA) — se adicionar mais botões flutuantes, ajustar bottom em cascata
 
 ---
 
