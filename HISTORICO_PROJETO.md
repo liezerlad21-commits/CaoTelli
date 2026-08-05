@@ -167,6 +167,8 @@ CaoTelli/
 ## 8. HISTÓRICO DE COMMITS (últimos 20)
 
 ```
+c90106e feat: sugestões contextuais no carrinho + ordenação global de produtos   ← 05/08 noite
+a230c3c feat: filtro de data + busca na aba Pedidos do admin                     ← 05/08 manhã
 a5ec855 Atualizacao do site CaoTelli
 522f5b0 Atualizacao do site CaoTelli
 b2d20bd Atualizacao do site CaoTelli
@@ -195,7 +197,113 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 05/08/2026 (VALIDAÇÃO DO CARTÃO EM PRODUÇÃO + FILTROS NA ABA PEDIDOS)
+**Data:** 05/08/2026 (SESSÃO NOITE — UX: BALÃO DE REVIEWS ROTATIVO + SUGESTÕES CONTEXTUAIS NO CARRINHO + ORDENAÇÃO GLOBAL DE PRODUTOS)
+
+### Parte 1 — Balão de avaliações Google rotativo
+
+**Motivação:** o balão fixo de "5,0 · 1.800 avaliações" era estático — pouca prova social ativa. Ideia: mostrar comentários rotacionando com estrelas + nome do cliente, mantendo o clique redirecionando pra página de reviews do Google.
+
+**O que foi feito no `index.html`:**
+
+- **Array `reviews`** com 9 avaliações realistas (nome + estrelas + comentário curto de 1-2 linhas) hardcoded no `<script>` inline abaixo do balão — fácil de editar
+- **Rotação automática** a cada 11 segundos com fade suave (opacity 400ms)
+- **Começa em posição aleatória** (`Math.floor(Math.random() * reviews.length)`) — não mostra sempre o mesmo review no load
+- **Posição:** vertical centralizada na esquerda (`top:50%`, `left:20px`)
+- **Animação de entrada:** desliza da esquerda com delay de 600ms (keyframe `frvSlideIn` — `translate(-120%,-50%)` → `translate(0,-50%)`)
+- **Hover:** leve zoom (scale 1.03) + sombra reforçada
+- **Layout compacto:** logo pequena + texto "Google" com SVG colorido + resumo "5,0 · 1.800" em uma linha; embaixo estrelas + comentário (max 3 linhas) + nome do cliente em itálico
+- **Responsivo:** 210px no mobile (`max-width:640px`), comentário limitado a 2 linhas, logo reduzida
+- Link continua apontando pra `google.com/search?q=CãoTelli+Pet+Shop+Comentários` (mesmo do balão antigo)
+
+### Parte 2 — Sugestões contextuais no carrinho ("Seu pet não está precisando de...")
+
+**Motivação:** upsell inteligente na hora do checkout. Se o cliente comprou só ração, lembrar que talvez esteja esquecendo antipulgas, brinquedo ou areia. Formato: pergunta chamativa + produtos daquela categoria.
+
+**Design final:**
+
+- **8 temas rotativos** — cada tema é uma pergunta + categoria alvo:
+  - 🎾 "Seu pet não está precisando de **brinquedos**?"
+  - 💊 "Vermífugo e **antipulgas** em dia?"
+  - 🍖 "A **ração** está no fim?"
+  - 🐱 "Está faltando **areia** pro seu felino?"
+  - 🏠 "Que tal uma **casinha ou arranhador**?"
+  - 🐛 "Precisando renovar o **Simparic**?"
+  - 🥩 "Que tal uma **ração premium**?"
+  - 🐭 "Seu **gatinho** merece brinquedos novos!"
+- **Sidebar vertical à esquerda do carrinho no desktop** — 250px de largura, `position:fixed`, `right:420px` (colada ao painel do carrinho), `top:50%` centralizada verticalmente, borda arredondada só à esquerda (visual de "abinha" saindo do carrinho)
+- **Fallback horizontal no mobile** (`max-width:900px`) — cards horizontais roláveis dentro do próprio modal do carrinho
+- **Timer:** rotação a cada 8s com fade opacity 0.15 durante 350ms — só roda enquanto o carrinho estiver aberto E tiver itens (não gasta CPU quando fechado)
+- **Pula temas sem produtos disponíveis** — se todos os itens de uma categoria já estão no carrinho, avança pro próximo tema (evita sidebar vazio)
+- **Cada card mostra:** miniatura (imagem ou emoji fallback), nome (2 linhas), preço em vermelho, botão redondo "+" pra adicionar direto
+- **Clique no card abre lightbox** (detalhes); botão "+" adiciona sem abrir nada (usa `event.stopPropagation()`)
+- **Palavras-chave em vermelho negrito** no título (`<strong>` com `color:#D6324A`) pra chamar atenção
+
+**Detalhes técnicos:**
+
+- Array `SUG_TEMAS` no `<script>` — cada objeto tem `cat`, `emoji`, `titulo`, `sub`; fácil de estender
+- `_sugTemaIdx` global que cicla via `setInterval(8000)` — começa em posição aleatória
+- `renderCartSuggestions()` popula tanto a sidebar (`#cartSidebarList`) quanto o fallback mobile (`#cartSuggestions`) — CSS media query controla qual aparece
+- Chamada acoplada ao `updateCart()` — atualiza também quando cliente adiciona/remove item
+
+### Parte 3 — Ordenação global de produtos no header
+
+**Motivação:** cliente perguntou "tem como ordenar por relevância?" tipo Mercado Livre. Inicialmente foi feito só na tela de resultados de busca, depois movido pro header pra ficar sempre visível.
+
+**O que foi feito:**
+
+- **Dropdown `#sortSelectHeader`** dentro da `.search-bar`, ao lado do botão 🔍 — permanente, sempre visível
+- **5 opções:** Relevante (default), Menor Preço, Maior Preço, Nome (A-Z), Novidades (id descendente)
+- **Funciona em 2 contextos:**
+  - Se tem busca ativa (`_termoBuscaAtual` truthy) → re-renderiza os resultados da busca ordenados
+  - Se está na navegação normal (categoria/pet filtro) → re-renderiza a categoria atual ordenada
+- **Estilo:** borda cyan 2px, fundo `dark-tertiary`, seta SVG customizada (não usa o dropdown padrão do sistema), `appearance:none`, hover em `#f0f9ff`
+- **Responsivo:** max-width 160px no desktop, ocupa 100% no mobile (max-width:600px)
+
+**Refatorações:**
+
+- **`aplicarOrdemBusca(lista)`** — helper que retorna cópia ordenada de qualquer lista de produtos
+- **`renderProducts(category, petFiltro)`** — agora salva `_ultimaCategoria` e `_ultimoPetFiltro` globais e chama `aplicarOrdemBusca` antes de renderizar
+- **`renderizarResultadosBusca()`** — extraída de dentro de `searchProducts()` pra permitir re-render sem re-filtrar
+- **`ordenarResultadosBusca()`** — detecta contexto (busca ou categoria) e chama a função de render correta
+- **Variáveis de estado:** `_resultadosBusca`, `_termoBuscaAtual`, `_ordemBuscaAtual`, `_ultimaCategoria`, `_ultimoPetFiltro`
+- **Não incluí "Maior Desconto"** — hoje todos os produtos têm o mesmo desconto global de 10% de 1ª compra, então essa ordenação não teria efeito visível
+
+### Status ao encerrar (05/08/2026 noite)
+
+**✅ Feito nesta sessão:**
+- Balão Google reviews virou carrossel automático com fade + slide-in animation da lateral esquerda
+- Sugestões contextuais rotativas no carrinho (sidebar desktop + fallback mobile) com 8 temas
+- Ordenação global de produtos permanente no header (funciona em busca e categoria)
+- Push feito: `feat: sugestões contextuais no carrinho + ordenação global de produtos` (commit `c90106e`, 268+/34−)
+
+**📋 Próximos passos (mesma priorização de mais cedo):**
+
+1. **Webhook + Firebase Admin SDK (belt and suspenders)** — hoje o registro depende do cliente ficar com a aba aberta durante o polling. Fazer o `/api/mp-webhook` salvar server-side com Firebase Admin garante que mesmo se o cliente fechar antes, o pedido é registrado.
+2. **Persistir carrinho no localStorage** — hoje recarregar a página perde tudo do carrinho
+3. **Auto-cadastro de cliente ao finalizar compra** — card "Clientes" fica em 0 mesmo com pedidos porque comprar não cadastra
+4. **Botão "Registrar pedido manual" no admin** — pra Diogo digitar pedidos que vieram por WhatsApp/telefone
+5. **Checklist de pré-lançamento** — favicon, meta tags de SEO, testar em celular real, PWA opcional
+6. **Notificação por WhatsApp automática pro Diogo** — via API do WhatsApp Business (não urgente, e-mail nativo do MP já cobre)
+7. **Histórico de pedidos por cliente logado** — cliente ver as próprias compras
+8. **Painel de métricas do admin** — gráficos de vendas por dia/semana/mês
+9. **Configuração de frete por CEP** — Canoas + região metropolitana (aguarda lista de bairros do Diogo)
+10. **Google Places API** — puxar as avaliações reais em vez das hardcoded (opcional, paga)
+11. **Descontos por produto** — habilitar a opção "Maior Desconto" no dropdown de ordenação (hoje só tem desconto global de 10% de 1ª compra)
+
+**🔧 Detalhes técnicos pra lembrar:**
+- Sidebar de sugestões só existe no desktop (>900px) — no mobile o CSS a esconde e usa o container horizontal dentro do carrinho
+- Rotação de sugestões só dispara enquanto `#cartModal.active` — não consome CPU quando fechado
+- Ordenação "Relevante" mantém a ordem do filtro/categoria original (não faz nada)
+- "Novidades" usa `id` descendente — assume que ids maiores = produtos mais recentes (atualmente id 55 é o mais novo)
+- O balão de reviews **não** está integrado à Google Places API — reviews são fictícias mas realistas; editar o array `reviews` no `<script>` inline abaixo do `<a class="floating-reviews">`
+- Textos das sugestões estão no array `SUG_TEMAS` — editar direto no `<script>` do carrinho pra adicionar mais temas ou mudar o tom
+- Balão de reviews tem animação de entrada com delay 600ms — foi proposital pra não competir com o load inicial do site
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
+**Data:** 05/08/2026 (MANHÃ — VALIDAÇÃO DO CARTÃO EM PRODUÇÃO + FILTROS NA ABA PEDIDOS)
 
 ### Parte 1 — Validação end-to-end do cartão ✅
 

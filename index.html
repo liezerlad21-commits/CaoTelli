@@ -245,7 +245,11 @@
             margin: 0;
             animation: fadeIn 0.3s ease;
         }
-        .search-header { display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-bottom:15px;padding:10px 14px;background:#fff;border:1.5px solid #e4eaf3;border-radius:12px; }
+        .search-header { display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:10px 14px;background:#fff;border:1.5px solid #e4eaf3;border-radius:12px;flex:1;min-width:200px; }
+        /* Toolbar acima do grid: cabeçalho da busca (esq) + ordenação (dir) */
+        .products-toolbar { display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:20px; }
+        .products-sort-wrap { display:flex;align-items:center;gap:8px;background:#fff;padding:8px 12px;border:1.5px solid #e4eaf3;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.04); }
+        .products-sort-label { font-size:14px;font-weight:600;color:var(--text-gray);white-space:nowrap; }
         /* Dropdown de ordenação no header (ao lado do botão de busca) */
         .search-sort-inline { padding:10px 32px 10px 12px;border:2px solid var(--primary-cyan);border-radius:8px;background:var(--dark-tertiary) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230088C2'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 8px center;background-size:16px;color:var(--text-light);font-size:14px;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;transition:.2s;min-width:0;max-width:160px; }
         .search-sort-inline:hover { background-color:#f0f9ff; }
@@ -1938,13 +1942,6 @@
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Buscar produtos...">
                 <button onclick="searchProducts()" title="Buscar">🔍</button>
-                <select id="sortSelectHeader" class="search-sort-inline" onchange="ordenarResultadosBusca()" title="Ordenar produtos">
-                    <option value="relevante">Relevante</option>
-                    <option value="menor">Menor Preço</option>
-                    <option value="maior">Maior Preço</option>
-                    <option value="nome">Nome (A-Z)</option>
-                    <option value="novidades">Novidades</option>
-                </select>
             </div>
             <div class="header-icons">
 <div class="header-icon" onclick="toggleCart()">
@@ -2101,8 +2098,20 @@
 
     <section class="section" id="produtosSection">
         <h2 class="section-title">📦 Nossos Produtos</h2>
-        <div id="searchHeader" class="search-header" style="display:none">
-            <div id="searchResultTitle" class="search-title"></div>
+        <div class="products-toolbar">
+            <div id="searchHeader" class="search-header" style="display:none">
+                <div id="searchResultTitle" class="search-title"></div>
+            </div>
+            <div class="products-sort-wrap">
+                <label for="sortSelectHeader" class="products-sort-label">Ordenar por</label>
+                <select id="sortSelectHeader" class="search-sort-inline" onchange="ordenarResultadosBusca()" title="Ordenar produtos">
+                    <option value="relevante">Relevante</option>
+                    <option value="menor">Menor Preço</option>
+                    <option value="maior">Maior Preço</option>
+                    <option value="nome">Nome (A-Z)</option>
+                    <option value="novidades">Novidades</option>
+                </select>
+            </div>
         </div>
         <div class="products-grid" id="productsGrid"></div>
     </section>
