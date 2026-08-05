@@ -80,6 +80,11 @@
             50% { opacity: 0.7; }
         }
 
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%,60% { transform: translateX(-6px); }
+            40%,80% { transform: translateX(6px); }
+        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -190,6 +195,45 @@
             padding: 40px 20px;
             font-size: 16px;
         }
+        /* ═══════════════ SELEÇÃO DE HORÁRIO DE ENTREGA ═══════════════ */
+        .horario-entrega { background:#fff9e6;border:1.5px solid #ffd970;border-radius:10px;padding:10px 12px;margin:8px 0;animation:fadeIn .3s ease; }
+        .he-title { font-size:.78rem;font-weight:700;color:#8a6d00;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px; }
+        .he-dias { display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap; }
+        .he-dia-btn { border:1.5px solid #e8c766;background:#fff;color:#8a6d00;border-radius:20px;padding:5px 12px;font-size:.8rem;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap; }
+        .he-dia-btn:hover { border-color:#e0a800;background:#fffbe6; }
+        .he-dia-btn.ativo { background:#e0a800;border-color:#e0a800;color:#fff;box-shadow:0 2px 6px rgba(224,168,0,.35); }
+        .he-slots { display:grid;grid-template-columns:1fr 1fr;gap:6px; }
+        .he-slot { display:flex;align-items:center;justify-content:center;gap:5px;background:#fff;border:1.5px solid #e8c766;border-radius:8px;padding:8px 10px;font-size:.82rem;font-weight:600;color:#8a6d00;cursor:pointer;transition:.15s;user-select:none; }
+        .he-slot:hover { border-color:#e0a800;background:#fffbe6; }
+        .he-slot.ativo { background:#e0a800;border-color:#e0a800;color:#fff;box-shadow:0 3px 8px rgba(224,168,0,.35); }
+        .he-slot.desativado { opacity:.4;cursor:not-allowed;background:#f5f0e0; }
+        .he-slot.desativado:hover { border-color:#e8c766;background:#f5f0e0; }
+        .he-nenhum { text-align:center;color:#D6324A;font-size:.8rem;font-weight:600;padding:8px;background:#fff;border-radius:6px;margin-top:6px; }
+
+        /* ═══════════════ FORMULÁRIO DE ENDEREÇO NO CARRINHO ═══════════════ */
+        .form-endereco { background:#f0f9ff;border:1.5px solid #b8ddf0;border-radius:10px;padding:10px 12px;margin:8px 0;animation:fadeIn .3s ease; }
+        .fe-title { font-size:.78rem;font-weight:700;color:#0077aa;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px; }
+        .fe-grid { display:grid;grid-template-columns:1fr 1fr;gap:7px; }
+        .fe-field { display:flex;flex-direction:column; }
+        .fe-field.fe-full { grid-column:1/-1; }
+        .fe-field label { font-size:.7rem;font-weight:600;color:#5a6a85;margin-bottom:2px; }
+        .fe-field input { border:1px solid #cddcea;border-radius:6px;padding:6px 9px;font-size:.85rem;background:#fff;color:#1a2340;transition:.15s; }
+        .fe-field input:focus { border-color:#0088C2;outline:none;box-shadow:0 0 0 2px rgba(0,136,194,.15); }
+        .fe-field input.invalid { border-color:#D6324A;background:#fef1f4; }
+
+        /* ═══════════════ FORMAS DE PAGAMENTO SELECIONÁVEIS ═══════════════ */
+        .formas-pgto-box { background:#f0f8ff;border:1.5px solid #c5e3f5;border-radius:12px;padding:12px 14px;margin-bottom:12px; }
+        .formas-pgto-title { font-size:12px;color:#555;font-weight:600;margin-bottom:8px;text-align:center; }
+        .formas-pgto-grid { display:flex;justify-content:center;gap:8px;flex-wrap:wrap; }
+        .formas-pgto-item { display:flex;align-items:center;gap:6px;background:#fff;border:2px solid #ddd;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:#333;cursor:pointer;transition:.2s;user-select:none; }
+        .formas-pgto-item:hover { border-color:#0088C2;background:#f0f9ff; }
+        .formas-pgto-item input { display:none; }
+        .formas-pgto-item.ativa { border-color:#0088C2;background:#e0f2fe;box-shadow:0 2px 6px rgba(0,136,194,.15); }
+        .troco-box { margin-top:10px;padding-top:10px;border-top:1px dashed #c5e3f5;animation:fadeIn .3s ease; }
+        .troco-title { font-size:.85rem;color:#1a2340;font-weight:700;margin-bottom:6px;text-align:center; }
+        .troco-opts { display:flex;justify-content:center;gap:14px;flex-wrap:wrap; }
+        .troco-opt { display:flex;align-items:center;gap:5px;font-size:.85rem;color:#1a2340;cursor:pointer;font-weight:600; }
+        .troco-opt input { accent-color:#0088C2;cursor:pointer; }
         /* ═══════════════ SUGESTÕES NO CARRINHO ═══════════════ */
         /* Sidebar à esquerda do carrinho (desktop) */
         .cart-sidebar { position:fixed;top:50%;right:420px;z-index:9998;width:250px;max-height:82vh;background:#fff;border:1.5px solid #f4dee2;border-right:none;border-radius:14px 0 0 14px;box-shadow:-6px 0 20px rgba(0,0,0,.12);padding:14px 12px;display:flex;flex-direction:column;gap:10px;opacity:0;transform:translate(-15px,-50%);transition:opacity .4s ease .15s,transform .5s cubic-bezier(.22,1,.36,1) .15s;pointer-events:none; }
@@ -3909,7 +3953,293 @@
                     labelEntrega.style.borderColor = '#0088C2';
                     labelRetirada.style.borderColor = '#ddd';
                 }
+
+                // Mostra/esconde form de endereço + auto-preenche
+                renderFormEndereco();
             }
+        }
+
+        // ═══════════════ FORMULÁRIO DE ENDEREÇO ═══════════════
+        function renderFormEndereco() {
+            const form = document.getElementById('formEndereco');
+            const horBox = document.getElementById('horarioEntregaBox');
+            if (deliveryType !== 'entrega') {
+                if (form) form.style.display = 'none';
+                if (horBox) horBox.style.display = 'none';
+                return;
+            }
+            if (form) form.style.display = 'block';
+            if (horBox) horBox.style.display = 'block';
+            preencherEnderecoAuto();
+            renderHorariosEntrega();
+        }
+
+        // ═══════════════ HORÁRIO DE ENTREGA ═══════════════
+        const HORARIOS_SLOTS = [
+            { start:'10:00', end:'12:30' },
+            { start:'12:30', end:'15:30' },
+            { start:'15:30', end:'18:30' },
+            { start:'18:30', end:'21:30' }
+        ];
+        let _heDiaAtivo = 0;  // 0 = hoje, 1 = amanhã, 2 = depois de amanhã
+        let _heSlotAtivo = null;
+
+        function _heFormatarData(offset) {
+            const d = new Date();
+            d.setDate(d.getDate() + offset);
+            return d;
+        }
+        function _heLabelDia(offset) {
+            if (offset === 0) return 'Hoje';
+            if (offset === 1) return 'Amanhã';
+            const d = _heFormatarData(offset);
+            const dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+            return dias[d.getDay()] + ' ' + String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+        }
+        function _heSlotEstaNoFuturo(slot, dataOffset) {
+            if (dataOffset > 0) return true;  // amanhã ou depois — sempre no futuro
+            const agora = new Date();
+            const [h, m] = slot.start.split(':').map(Number);
+            const inicio = new Date();
+            inicio.setHours(h, m, 0, 0);
+            // Permite reservar até 1h antes do início do slot
+            return agora.getTime() + (60 * 60 * 1000) <= inicio.getTime();
+        }
+
+        function renderHorariosEntrega() {
+            const diasEl = document.getElementById('heDias');
+            const slotsEl = document.getElementById('heSlots');
+            const nenhumEl = document.getElementById('heNenhum');
+            if (!diasEl || !slotsEl) return;
+
+            // Renderiza chips de dia (hoje/amanhã/depois)
+            const offsets = [0, 1, 2];
+            diasEl.innerHTML = offsets.map(o =>
+                `<button type="button" class="he-dia-btn${o === _heDiaAtivo ? ' ativo' : ''}" onclick="selecionarDiaEntrega(${o})">${_heLabelDia(o)}</button>`
+            ).join('');
+
+            // Renderiza slots pro dia selecionado
+            let algumDisponivel = false;
+            slotsEl.innerHTML = HORARIOS_SLOTS.map((slot, i) => {
+                const disp = _heSlotEstaNoFuturo(slot, _heDiaAtivo);
+                if (disp) algumDisponivel = true;
+                const ativo = (_heSlotAtivo === i);
+                return `<div class="he-slot${!disp ? ' desativado' : ''}${ativo && disp ? ' ativo' : ''}" ${disp ? 'onclick="selecionarSlotEntrega(' + i + ')"' : ''} data-slot="${i}">⏰ ${slot.start} — ${slot.end}</div>`;
+            }).join('');
+
+            nenhumEl.style.display = algumDisponivel ? 'none' : 'block';
+
+            // Se o slot selecionado ficou indisponível (mudança de dia), reseta
+            if (_heSlotAtivo !== null) {
+                const s = HORARIOS_SLOTS[_heSlotAtivo];
+                if (!_heSlotEstaNoFuturo(s, _heDiaAtivo)) _heSlotAtivo = null;
+            }
+        }
+
+        function selecionarDiaEntrega(offset) {
+            _heDiaAtivo = offset;
+            _heSlotAtivo = null;
+            renderHorariosEntrega();
+            salvarHorarioLocal();
+        }
+
+        function selecionarSlotEntrega(idx) {
+            _heSlotAtivo = idx;
+            renderHorariosEntrega();
+            salvarHorarioLocal();
+        }
+
+        function getHorarioEntrega() {
+            if (deliveryType !== 'entrega' || _heSlotAtivo === null) return null;
+            const slot = HORARIOS_SLOTS[_heSlotAtivo];
+            if (!slot) return null;
+            const dataObj = _heFormatarData(_heDiaAtivo);
+            return {
+                dataISO:   dataObj.toISOString().slice(0, 10),
+                dataLabel: _heLabelDia(_heDiaAtivo),
+                slotStart: slot.start,
+                slotEnd:   slot.end
+            };
+        }
+
+        function salvarHorarioLocal() {
+            try {
+                const h = getHorarioEntrega();
+                if (h) localStorage.setItem('caotelli_horario_entrega', JSON.stringify({ ...h, diaOffset:_heDiaAtivo, slotIdx:_heSlotAtivo }));
+            } catch(e) {}
+        }
+
+        function restaurarHorarioLocal() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('caotelli_horario_entrega') || 'null');
+                if (!saved) return;
+                // Se dia salvo é hoje e o slot já passou, ignora
+                if (saved.diaOffset === 0 && !_heSlotEstaNoFuturo(HORARIOS_SLOTS[saved.slotIdx], 0)) return;
+                _heDiaAtivo = saved.diaOffset;
+                _heSlotAtivo = saved.slotIdx;
+            } catch(e) {}
+        }
+
+        function validarHorarioEntrega() {
+            if (deliveryType !== 'entrega') return true;
+            if (_heSlotAtivo === null) {
+                showNotification('Escolha um horário de entrega ⏰', 'error');
+                const box = document.getElementById('horarioEntregaBox');
+                if (box) {
+                    box.scrollIntoView({ behavior:'smooth', block:'center' });
+                    box.style.animation = 'shake .4s';
+                    setTimeout(() => box.style.animation = '', 500);
+                }
+                return false;
+            }
+            return true;
+        }
+
+        function preencherEnderecoAuto() {
+            // Prioridade: 1) localStorage salvo do carrinho, 2) perfil (caotelli_clientes)
+            let saved = null;
+            try { saved = JSON.parse(localStorage.getItem('caotelli_endereco_entrega') || 'null'); } catch(e) {}
+
+            if (!saved) {
+                // Tenta puxar do último cliente cadastrado (mesmo email do Firebase user)
+                try {
+                    const clientes = JSON.parse(localStorage.getItem('caotelli_clientes') || '[]');
+                    const email = (window._fbUser && window._fbUser.email) || localStorage.getItem('caotelli_last_email');
+                    const c = email ? clientes.find(cli => cli.email === email) : clientes[clientes.length-1];
+                    if (c) {
+                        saved = {
+                            nome: c.nome || '',
+                            cep: c.cep || '',
+                            rua: c.endereco || c.rua || '',
+                            numero: c.numero || '',
+                            complemento: c.complemento || '',
+                            bairro: c.bairro || '',
+                            referencia: c.referencia || ''
+                        };
+                    }
+                } catch(e) {}
+            }
+
+            if (!saved) return;
+            const map = { endNome:'nome', endCep:'cep', endRua:'rua', endNumero:'numero', endComplemento:'complemento', endBairro:'bairro', endReferencia:'referencia' };
+            Object.keys(map).forEach(id => {
+                const el = document.getElementById(id);
+                if (el && !el.value && saved[map[id]]) el.value = saved[map[id]];
+            });
+        }
+
+        function getEnderecoEntrega() {
+            const g = (id) => (document.getElementById(id) || {}).value || '';
+            return {
+                nome: g('endNome').trim(),
+                cep: g('endCep').trim(),
+                rua: g('endRua').trim(),
+                numero: g('endNumero').trim(),
+                complemento: g('endComplemento').trim(),
+                bairro: g('endBairro').trim(),
+                referencia: g('endReferencia').trim()
+            };
+        }
+
+        function salvarEnderecoLocal() {
+            try { localStorage.setItem('caotelli_endereco_entrega', JSON.stringify(getEnderecoEntrega())); } catch(e) {}
+        }
+
+        function validarEnderecoEntrega() {
+            if (deliveryType !== 'entrega') return true;  // retirada não precisa
+            const end = getEnderecoEntrega();
+            const obrig = ['endNome','endRua','endNumero','endBairro'];
+            let ok = true;
+            obrig.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
+                else el.classList.remove('invalid');
+            });
+            if (!ok) showNotification('Preencha o endereço de entrega (nome, rua, número e bairro)', 'error');
+            return ok;
+        }
+
+        function mascaraCEPEndereco(input) {
+            let v = input.value.replace(/\D/g, '').slice(0, 8);
+            if (v.length > 5) v = v.slice(0,5) + '-' + v.slice(5);
+            input.value = v;
+            salvarEnderecoLocal();
+        }
+
+        async function buscarCepEndereco() {
+            const cepEl = document.getElementById('endCep');
+            if (!cepEl) return;
+            const cep = cepEl.value.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+            try {
+                const res = await fetch('https://viacep.com.br/ws/' + cep + '/json/');
+                const data = await res.json();
+                if (data.erro) return;
+                const rua = document.getElementById('endRua');
+                const bairro = document.getElementById('endBairro');
+                if (rua && !rua.value)       rua.value = data.logradouro || '';
+                if (bairro && !bairro.value) bairro.value = data.bairro || '';
+                salvarEnderecoLocal();
+                const numero = document.getElementById('endNumero');
+                if (numero && !numero.value) numero.focus();
+            } catch(e) { console.warn('ViaCEP:', e); }
+        }
+
+        // ═══════════════ FORMA DE PAGAMENTO + TROCO ═══════════════
+        function selecionarFormaPagamento(forma) {
+            document.querySelectorAll('.formas-pgto-item').forEach(el => {
+                el.classList.toggle('ativa', el.dataset.forma === forma);
+            });
+            const trocoBox = document.getElementById('trocoBox');
+            if (trocoBox) trocoBox.style.display = (forma === 'dinheiro') ? 'block' : 'none';
+            salvarFormaPagamentoLocal();
+        }
+
+        function onTrocoChange(valor) {
+            const wrap = document.getElementById('trocoValorWrap');
+            if (wrap) wrap.style.display = (valor === 'sim') ? 'block' : 'none';
+            salvarFormaPagamentoLocal();
+        }
+
+        function mascaraTrocoValor(input) {
+            let v = input.value.replace(/\D/g, '');
+            if (!v) { input.value = ''; return; }
+            v = (parseInt(v,10) / 100).toFixed(2).replace('.', ',');
+            v = v.replace(/(\d)(\d{3},)/, '$1.$2');
+            input.value = 'R$ ' + v;
+        }
+
+        function getFormaPagamento() {
+            const sel = document.querySelector('input[name="formaPgto"]:checked');
+            const forma = sel ? sel.value : null;
+            const precisaSel = document.querySelector('input[name="precisaTroco"]:checked');
+            const precisaTroco = precisaSel ? precisaSel.value === 'sim' : false;
+            const trocoInput = document.getElementById('trocoValor');
+            const trocoRaw = trocoInput ? trocoInput.value.replace(/[^\d,]/g,'').replace(',','.') : '';
+            const trocoValor = precisaTroco && trocoRaw ? parseFloat(trocoRaw) : null;
+            return { forma, precisaTroco, trocoValor };
+        }
+
+        function salvarFormaPagamentoLocal() {
+            try { localStorage.setItem('caotelli_forma_pagamento', JSON.stringify(getFormaPagamento())); } catch(e) {}
+        }
+
+        function restaurarFormaPagamentoLocal() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('caotelli_forma_pagamento') || 'null');
+                if (!saved || !saved.forma) return;
+                const radio = document.querySelector('input[name="formaPgto"][value="' + saved.forma + '"]');
+                if (radio) { radio.checked = true; selecionarFormaPagamento(saved.forma); }
+                if (saved.forma === 'dinheiro') {
+                    const trocoRadio = document.querySelector('input[name="precisaTroco"][value="' + (saved.precisaTroco?'sim':'nao') + '"]');
+                    if (trocoRadio) { trocoRadio.checked = true; onTrocoChange(saved.precisaTroco?'sim':'nao'); }
+                    if (saved.precisaTroco && saved.trocoValor) {
+                        const t = document.getElementById('trocoValor');
+                        if (t) t.value = 'R$ ' + saved.trocoValor.toFixed(2).replace('.',',');
+                    }
+                }
+            } catch(e) {}
         }
 
         // APLICAR CUPOM
@@ -3950,6 +4280,12 @@
             modal.classList.toggle('active');
             const isOpen = modal.classList.contains('active');
             document.querySelector('.floating-cart').style.display = isOpen ? 'none' : 'flex';
+            if (isOpen) {
+                // Renderiza form de endereço + restaura preferências salvas
+                if (typeof restaurarHorarioLocal === 'function') restaurarHorarioLocal();
+                if (typeof renderFormEndereco === 'function') renderFormEndereco();
+                if (typeof restaurarFormaPagamentoLocal === 'function') restaurarFormaPagamentoLocal();
+            }
         }
 
         // ================================================================
@@ -4131,6 +4467,14 @@
         async function checkout() {
             if (cart.length === 0) {
                 showNotification('Seu carrinho está vazio!', 'error');
+                return;
+            }
+            // Valida horário e endereço se for entrega
+            if (!validarHorarioEntrega()) return;
+            if (!validarEnderecoEntrega()) {
+                // Scroll suave até o form
+                const f = document.getElementById('formEndereco');
+                if (f) f.scrollIntoView({ behavior:'smooth', block:'center' });
                 return;
             }
             abrirPaymentModal();
@@ -5586,7 +5930,8 @@
                     <td style="font-size:0.82rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(p.itens||[]).map(x=>x.name).join(', ')}</td>
                     <td style="font-weight:700;color:#0088C2">R$${(p.total||0).toFixed(2)}</td>
                     <td><span class="admin-badge ${statusBadge[(p.status||'pendente').toLowerCase()]||'badge-pendente'}">${p.status||'Pendente'}</span></td>
-                    <td>
+                    <td style="white-space:nowrap;display:flex;gap:5px;align-items:center">
+                        <button onclick="abrirDetalhePedido(${_pedidosCache.indexOf(p)})" title="Ver detalhes" style="background:#0088C2;color:#fff;border:none;border-radius:6px;padding:5px 9px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.2s">🔍</button>
                         <select onchange="atualizarStatusPedido('${p._fsId||''}', this.value)" style="border:1px solid #dde3ee;border-radius:6px;padding:4px 8px;font-size:0.82rem">
                             <option value="pendente"  ${(p.status||'pendente')==='pendente'  ?'selected':''}>Pendente</option>
                             <option value="pago"      ${p.status==='pago'      ?'selected':''}>Pago</option>
@@ -5596,6 +5941,87 @@
                     </td>
                 </tr>`;
             }).join('');
+        }
+
+        // ═══════════════ MODAL DE DETALHES DO PEDIDO ═══════════════
+        function abrirDetalhePedido(idx) {
+            const p = _pedidosCache[idx];
+            if (!p) return;
+            const numOriginal = _pedidosCache.length - idx;
+
+            const enderecoHtml = p.enderecoEntrega
+                ? `<div><strong>👤 ${p.enderecoEntrega.nome || '(sem nome)'}</strong></div>
+                   <div>${p.enderecoEntrega.rua || ''}${p.enderecoEntrega.numero ? ', ' + p.enderecoEntrega.numero : ''}${p.enderecoEntrega.complemento ? ' — ' + p.enderecoEntrega.complemento : ''}</div>
+                   <div>${p.enderecoEntrega.bairro || ''}${p.enderecoEntrega.cep ? ' — CEP ' + p.enderecoEntrega.cep : ''}</div>
+                   ${p.enderecoEntrega.referencia ? '<div style="color:#5a6a85;font-size:.85rem;margin-top:4px">📍 ' + p.enderecoEntrega.referencia + '</div>' : ''}
+                   ${p.horarioEntrega ? '<div style="margin-top:8px;padding:6px 10px;background:#fff9e6;border-left:3px solid #e0a800;border-radius:4px;font-size:.9rem"><strong>⏰ ' + p.horarioEntrega.dataLabel + ' — ' + p.horarioEntrega.slotStart + ' às ' + p.horarioEntrega.slotEnd + '</strong></div>' : ''}`
+                : '<div style="color:#5a6a85">🏪 Retirada na loja</div>';
+
+            const pgtoNomes = { pix:'💠 Pix', dinheiro:'💵 Dinheiro', cartao:'💳 Cartão' };
+            const pref = p.formaPagamentoPref || {};
+            const pgtoHtml = pref.forma
+                ? `<div><strong>${pgtoNomes[pref.forma] || pref.forma}</strong></div>
+                   ${pref.forma === 'dinheiro' ? (pref.precisaTroco
+                       ? '<div style="color:#D6324A;font-weight:700;margin-top:4px">⚠️ Precisa de troco pra R$ ' + (pref.trocoValor ? pref.trocoValor.toFixed(2).replace('.',',') : '?') + '</div>'
+                       : '<div style="color:#2e7d32;margin-top:4px">✅ Não precisa de troco</div>') : ''}`
+                : '<div style="color:#5a6a85">Não especificado</div>';
+
+            const itensHtml = (p.itens || []).map(i =>
+                `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0">
+                    <span>${i.emoji || ''} ${i.name} <span style="color:#5a6a85">× ${i.qty}</span></span>
+                    <span style="font-weight:700">R$ ${(i.price * i.qty).toFixed(2)}</span>
+                </div>`
+            ).join('');
+
+            const html = `
+                <div style="position:fixed;inset:0;background:rgba(26,35,64,.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px" onclick="fecharDetalhePedido(event)" id="pedidoDetalheOverlay">
+                    <div style="background:#fff;border-radius:14px;padding:24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.3)" onclick="event.stopPropagation()">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                            <h3 style="color:#1a2340;margin:0">📋 Pedido #${numOriginal}</h3>
+                            <button onclick="fecharDetalhePedido()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#5a6a85">✕</button>
+                        </div>
+                        <div style="font-size:.85rem;color:#5a6a85;margin-bottom:16px">${p.data || ''} • ${p.cliente || 'Visitante'}</div>
+
+                        <div style="background:#f9fbff;border:1px solid #e4eaf3;border-radius:10px;padding:12px;margin-bottom:12px">
+                            <div style="font-size:.78rem;font-weight:700;color:#0088C2;text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px">📦 Entrega</div>
+                            ${enderecoHtml}
+                        </div>
+
+                        <div style="background:#fff7f8;border:1px solid #f4dee2;border-radius:10px;padding:12px;margin-bottom:12px">
+                            <div style="font-size:.78rem;font-weight:700;color:#D6324A;text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px">💰 Forma de pagamento preferida</div>
+                            ${pgtoHtml}
+                        </div>
+
+                        <div style="background:#fff;border:1px solid #e4eaf3;border-radius:10px;padding:12px;margin-bottom:12px">
+                            <div style="font-size:.78rem;font-weight:700;color:#5a6a85;text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px">🛒 Itens</div>
+                            ${itensHtml}
+                            <div style="display:flex;justify-content:space-between;padding-top:10px;margin-top:6px;border-top:2px solid #e4eaf3;font-size:1rem;font-weight:700;color:#0088C2">
+                                <span>Total</span><span>R$ ${(p.total || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+
+                        ${p.paymentId ? `<div style="background:#fff;border:1px solid #e4eaf3;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:.85rem"><strong>Payment ID:</strong> <code style="background:#f4f7fb;padding:2px 6px;border-radius:4px">${p.paymentId}</code></div>` : ''}
+
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+                            ${p.enderecoEntrega && p.enderecoEntrega.nome ? `<button onclick="whatsappCliente('${encodeURIComponent(p.enderecoEntrega.nome)}', '${p._fsId||''}')" style="background:#25D366;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:.9rem;font-weight:600;cursor:pointer"><i class="fa-brands fa-whatsapp"></i> Copiar msg pro cliente</button>` : ''}
+                            <button onclick="fecharDetalhePedido()" style="background:#f0f4f8;color:#1a2340;border:none;border-radius:8px;padding:10px 20px;font-size:.9rem;font-weight:600;cursor:pointer">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            document.body.appendChild(div.firstElementChild);
+        }
+        function fecharDetalhePedido(e) {
+            if (e && e.target && e.target.id !== 'pedidoDetalheOverlay') return;
+            const overlay = document.getElementById('pedidoDetalheOverlay');
+            if (overlay) overlay.remove();
+        }
+        function whatsappCliente(nomeEncoded, fsId) {
+            const nome = decodeURIComponent(nomeEncoded);
+            const msg = 'Olá ' + nome + '! Aqui é da CãoTelli 🐾 Seu pedido foi recebido e está sendo preparado. Qualquer dúvida é só chamar!';
+            navigator.clipboard.writeText(msg).then(() => showNotification('Mensagem copiada! Cole no WhatsApp do cliente 📋', 'success'));
         }
 
         async function atualizarStatusPedido(fsId, status) {
@@ -5840,6 +6266,12 @@
                 || localStorage.getItem('caotelli_last_email')
                 || 'Visitante';
 
+            // Coleta endereço de entrega (se for entrega), horário e preferência de pagamento
+            const enderecoEntrega = (typeof deliveryType !== 'undefined' && deliveryType === 'entrega' && typeof getEnderecoEntrega === 'function')
+                ? getEnderecoEntrega() : null;
+            const horarioEntrega = typeof getHorarioEntrega === 'function' ? getHorarioEntrega() : null;
+            const formaPref = typeof getFormaPagamento === 'function' ? getFormaPagamento() : null;
+
             const pedido = {
                 data:         new Date().toLocaleString('pt-BR'),
                 dataISO:      new Date().toISOString(),
@@ -5848,6 +6280,9 @@
                 itens:        cart.map(i => ({ id: i.id, name: i.name, qty: i.quantity, price: i.price, emoji: i.emoji || '', imgUrl: i.imgUrl || '' })),
                 total:        Number(total.toFixed(2)),
                 deliveryType: (typeof deliveryType !== 'undefined' ? deliveryType : 'entrega'),
+                enderecoEntrega: enderecoEntrega,        // {nome, cep, rua, numero, complemento, bairro, referencia} ou null
+                horarioEntrega: horarioEntrega,          // {dataISO, dataLabel, slotStart, slotEnd} ou null
+                formaPagamentoPref: formaPref,           // {forma, precisaTroco, trocoValor} — preferência declarada pelo cliente
                 status:       meta.status || 'pendente',
                 paymentId:    meta.paymentId ? String(meta.paymentId) : null,
                 method:       meta.method || 'pix',
@@ -6752,6 +7187,47 @@
                         </label>
                     </div>
                 </div>
+                <!-- SELEÇÃO DE HORÁRIO DE ENTREGA (só quando entrega selecionada) -->
+                <div id="horarioEntregaBox" class="horario-entrega" style="display:none">
+                    <div class="he-title">⏰ Escolha o horário de entrega</div>
+                    <div class="he-dias" id="heDias"></div>
+                    <div class="he-slots" id="heSlots"></div>
+                    <div id="heNenhum" class="he-nenhum" style="display:none">⚠️ Nenhum horário disponível hoje. Escolha outro dia.</div>
+                </div>
+                <!-- FORMULÁRIO DE ENDEREÇO DE ENTREGA (só quando entrega selecionada) -->
+                <div id="formEndereco" class="form-endereco" style="display:none">
+                    <div class="fe-title">📦 Endereço de entrega</div>
+                    <div class="fe-grid">
+                        <div class="fe-field fe-full">
+                            <label>Nome de quem vai receber *</label>
+                            <input type="text" id="endNome" placeholder="Ex: Maria Silva" oninput="salvarEnderecoLocal()">
+                        </div>
+                        <div class="fe-field">
+                            <label>CEP</label>
+                            <input type="text" id="endCep" placeholder="00000-000" maxlength="9" oninput="mascaraCEPEndereco(this);buscarCepEndereco()">
+                        </div>
+                        <div class="fe-field">
+                            <label>Bairro *</label>
+                            <input type="text" id="endBairro" placeholder="Ex: Mal. Rondon" oninput="salvarEnderecoLocal()">
+                        </div>
+                        <div class="fe-field fe-full">
+                            <label>Rua/Avenida *</label>
+                            <input type="text" id="endRua" placeholder="Ex: Rua das Flores" oninput="salvarEnderecoLocal()">
+                        </div>
+                        <div class="fe-field">
+                            <label>Número *</label>
+                            <input type="text" id="endNumero" placeholder="123" oninput="salvarEnderecoLocal()">
+                        </div>
+                        <div class="fe-field">
+                            <label>Complemento</label>
+                            <input type="text" id="endComplemento" placeholder="Apt / Casa / Bloco" oninput="salvarEnderecoLocal()">
+                        </div>
+                        <div class="fe-field fe-full">
+                            <label>Referência / Ponto de referência</label>
+                            <input type="text" id="endReferencia" placeholder="Ex: perto do mercado, portão azul" oninput="salvarEnderecoLocal()">
+                        </div>
+                    </div>
+                </div>
                 <div class="summary-row">
                     <span>Frete:</span>
                     <span id="frete">R$ 0,00</span>
@@ -6768,17 +7244,39 @@
             <!-- SUGESTÕES "VOCÊ TAMBÉM PODE GOSTAR" -->
             <div id="cartSuggestions" class="cart-suggestions" style="display:none"></div>
             <!-- FORMAS DE PAGAMENTO NA ENTREGA -->
-            <div style="background:#f0f8ff;border:1.5px solid #c5e3f5;border-radius:12px;padding:12px 14px;margin-bottom:12px">
-                <p style="font-size:12px;color:#555;font-weight:600;margin-bottom:8px;text-align:center">🚚 Entrega ou retirada na loja — aceitamos:</p>
-                <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
-                    <div style="display:flex;align-items:center;gap:5px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:#333">
-                        <i class="fa-brands fa-pix" style="color:#32BCAD;font-size:15px"></i> Pix
+            <div class="formas-pgto-box">
+                <p class="formas-pgto-title">💰 Como você prefere pagar?</p>
+                <div class="formas-pgto-grid">
+                    <label class="formas-pgto-item" data-forma="pix">
+                        <input type="radio" name="formaPgto" value="pix" onchange="selecionarFormaPagamento('pix')">
+                        <i class="fa-brands fa-pix" style="color:#32BCAD;font-size:18px"></i>
+                        <span>Pix</span>
+                    </label>
+                    <label class="formas-pgto-item" data-forma="dinheiro">
+                        <input type="radio" name="formaPgto" value="dinheiro" onchange="selecionarFormaPagamento('dinheiro')">
+                        <span style="font-size:18px">💵</span>
+                        <span>Dinheiro</span>
+                    </label>
+                    <label class="formas-pgto-item" data-forma="cartao">
+                        <input type="radio" name="formaPgto" value="cartao" onchange="selecionarFormaPagamento('cartao')">
+                        <i class="fa-regular fa-credit-card" style="color:#0077aa;font-size:17px"></i>
+                        <span>Cartão</span>
+                    </label>
+                </div>
+                <!-- Campo troco (só aparece pra dinheiro) -->
+                <div id="trocoBox" class="troco-box" style="display:none">
+                    <p class="troco-title">Precisa de troco?</p>
+                    <div class="troco-opts">
+                        <label class="troco-opt">
+                            <input type="radio" name="precisaTroco" value="nao" checked onchange="onTrocoChange('nao')"> Não preciso
+                        </label>
+                        <label class="troco-opt">
+                            <input type="radio" name="precisaTroco" value="sim" onchange="onTrocoChange('sim')"> Sim, preciso
+                        </label>
                     </div>
-                    <div style="display:flex;align-items:center;gap:5px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:#333">
-                        💵 Dinheiro
-                    </div>
-                    <div style="display:flex;align-items:center;gap:5px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;color:#333">
-                        <i class="fa-regular fa-credit-card" style="color:#0077aa;font-size:14px"></i> Cartão
+                    <div id="trocoValorWrap" style="display:none;margin-top:8px">
+                        <label style="font-size:.8rem;color:#5a6a85;font-weight:600;display:block;margin-bottom:4px">Troco para quanto?</label>
+                        <input type="text" id="trocoValor" placeholder="R$ 0,00" oninput="mascaraTrocoValor(this);salvarFormaPagamentoLocal()" style="width:100%;padding:8px 12px;border:1.5px solid #dde3ee;border-radius:8px;font-size:.95rem;box-sizing:border-box">
                     </div>
                 </div>
             </div>
