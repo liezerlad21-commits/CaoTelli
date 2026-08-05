@@ -2408,6 +2408,25 @@
 
         <!-- ABA PEDIDOS -->
         <div class="admin-tab-content" id="adminPedidos">
+            <!-- Barra de filtros -->
+            <div id="pedidosFiltros" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px;padding:12px;background:#f4f7fb;border-radius:10px;border:1px solid #e4eaf3">
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <button type="button" class="pedido-chip" data-periodo="hoje"   onclick="filtrarPedidosPeriodo('hoje', this)">Hoje</button>
+                    <button type="button" class="pedido-chip" data-periodo="7dias"  onclick="filtrarPedidosPeriodo('7dias', this)">7 dias</button>
+                    <button type="button" class="pedido-chip" data-periodo="30dias" onclick="filtrarPedidosPeriodo('30dias', this)">30 dias</button>
+                    <button type="button" class="pedido-chip" data-periodo="mes"    onclick="filtrarPedidosPeriodo('mes', this)">Mês atual</button>
+                    <button type="button" class="pedido-chip active" data-periodo="tudo" onclick="filtrarPedidosPeriodo('tudo', this)">Tudo</button>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;font-size:.82rem;color:#5a6a85">
+                    <span>De</span>
+                    <input type="date" id="pedidoDataInicio" onchange="filtrarPedidosPersonalizado()" style="border:1px solid #dde3ee;border-radius:6px;padding:4px 8px;font-size:.82rem">
+                    <span>até</span>
+                    <input type="date" id="pedidoDataFim"    onchange="filtrarPedidosPersonalizado()" style="border:1px solid #dde3ee;border-radius:6px;padding:4px 8px;font-size:.82rem">
+                </div>
+                <input type="text" id="pedidoBusca" placeholder="🔍 Buscar por cliente, nº ou item..." oninput="aplicarFiltrosPedidos()"
+                       style="flex:1;min-width:200px;border:1px solid #dde3ee;border-radius:6px;padding:6px 10px;font-size:.85rem">
+                <div id="pedidosResumo" style="font-size:.82rem;color:#5a6a85;font-weight:600;white-space:nowrap"></div>
+            </div>
             <div style="overflow-x:auto">
                 <table class="admin-table" id="tabelaPedidos">
                     <thead><tr>
@@ -2417,6 +2436,15 @@
                 </table>
             </div>
         </div>
+        <style>
+            .pedido-chip {
+                border:1px solid #dde3ee; background:#fff; color:#5a6a85;
+                border-radius:20px; padding:5px 14px; font-size:.82rem; font-weight:600;
+                cursor:pointer; transition:all .2s;
+            }
+            .pedido-chip:hover { border-color:#0088C2; color:#0088C2; }
+            .pedido-chip.active { background:#0088C2; border-color:#0088C2; color:#fff; }
+        </style>
 
         <!-- ABA CLIENTES -->
         <div class="admin-tab-content" id="adminClientes">
@@ -5079,6 +5107,11 @@
         }
 
         // ── Pedidos ───────────────────────────────────
+        // Cache dos pedidos carregados — evita refazer a query do Firestore em cada mudança de filtro
+        let _pedidosCache = [];
+        // Filtro ativo — 'hoje' | '7dias' | '30dias' | 'mes' | 'tudo' | 'personalizado'
+        let _pedidosFiltroAtivo = 'tudo';
+
         async function renderAdminPedidos() {
             const tbody = document.getElementById('pedidosBody');
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">⏳ Carregando pedidos...</td></tr>';
@@ -5096,14 +5129,100 @@
             } else {
                 pedidos = JSON.parse(localStorage.getItem('caotelli_pedidos') || '[]').reverse();
             }
-            if (!pedidos.length) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">Nenhum pedido registrado ainda.</td></tr>';
+            _pedidosCache = pedidos;
+            aplicarFiltrosPedidos();
+        }
+
+        // ── Filtros da aba Pedidos ──
+        function filtrarPedidosPeriodo(periodo, btn) {
+            _pedidosFiltroAtivo = periodo;
+            document.querySelectorAll('.pedido-chip').forEach(c => c.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            // limpa datas personalizadas se um chip padrão for clicado
+            const ini = document.getElementById('pedidoDataInicio');
+            const fim = document.getElementById('pedidoDataFim');
+            if (ini) ini.value = '';
+            if (fim) fim.value = '';
+            aplicarFiltrosPedidos();
+        }
+
+        function filtrarPedidosPersonalizado() {
+            _pedidosFiltroAtivo = 'personalizado';
+            document.querySelectorAll('.pedido-chip').forEach(c => c.classList.remove('active'));
+            aplicarFiltrosPedidos();
+        }
+
+        function _pedidoDentroDoPeriodo(p) {
+            if (_pedidosFiltroAtivo === 'tudo') return true;
+            const raw = p.dataISO || p.data;
+            if (!raw) return false;
+            const d = new Date(raw);
+            if (isNaN(d)) return false;
+            const agora = new Date();
+            if (_pedidosFiltroAtivo === 'hoje') {
+                return d.toDateString() === agora.toDateString();
+            }
+            if (_pedidosFiltroAtivo === '7dias') {
+                return (agora - d) <= 7 * 86400000;
+            }
+            if (_pedidosFiltroAtivo === '30dias') {
+                return (agora - d) <= 30 * 86400000;
+            }
+            if (_pedidosFiltroAtivo === 'mes') {
+                return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+            }
+            if (_pedidosFiltroAtivo === 'personalizado') {
+                const iniV = document.getElementById('pedidoDataInicio')?.value;
+                const fimV = document.getElementById('pedidoDataFim')?.value;
+                if (iniV) {
+                    const ini = new Date(iniV + 'T00:00:00');
+                    if (d < ini) return false;
+                }
+                if (fimV) {
+                    const fim = new Date(fimV + 'T23:59:59');
+                    if (d > fim) return false;
+                }
+                return true;
+            }
+            return true;
+        }
+
+        function aplicarFiltrosPedidos() {
+            const tbody = document.getElementById('pedidosBody');
+            if (!tbody) return;
+            const busca = (document.getElementById('pedidoBusca')?.value || '').trim().toLowerCase();
+            let filtrados = _pedidosCache.filter(_pedidoDentroDoPeriodo);
+            if (busca) {
+                filtrados = filtrados.filter(p => {
+                    const num = String(_pedidosCache.length - _pedidosCache.indexOf(p));
+                    const cliente = (p.cliente || '').toLowerCase();
+                    const itens = (p.itens || []).map(x => x.name || '').join(' ').toLowerCase();
+                    const payId = (p.paymentId || '').toLowerCase();
+                    return num.includes(busca) || cliente.includes(busca) || itens.includes(busca) || payId.includes(busca);
+                });
+            }
+            // Resumo (contagem + total do período)
+            const resumo = document.getElementById('pedidosResumo');
+            if (resumo) {
+                const total = filtrados.reduce((s, p) => s + (Number(p.total) || 0), 0);
+                resumo.textContent = filtrados.length
+                    ? `${filtrados.length} pedido${filtrados.length > 1 ? 's' : ''} • Total R$ ${total.toFixed(2)}`
+                    : '';
+            }
+            if (!filtrados.length) {
+                const msg = _pedidosCache.length
+                    ? 'Nenhum pedido no filtro selecionado.'
+                    : 'Nenhum pedido registrado ainda.';
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">${msg}</td></tr>`;
                 return;
             }
             const statusBadge = { pago:'badge-pago', pendente:'badge-pendente', entregue:'badge-entregue', cancelado:'badge-cancelado' };
-            tbody.innerHTML = pedidos.map((p,i) => `
+            tbody.innerHTML = filtrados.map(p => {
+                // Nº do pedido é a posição original no cache (mantém identidade estável entre filtros)
+                const numOriginal = _pedidosCache.length - _pedidosCache.indexOf(p);
+                return `
                 <tr>
-                    <td><strong>#${pedidos.length - i}</strong></td>
+                    <td><strong>#${numOriginal}</strong></td>
                     <td style="font-size:0.82rem;color:#5a6a85">${p.data || '-'}</td>
                     <td>${p.cliente || '-'}</td>
                     <td style="font-size:0.82rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(p.itens||[]).map(x=>x.name).join(', ')}</td>
@@ -5117,7 +5236,8 @@
                             <option value="cancelado" ${p.status==='cancelado' ?'selected':''}>Cancelado</option>
                         </select>
                     </td>
-                </tr>`).join('');
+                </tr>`;
+            }).join('');
         }
 
         async function atualizarStatusPedido(fsId, status) {
