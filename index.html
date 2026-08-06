@@ -120,12 +120,19 @@
             max-width: 95vw;
             height: 100%;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 15px;
             border-left: 3px solid var(--primary-cyan);
+            box-sizing: border-box;
         }
+        /* Garante que nada dentro do carrinho vaze horizontalmente */
+        .cart-content * { box-sizing: border-box; max-width: 100%; }
+        .cart-content input, .cart-content select, .cart-content textarea { width: 100%; min-width: 0; }
+        .cart-content .fe-grid, .cart-content .he-slots, .cart-content .formas-pgto-grid { min-width: 0; }
+        .cart-content .fe-grid > *, .cart-content .he-slots > *, .cart-content .formas-pgto-grid > * { min-width: 0; }
         .cart-header {
             display: flex;
             justify-content: space-between;
@@ -1435,6 +1442,15 @@
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
+
+            /* CARRINHO NO CELULAR — grid de endereço/horário/pagamento em coluna única quando aperta */
+            .cart-content { padding: 15px; }
+            .cart-content .fe-grid,
+            .cart-content .he-slots { grid-template-columns: 1fr; }
+            .cart-content .form-endereco,
+            .cart-content .horario-entrega { padding: 10px; }
+            .cart-content .fe-field input { font-size: 16px; }
+            /* font-size: 16px nos inputs evita zoom automático do iOS ao focar */
         }
 
         /* HIDDEN SECTIONS */
@@ -4137,7 +4153,18 @@
                 const el = document.getElementById(id);
                 if (el && !el.value && saved[map[id]]) el.value = saved[map[id]];
             });
+            // Se tem CEP salvo, re-valida cobertura ao restaurar
+            const cepEl = document.getElementById('endCep');
+            if (cepEl && cepEl.value.replace(/\D/g,'').length === 8) {
+                buscarCepEndereco();
+            }
         }
+
+        // ═══════════════ ÁREA DE COBERTURA DE ENTREGA ═══════════════
+        // Adicione aqui as cidades atendidas (nomes exatamente como retornados pelo ViaCEP, campo "localidade")
+        // Para adicionar bairros específicos ou faixas de CEP, expandir CIDADES_ATENDIDAS pra objeto com regras.
+        const CIDADES_ATENDIDAS = ['Canoas']; // TODO: confirmar com Diogo se atende também Esteio, São Leopoldo, Nova Santa Rita, etc.
+        let _cepDentroArea = true; // estado atualizado por buscarCepEndereco()
 
         function getEnderecoEntrega() {
             const g = (id) => (document.getElementById(id) || {}).value || '';
@@ -4167,8 +4194,21 @@
                 if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
                 else el.classList.remove('invalid');
             });
-            if (!ok) showNotification('Preencha o endereço de entrega (nome, rua, número e bairro)', 'error');
-            return ok;
+            if (!ok) {
+                showNotification('Preencha o endereço de entrega (nome, rua, número e bairro)', 'error');
+                return false;
+            }
+            // Bloqueia checkout se CEP for fora da área de cobertura
+            if (!_cepDentroArea) {
+                const cepEl = document.getElementById('endCep');
+                if (cepEl) cepEl.classList.add('invalid');
+                const aviso = document.getElementById('cepForaAreaAviso');
+                if (aviso) aviso.style.display = 'block';
+                showNotification('Esse CEP está fora da área de entrega. Fale com a gente no WhatsApp!', 'error');
+                if (aviso) aviso.scrollIntoView({ behavior:'smooth', block:'center' });
+                return false;
+            }
+            return true;
         }
 
         function mascaraCEPEndereco(input) {
@@ -4182,11 +4222,56 @@
             const cepEl = document.getElementById('endCep');
             if (!cepEl) return;
             const cep = cepEl.value.replace(/\D/g, '');
-            if (cep.length !== 8) return;
+
+            // CEP incompleto: esconde aviso e libera checkout (cliente ainda tá digitando)
+            if (cep.length !== 8) {
+                _cepDentroArea = true;
+                const aviso = document.getElementById('cepForaAreaAviso');
+                if (aviso) aviso.style.display = 'none';
+                cepEl.classList.remove('invalid');
+                return;
+            }
+
             try {
                 const res = await fetch('https://viacep.com.br/ws/' + cep + '/json/');
                 const data = await res.json();
-                if (data.erro) return;
+
+                // CEP inexistente
+                if (data.erro) {
+                    _cepDentroArea = false;
+                    const aviso = document.getElementById('cepForaAreaAviso');
+                    const detalhe = document.getElementById('cepForaAreaCidade');
+                    if (detalhe) detalhe.textContent = 'CEP não encontrado. Verifique se digitou certo. ';
+                    if (aviso) aviso.style.display = 'block';
+                    cepEl.classList.add('invalid');
+                    return;
+                }
+
+                // CEP encontrado: verifica área de cobertura
+                const cidadeCep = (data.localidade || '').trim();
+                const ufCep = (data.uf || '').trim();
+                const dentroArea = CIDADES_ATENDIDAS.some(c => c.toLowerCase() === cidadeCep.toLowerCase());
+
+                _cepDentroArea = dentroArea;
+                const aviso = document.getElementById('cepForaAreaAviso');
+                const detalhe = document.getElementById('cepForaAreaCidade');
+
+                if (!dentroArea) {
+                    if (detalhe) detalhe.textContent = `Esse CEP é de ${cidadeCep}/${ufCep}. `;
+                    if (aviso) aviso.style.display = 'block';
+                    cepEl.classList.add('invalid');
+                    // Ainda preenche rua/bairro pra caso o cliente esteja só conferindo
+                    const rua = document.getElementById('endRua');
+                    const bairroEl = document.getElementById('endBairro');
+                    if (rua && !rua.value)             rua.value = data.logradouro || '';
+                    if (bairroEl && !bairroEl.value)   bairroEl.value = data.bairro || '';
+                    salvarEnderecoLocal();
+                    return;
+                }
+
+                // Dentro da área: preenche tudo normalmente
+                if (aviso) aviso.style.display = 'none';
+                cepEl.classList.remove('invalid');
                 const rua = document.getElementById('endRua');
                 const bairro = document.getElementById('endBairro');
                 if (rua && !rua.value)       rua.value = data.logradouro || '';
@@ -4194,7 +4279,11 @@
                 salvarEnderecoLocal();
                 const numero = document.getElementById('endNumero');
                 if (numero && !numero.value) numero.focus();
-            } catch(e) { console.warn('ViaCEP:', e); }
+            } catch(e) {
+                console.warn('ViaCEP:', e);
+                // Erro de rede: não trava o fluxo, cliente pode preencher manualmente
+                _cepDentroArea = true;
+            }
         }
 
         // ═══════════════ FORMA DE PAGAMENTO + TROCO ═══════════════
@@ -4416,17 +4505,35 @@
             }
         }
 
-        function abrirPaymentModal() {
+        function abrirPaymentModal(preferredForma) {
             _currentTotal = calcularTotalPedido();
             document.getElementById('payTotalValue').textContent = `R$ ${_currentTotal.toFixed(2).replace('.', ',')}`;
             document.getElementById('payDeliveryLabel').textContent = deliveryType === 'retirada' ? '🏪 Retirada na Loja' : '🚚 Entrega';
             preencherDadosPagador();
-            trocarAbaPagamento('pix');
+
+            // Se cliente escolheu forma no carrinho, abre direto naquela aba e esconde as outras
+            const tabsBar = document.querySelector('#paymentModal .pay-tabs');
+            const tabPix  = document.getElementById('tab-pix');
+            const tabCard = document.getElementById('tab-card');
+            if (preferredForma === 'pix') {
+                trocarAbaPagamento('pix');
+                if (tabsBar) tabsBar.style.display = 'none';
+            } else if (preferredForma === 'cartao') {
+                trocarAbaPagamento('card');
+                if (tabsBar) tabsBar.style.display = 'none';
+            } else {
+                // Nenhuma escolha prévia: mostra as duas abas, default PIX
+                if (tabsBar) tabsBar.style.display = '';
+                if (tabPix)  tabPix.style.display  = '';
+                if (tabCard) tabCard.style.display = '';
+                trocarAbaPagamento('pix');
+            }
+
             document.getElementById('paymentModal').classList.add('active');
             document.getElementById('cartModal').classList.remove('active');
             document.querySelector('.floating-cart').style.display = 'none';
-            // dispara init do SDK em paralelo (não bloqueia UI)
-            initMercadoPagoSDK();
+            // dispara init do SDK em paralelo (não bloqueia UI) — só faz sentido se cartão for opção
+            if (preferredForma !== 'pix') initMercadoPagoSDK();
         }
 
         function fecharPaymentModal() {
@@ -4500,7 +4607,111 @@
                 if (f) f.scrollIntoView({ behavior:'smooth', block:'center' });
                 return;
             }
-            abrirPaymentModal();
+
+            // Rotea de acordo com a forma de pagamento escolhida no carrinho
+            const forma = (typeof getFormaPagamento === 'function' ? getFormaPagamento().forma : null);
+            if (forma === 'dinheiro') {
+                // Dinheiro é pago presencial (retirada ou entrega). Não passa pelo modal online.
+                return finalizarPedidoDinheiro();
+            }
+            // Pix ou Cartão → modal de pagamento com aba pré-selecionada; se nada foi escolhido, abre neutro
+            abrirPaymentModal(forma === 'pix' || forma === 'cartao' ? forma : null);
+        }
+
+        // ==================== FLUXO DINHEIRO (pago presencialmente) ====================
+        async function finalizarPedidoDinheiro() {
+            _currentTotal = calcularTotalPedido();
+            const formaPref = getFormaPagamento();
+
+            // Registra o pedido com status "aguardando_pagamento" e método "dinheiro"
+            const resultado = await registrarPedido({
+                method: 'dinheiro',
+                status: 'aguardando_pagamento',
+            });
+
+            // Monta a tela de confirmação
+            const totalStr = `R$ ${_currentTotal.toFixed(2).replace('.', ',')}`;
+            const deliveryStr = deliveryType === 'retirada'
+                ? '🏪 Retirada na loja — pague no balcão'
+                : '🚚 Entrega — pague ao entregador na porta';
+
+            let trocoBlock = '';
+            if (formaPref.precisaTroco && formaPref.trocoValor) {
+                const troco = formaPref.trocoValor - _currentTotal;
+                if (troco > 0) {
+                    trocoBlock = `
+                        <div style="background:#fff3cd; border:1.5px solid #ffe08a; border-radius:10px; padding:12px; margin:12px 0; text-align:left;">
+                            <div style="font-weight:700; color:#8a6d00; margin-bottom:4px;">💵 Troco separado</div>
+                            <div style="font-size:.88rem; color:#5a6a85;">Você pagará R$ ${formaPref.trocoValor.toFixed(2).replace('.',',')} e receberá <strong style="color:#8a6d00">R$ ${troco.toFixed(2).replace('.',',')}</strong> de troco.</div>
+                        </div>`;
+                }
+            } else if (formaPref.forma === 'dinheiro') {
+                trocoBlock = `
+                    <div style="background:#e8f5e9; border:1.5px solid #a5d6a7; border-radius:10px; padding:12px; margin:12px 0; text-align:left;">
+                        <div style="font-weight:700; color:#1b5e20;">💵 Sem troco</div>
+                        <div style="font-size:.88rem; color:#5a6a85;">Prepare o valor exato: <strong>${totalStr}</strong>.</div>
+                    </div>`;
+            }
+
+            let enderecoBlock = '';
+            if (deliveryType === 'entrega') {
+                const end = getEnderecoEntrega();
+                if (end) {
+                    enderecoBlock = `
+                        <div style="background:#f0f9ff; border:1.5px solid #b8ddf0; border-radius:10px; padding:12px; margin:12px 0; text-align:left;">
+                            <div style="font-weight:700; color:#0077aa; margin-bottom:4px;">📍 Endereço de entrega</div>
+                            <div style="font-size:.85rem; color:#1a2340; line-height:1.5;">
+                                ${end.nome ? '<strong>' + end.nome + '</strong><br>' : ''}
+                                ${end.rua || ''}${end.numero ? ', ' + end.numero : ''}${end.complemento ? ' — ' + end.complemento : ''}<br>
+                                ${end.bairro ? end.bairro + ' — ' : ''}CEP ${end.cep || ''}
+                            </div>
+                        </div>`;
+                }
+            }
+
+            const conteudo = `
+                <div style="text-align:center; padding:22px 20px 26px;">
+                    <div style="width:64px; height:64px; margin:0 auto 14px; background:linear-gradient(135deg,#22a06b,#178a56); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; color:#fff; box-shadow:0 6px 20px rgba(34,160,107,.3);">✓</div>
+                    <h2 style="color:#178a56; font-size:1.3rem; margin:0 0 6px;">Pedido registrado!</h2>
+                    <p style="color:#5a6a85; font-size:.9rem; margin:0 0 14px;">${deliveryStr}</p>
+                    <div style="background:#f5f5f5; border-radius:10px; padding:14px; margin:14px 0;">
+                        <div style="font-size:.75rem; color:#5a6a85; text-transform:uppercase; letter-spacing:.5px;">Total a pagar em dinheiro</div>
+                        <div style="font-size:1.6rem; font-weight:800; color:#178a56; margin-top:4px;">${totalStr}</div>
+                    </div>
+                    ${trocoBlock}
+                    ${enderecoBlock}
+                    <div style="background:#fff9e6; border:1.5px solid #ffd970; border-radius:10px; padding:10px 12px; margin:14px 0; font-size:.82rem; color:#8a6d00;">
+                        <strong>📞 A gente vai te confirmar em instantes pelo WhatsApp.</strong><br>
+                        Se preferir, mande uma mensagem pra <a href="https://wa.me/5551997655755" style="color:#0088C2; font-weight:600;">(51) 99765-5755</a>.
+                    </div>
+                    <button onclick="fecharDinheiroConfirm()" style="width:100%; padding:13px; background:linear-gradient(135deg,#22a06b,#178a56); color:#fff; border:none; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer; margin-top:6px;">
+                        🎉 Continuar navegando
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('dinheiroConfirmBody').innerHTML = conteudo;
+            document.getElementById('dinheiroConfirmModal').classList.add('active');
+            document.getElementById('cartModal').classList.remove('active');
+            document.querySelector('.floating-cart').style.display = 'none';
+
+            // Limpa carrinho (memória + localStorage) — pedido já foi registrado
+            cart = [];
+            appliedCoupon = null;
+            limparCarrinhoSalvo();
+            const cupomInput = document.getElementById('couponInput');
+            if (cupomInput) cupomInput.value = '';
+            updateCart();
+
+            // Avisa se registro falhou
+            if (resultado && !resultado.firestoreOk) {
+                setTimeout(() => showNotification('Pedido salvo localmente. Se possível, envie os itens pelo WhatsApp pra confirmação.', 'error'), 500);
+            }
+        }
+
+        function fecharDinheiroConfirm() {
+            document.getElementById('dinheiroConfirmModal').classList.remove('active');
+            document.querySelector('.floating-cart').style.display = 'flex';
         }
 
         // ==================== SUBMIT PIX ====================
@@ -7233,6 +7444,15 @@
                             <label>CEP</label>
                             <input type="text" id="endCep" placeholder="00000-000" maxlength="9" oninput="mascaraCEPEndereco(this);buscarCepEndereco()">
                         </div>
+                        <!-- Aviso quando CEP está fora da área de cobertura -->
+                        <div class="fe-full" id="cepForaAreaAviso" style="display:none;">
+                            <div style="background:#fef1f4; border:1.5px solid #f5b7c3; border-radius:8px; padding:10px 12px; margin-top:2px; font-size:.82rem; color:#a1263c; line-height:1.4;">
+                                <strong>😔 Ops! Ainda não atendemos esse CEP.</strong><br>
+                                <span id="cepForaAreaCidade" style="color:#5a6a85; font-weight:500;"></span>
+                                Estamos trabalhando para expandir a área de cobertura em breve!
+                                <br><a href="https://wa.me/5551997655755?text=Ol%C3%A1%20C%C3%A3oTelli!%20Meu%20CEP%20%C3%A9%20fora%20da%20%C3%A1rea%20atual%20de%20cobertura%2C%20mas%20gostaria%20de%20saber%20se%20conseguem%20me%20atender." target="_blank" style="color:#0088C2; font-weight:600; text-decoration:none;">💬 Fale com a gente no WhatsApp</a>
+                            </div>
+                        </div>
                         <div class="fe-field">
                             <label>Bairro *</label>
                             <input type="text" id="endBairro" placeholder="Ex: Mal. Rondon" oninput="salvarEnderecoLocal()">
@@ -7425,6 +7645,15 @@
         <div class="pay-modal">
             <div class="pay-modal-body pay-result" id="cardResultBody">
                 <!-- preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAÇÃO PEDIDO EM DINHEIRO -->
+    <div id="dinheiroConfirmModal" class="pay-overlay" role="dialog" aria-modal="true" aria-labelledby="dinheiroConfirmTitle">
+        <div class="pay-modal">
+            <div class="pay-modal-body" id="dinheiroConfirmBody">
+                <!-- preenchido dinamicamente por finalizarPedidoDinheiro() -->
             </div>
         </div>
     </div>
