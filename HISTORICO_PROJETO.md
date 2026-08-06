@@ -327,13 +327,214 @@ Diogo respondeu que a ideia era usar o domínio `caotelli.com.br` que eles já t
 3. Texto das 4 páginas legais (Política de Privacidade, Termos de Uso, Política de Cookies, Política de Publicidade) — pra manter conformidade LGPD/Procon
 4. Arquivo `og-image.jpg` do site atual
 
-**Status ao encerrar (06/08/2026 — final da sessão):**
+### Parte 6 — Botão "Voltar" no modal de pagamento
 
-- ✅ Pacote pré-lançamento código feito (partes 1-4 acima)
-- ✅ Diagnóstico completo do domínio `caotelli.com.br`
-- ✅ Mensagem detalhada enviada ao Diogo com as 4 perguntas
-- ⏳ Aguardando resposta do Diogo/Endrich com acessos e conteúdo das páginas legais
-- 📋 Próxima sessão: assim que tivermos os acessos, migrar pra Vercel (Opção B) e apontar domínio
+**Motivação (feedback do Diogo):** cliente pode escolher Entrega no carrinho, ir pro modal de pagamento e mudar de ideia (querer retirada). Sem botão de voltar, precisa fechar tudo e reabrir.
+
+**Implementação:**
+- Novo botão pill `← Voltar` no header do modal `#paymentModal`, à esquerda do título
+- Nova função `voltarAoCarrinho()` — fecha modal de pgto e reabre o carrinho
+- CSS: `.pay-back-btn` (border cyan, hover vira sólido com translate -2px pra sensação de "voltar")
+- Responsivo: fonte menor no mobile pra não brigar com o título
+
+### Parte 7 — Fix de overflow no carrinho mobile
+
+**Motivação:** Diogo mandou print — os inputs do endereço estavam vazando horizontalmente no carrinho no mobile, aparecendo scroll horizontal.
+
+**Causas identificadas (3 combinadas):**
+1. Inputs sem `box-sizing: border-box` — padding somava sobre a largura
+2. Grid sem `min-width: 0` — CSS Grid padrão empurra colunas quando conteúdo excede
+3. `.cart-content` sem `overflow-x: hidden`
+
+**Correções em `.cart-content`:**
+- `overflow-x: hidden` + `box-sizing: border-box`
+- Regra global: `.cart-content * { box-sizing: border-box; max-width: 100%; }`
+- `.cart-content input, select, textarea { width: 100%; min-width: 0; }`
+- Grids e seus filhos com `min-width: 0`
+- Novo breakpoint `@media (max-width:480px)`:
+  - Grid de endereço + slots viram 1 coluna
+  - Padding reduzido
+  - `font-size: 16px` nos inputs (evita zoom automático do iOS)
+
+### Parte 8 — Fluxo do Dinheiro pula modal + auto-seleção de aba
+
+**Motivação (Diogo):** "Se for pagar em dinheiro teria só que registrar o pedido. E se eu escolhi cartão, não tem por que o modal mostrar PIX também."
+
+**Também confirmado:** dinheiro serve tanto pra retirada (paga no balcão) quanto pra entrega (paga ao entregador na porta) — a CãoTelli tem tele-entrega própria, e receber em dinheiro é mais vantajoso do que cartão pra eles (sem taxas).
+
+**Refatoração de `checkout()`:**
+```js
+const forma = getFormaPagamento().forma;
+if (forma === 'dinheiro') return finalizarPedidoDinheiro();
+abrirPaymentModal(forma === 'pix' || forma === 'cartao' ? forma : null);
+```
+
+**Nova função `finalizarPedidoDinheiro()`:**
+- Chama `registrarPedido({ method: 'dinheiro', status: 'aguardando_pagamento' })`
+- Abre novo modal `#dinheiroConfirmModal` com:
+  - ✓ verde grande "Pedido registrado!"
+  - Aviso "🏪 Retirada — pague no balcão" ou "🚚 Entrega — pague ao entregador na porta"
+  - Total destacado
+  - **Bloco troco (amarelo)** se cliente pediu troco: "Você pagará R$ X e receberá R$ Y de troco"
+  - **Bloco sem troco (verde)**: "Prepare o valor exato"
+  - Endereço de entrega completo (se for entrega)
+  - CTA WhatsApp de contato + botão "Continuar navegando"
+- Limpa carrinho + localStorage automaticamente
+- Se registro no Firestore falhar → mostra notificação amarela avisando
+
+**Refatoração de `abrirPaymentModal(preferredForma)`:**
+- Aceita parâmetro opcional
+- Se `preferredForma === 'pix'` → abre na aba PIX + esconde a tabs bar (aba Cartão some)
+- Se `preferredForma === 'cartao'` → abre na aba Cartão + esconde a tabs bar
+- Se nada → comportamento antigo (2 abas, default PIX)
+- SDK do Mercado Pago (~200KB) só carrega quando cartão for possibilidade (se cliente escolheu PIX, nem baixa)
+
+**Novo HTML:** modal `#dinheiroConfirmModal` (pay-overlay + pay-modal reutilizando estilos existentes)
+
+### Parte 9 — Validação de CEP por área de cobertura
+
+**Motivação:** Diogo pediu que CEPs fora da área (ex: Porto Alegre) mostrem aviso amigável "Estamos trabalhando pra expandir a cobertura" em vez de deixar o cliente preencher tudo e ficar frustrado depois.
+
+**Primeira versão simples:** validava só cidade — `CIDADES_ATENDIDAS = ['Canoas']`. Se ViaCEP retornasse outra cidade, bloqueava.
+
+**Evoluiu pra estrutura completa** (ver Parte 10 abaixo).
+
+### Parte 10 — Cobertura por área com dias e slots dinâmicos
+
+**Motivação:** Diogo respondeu que também entrega em Esteio, Cachoeirinha e Porto Alegre — mas com regras diferentes:
+- **Esteio e Cachoeirinha:** qualquer bairro, só sábado 9h-13:30
+- **Porto Alegre:** só bairros **Humaitá, Farrapos e Zona Norte**, só sábado 9h-13:30
+- **São Leopoldo:** NÃO entrega
+- Sugestão do Diogo: "escolher horário deve ficar após o cadastro do endereço"
+
+**Refatoração pesada:**
+
+**Nova estrutura `AREAS_COBERTURA`** (substitui `CIDADES_ATENDIDAS`):
+```js
+{
+  'canoas':       { bairros:'*', diasDaSemana:[1..6], slots:[4 slots normais] },
+  'esteio':       { bairros:'*', diasDaSemana:[6],   slots:[{start:'09:00',end:'13:30'}] },
+  'cachoeirinha': { bairros:'*', diasDaSemana:[6],   slots:[{start:'09:00',end:'13:30'}] },
+  'porto alegre': { bairros:['humaita','humaitá','farrapos','zona norte'], diasDaSemana:[6], slots:[{start:'09:00',end:'13:30'}] }
+}
+```
+
+**Novos helpers globais:**
+- `_normalizeStr()` — lowercase + strip diacritics via `normalize('NFD').replace(/[̀-ͯ]/g,'')`
+- `_bairroPermitido(area, bairro)` — comparação case-insensitive + sem acento + suporta match parcial
+- `_diaSemanaPermitido(area, dia)`
+- `_proximoDiaEntrega(area, maxDiasFrente=14)` — busca janela de 14 dias
+- `_proximosDiasOfferecidos(area, quantidade=3, janela=14)` — chips de dia dinâmicos
+- `_slotsAtivos()` — retorna slots da área atual ou HORARIOS_SLOTS_DEFAULT
+
+**Novo estado global:** `_areaCoberturaAtual`, `_cidadeCepAtual`, `_bairroCepAtual`
+
+**`buscarCepEndereco()` refatorada:**
+- CEP incompleto → limpa estado, esconde aviso
+- CEP inválido → aviso vermelho "não encontrado"
+- Cidade não coberta → aviso "Esse CEP é de X/UF"
+- Cidade coberta mas bairro filtrado (PA) → aviso "Em Porto Alegre entregamos apenas em: ..."
+- Ok → segue normalmente + dispara `renderHorariosEntrega()`
+
+**Novo handler `revalidarBairroManual()`:** ligado ao `oninput` do campo Bairro — quando cliente edita manualmente o bairro (ex: ViaCEP retornou "Farrapos" mas ele digitou "Cidade Baixa"), o sistema re-avalia na hora.
+
+**`renderHorariosEntrega()` refatorada pra ser adaptativa:**
+- Se sem área identificada → aviso "📮 Preencha o CEP acima..."
+- Se área OK mas bairro fora → aviso "⚠️ Bairro fora da cobertura..."
+- Se área OK → renderiza próximos 3 dias permitidos + slots específicos + aviso se área tiver dias limitados ("ℹ️ Em Esteio entregamos apenas Sáb.")
+- Chips de dia agora usam `_proximosDiasOfferecidos()` — pode pular semanas se necessário
+
+**`restaurarHorarioLocal()` mais resiliente:** se slot salvo não existe mais na área atual (mudança de cidade), descarta silenciosamente.
+
+**Reordenação da UI no carrinho:**
+- Antes: Horário → Endereço
+- Agora: **Endereço → Horário** (horário depende do CEP pra saber slots disponíveis)
+
+**Novo HTML:** `<div id="heAvisoArea">` dentro do box de horário — mostra avisos contextuais por área.
+
+### Parte 11 — 11 imagens custom das categorias
+
+**Contexto:** Diogo criou/mandou 11 imagens autorais em estilo 3D cartoon pra substituir as imagens genéricas do Unsplash.
+
+**Ação:** Todas copiadas pra `img/categorias/` com nomes descritivos:
+- `cat_agendamento.jpg` — cachorro + calendário + estetoscópio (fundo azul)
+- `cat_vacinas.jpg` — cachorro + escudo + seringa (fundo vermelho)
+- `cat_ofertas.jpg` — cachorro + etiqueta % + presente + moedas (fundo vermelho)
+- `cat_brinquedos.jpg` — frango + bola + osso (fundo vermelho)
+- `cat_outros.jpg` — coelho + hamster + tartaruga + peixe + calopsita (fundo azul)
+- `cat_higiene_todos.jpg` — cachorro tomando banho + shampoo + escova (fundo rosa) → usado em **Todos**
+- `cat_farmacia.jpg` — cachorro + medicamentos + gotas + pomada (fundo azul)
+- `cat_acessorios.jpg` — cama + coleiras + guia + gravatinha (fundo rosa)
+- `cat_caes.jpg` — cachorro laranja + tigela + osso + bola (fundo azul)
+- `cat_gatos.jpg` — gato cinza + tigela + peixe + lã (fundo rosa)
+- `cat_equipe.jpg` — equipe CãoTelli estilo anime
+
+Substituídas 11 URLs Unsplash + 1 do freepik (Ofertas). Backup mantido em `equipe_caotelli.jpg` (a foto real anterior).
+
+**⚠️ Ponto pendente pra próxima sessão:** confirmar se a imagem do "banho" está bem em "Todos" ou se deve ir pra Farmácia (Diogo ainda não confirmou).
+
+### Parte 12 — Fix borda azul do botão "Todos"
+
+**Feedback do Diogo:** primeiro botão de categoria (Todos) tinha uma borda azul cyan sólida (2.5px `#0088C2`), enquanto os outros 10 tinham `rgba(255,255,255,0.4)` (praticamente invisível). Parecia bug visual — era um destaque decorativo antigo que não se atualizava conforme clique.
+
+**Fix:** trocada a borda do "Todos" pra igual às outras. Consistência visual restaurada.
+
+### Validação técnica pré-push (rodada final)
+
+- **HTML tags balanceadas:** script 6/6, style 2/2, div 517/517, button 99/99, form 6/6, html/head/body 1/1
+- **11 imagens de categoria:** todos os arquivos existem em `img/categorias/` + todas referenciadas no HTML
+- **URLs Unsplash residuais** na seção de categorias: **zero** (destaques ainda usam, esperado)
+- **17 funções críticas** todas definidas
+- **Constantes:** AREAS_COBERTURA, HORARIOS_SLOTS_DEFAULT, CART_STORAGE_KEY, COUPON_STORAGE_KEY ✓
+- **16 IDs críticos** todos presentes
+- **SEO:** sitemap.xml (com image + lastmod 2026-08-06) + robots.txt (Disallow /api/) ✓
+- **Meta tags mobile:** theme-color, apple-mobile-web-app, twitter-card, favicon ✓
+- **Parse JavaScript:** 4 blocos, 4.753 linhas — passou em `node --check` sem erros
+- **Arquivo final:** 598.8 KB · 8.107 linhas
+
+### Status ao encerrar (06/08/2026 — final da sessão)
+
+**✅ Feito (partes 1-12):**
+- SEO/PWA hints + persistência completa do carrinho + alt em logos + sitemap atualizado
+- Diagnóstico completo do domínio `caotelli.com.br` + mensagem enviada ao Diogo
+- Botão voltar no modal de pagamento
+- Fix overflow do carrinho no mobile
+- Fluxo do dinheiro pula modal + registra pedido direto
+- Auto-seleção de aba no modal (Pix ou Cartão) baseado na escolha do carrinho
+- Validação de CEP por cidade
+- Cobertura de entrega adaptativa (4 cidades, dias/slots/bairros por regra)
+- Reordenação UI (endereço → horário)
+- 11 imagens custom das categorias
+- Fix borda azul do botão Todos
+
+**📋 Push sugerido (bem denso):**
+```
+feat: SEO + carrinho persistente + botão voltar + fix mobile + fluxo dinheiro + auto-aba pgto + cobertura por área/dia/bairro + 11 imagens custom das categorias
+```
+
+**⏳ Aguardando resposta do Diogo (via WhatsApp) — 4 perguntas do domínio:**
+1. Acesso ao Registro.br (login/senha do painel Diogo/Luana)
+2. Acesso à Vercel onde o site atual `caotelli.com.br` está hospedado
+3. Texto das 4 páginas legais (Política de Privacidade, Termos, Cookies, Publicidade)
+4. Arquivo `og-image.jpg` do site atual
+
+**⚠️ Detalhes pra confirmar com Diogo na próxima sessão:**
+- Imagem do cachorro tomando banho deve ficar em **Todos** (como coloquei) ou trocar pra **Farmácia**?
+- Confirmar lista definitiva de cobertura: hoje `Canoas + Esteio + Cachoeirinha + PA (só Humaitá/Farrapos/Zona Norte)`
+
+**📋 Próximos passos (backlog atualizado):**
+
+1. **Aplicar domínio próprio** (depende das respostas do Diogo)
+2. **Webhook + Firebase Admin SDK** (belt and suspenders)
+3. **Auto-cadastro de cliente** ao finalizar compra
+4. **Botão "Registrar pedido manual"** no admin
+5. **Painel admin de gerenciamento de horários** (feriados, dias da semana)
+6. **Painel de métricas do admin** (gráficos de vendas)
+7. **Histórico de pedidos por cliente logado**
+8. **Descontos por produto** (habilitar "Maior Desconto" no dropdown)
+9. **PWA** (manifest.json + service worker — hints mobile já prontos)
+10. **Aba admin de gerenciamento de imagens de categoria** (se Diogo quiser mudar direto pelo admin)
+11. **Notificação e-mail pro Diogo** em pedido novo (alternativa grátis ao WhatsApp Business API)
 
 **📋 Próximos passos técnicos (backlog):**
 1. Webhook + Firebase Admin SDK (belt and suspenders — depende de service account no Firebase + env var na Vercel)
