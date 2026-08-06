@@ -277,6 +277,64 @@ feat: pacote pré-lançamento (meta tags mobile + alt em logos + sitemap atualiz
 3. **Diogo enviar lista de bairros de Canoas + região** — pra configurar frete por CEP
 4. **Diogo enviar fotos dos brinquedos** — alguns produtos ainda têm `imgUrl:""`
 
+### Parte 5 — Discussão sobre domínio próprio (`caotelli.com.br`)
+
+**Contexto:** Liézer perguntou "o que falta pro site rodar" e chegou à conclusão de que o único bloqueio restante pro lançamento oficial é ter o domínio próprio (sair do `liezerlad21-commits.github.io/CaoTelli/`).
+
+**Descoberta 1 — o domínio JÁ EXISTE e pertence à CãoTelli:**
+
+Diogo respondeu que a ideia era usar o domínio `caotelli.com.br` que eles já têm, atualmente hospedando um site institucional/vitrine. Liézer inicialmente pensou em comprar novo em CPF próprio pra dar de presente, mas a discussão evoluiu.
+
+**Diagnóstico técnico do domínio atual (via WebFetch + print do WHOIS enviado pelo Diogo):**
+
+- **Titular:** Caotelli Rações e Acessórios
+- **Documento:** 33.482.978/0001-96 (CNPJ da empresa)
+- **Responsável legal:** Luana Stachelski (deve ser sócia)
+- **Contato titular/técnico:** Endrich Malgor (`endrick1666@gmail.com`) — é o "cara do tráfego" que Diogo mencionou. NÃO é o dono, é só o admin técnico
+- **Servidores DNS:** `ns1.vercel-dns.com` e `ns2.vercel-dns.com` — **site atual está hospedado na Vercel** (mesma plataforma do nosso backend)
+- **Criado:** 19/01/2024
+- **Expiração:** 19/01/2027 (mais de 5 meses de folga)
+- **Status:** Publicado
+
+**Descoberta 2 — o Diogo estava enganado sobre "transferência de titularidade":** ele achava que precisava esperar pra transferir do nome do Endrich pro CNPJ da CãoTelli. Mas o CNPJ da empresa já É o titular desde a criação. Não tem burocracia de titularidade a fazer.
+
+**Análise do site atual (`caotelli.com.br`):**
+
+- Feito em **Astro** (framework moderno de site estático)
+- É **institucional/vitrine** — todo pedido vai pro WhatsApp, não tem carrinho/checkout
+- SEO bem feito (meta tags completas, og:image, structured data)
+- Design responsivo com tema **vermelho** (`#e8000f`) — nosso site novo é azul (`#0088C2`)
+- Já tem páginas legais indexadas pelo Google: `/politica-de-privacidade`, `/politica-de-cookies`, `/politica-de-publicidade`, `/termos-de-uso`
+- Já tem `og-image.jpg` otimizada 1200×630 pra compartilhamento no WhatsApp
+
+**Duas arquiteturas propostas pra transição:**
+
+- **Opção A** (mais simples, menos integrado): trocar nameservers pro padrão Registro.br, adicionar 4 registros A do GitHub Pages + CNAME, criar arquivo `CNAME` no repo. Backend continua em `cao-telli.vercel.app`.
+
+- **Opção B (RECOMENDADA)** — migrar tudo pra Vercel:
+  - Frontend + backend no mesmo lugar
+  - Deploy automático a cada push no GitHub (dispensa `PushCaoTelli.bat`)
+  - Nameservers já apontam pra Vercel — só adicionar o domínio ao projeto novo
+  - URLs mais bonitas: `/api/checkout` sem prefixo `cao-telli.vercel.app`
+  - HTTPS gratuito e automático
+  - Preview URLs de cada branch (pré-visualização pro Diogo antes de subir prod)
+  - Custo: gratuito (plano Hobby)
+
+**Mensagem enviada ao Diogo** (via Liézer) com 4 perguntas:
+
+1. Acesso ao Registro.br (login/senha do painel do Diogo ou Luana — não do Endrich)
+2. Acesso à conta Vercel onde o site atual está hospedado
+3. Texto das 4 páginas legais (Política de Privacidade, Termos de Uso, Política de Cookies, Política de Publicidade) — pra manter conformidade LGPD/Procon
+4. Arquivo `og-image.jpg` do site atual
+
+**Status ao encerrar (06/08/2026 — final da sessão):**
+
+- ✅ Pacote pré-lançamento código feito (partes 1-4 acima)
+- ✅ Diagnóstico completo do domínio `caotelli.com.br`
+- ✅ Mensagem detalhada enviada ao Diogo com as 4 perguntas
+- ⏳ Aguardando resposta do Diogo/Endrich com acessos e conteúdo das páginas legais
+- 📋 Próxima sessão: assim que tivermos os acessos, migrar pra Vercel (Opção B) e apontar domínio
+
 **📋 Próximos passos técnicos (backlog):**
 1. Webhook + Firebase Admin SDK (belt and suspenders — depende de service account no Firebase + env var na Vercel)
 2. Auto-cadastro de cliente ao finalizar compra (aproveita form de endereço)
