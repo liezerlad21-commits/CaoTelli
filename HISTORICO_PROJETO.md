@@ -197,6 +197,101 @@ ae05318 Atualizacao do site CaoTelli
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
+**Data:** 06/08/2026 (PACOTE DE PRÉ-LANÇAMENTO — SEO/PWA HINTS + PERSISTÊNCIA DO CARRINHO + ALT NAS LOGOS)
+
+### Contexto
+Diogo perguntou "o que falta pro site rodar" — o site já estava 100% funcional em produção (cartão testado por Diogo em 05/08 caiu no admin), mas faltavam refinamentos de pré-lançamento oficial. Sessão focada nos itens 100% código que não dependiam de nenhuma ação externa.
+
+### Parte 1 — Meta tags de tema mobile (`<head>` do index.html)
+
+**Novo bloco após favicon:**
+- `theme-color: #0088C2` — pinta a barra de status do navegador mobile com a cor primary-cyan
+- `msapplication-TileColor` — mesma cor para tile do Windows
+- `mobile-web-app-capable` + `apple-mobile-web-app-capable` — permite "adicionar à tela inicial" no iOS/Android
+- `apple-mobile-web-app-title: CãoTelli` — nome curto do ícone
+- `format-detection: telephone=yes` — habilita auto-link em números de telefone no mobile
+
+**Nota:** SEO básico (description, keywords, og:*, twitter card, canonical) já estava completo desde antes. Total de meta tags no head agora: 25.
+
+### Parte 2 — Alt nas logos base64 do header
+
+Três `<img>` das logos SVG base64 (linhas ~2010, 2049, 2143) estavam sem `alt`. Adicionado `alt="CãoTelli — Pet Shop em Canoas/RS"` nos três (via replace_all no prefixo comum `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMg`). Todas as outras imagens do site já tinham alt.
+
+### Parte 3 — sitemap.xml e robots.txt atualizados
+
+**sitemap.xml:**
+- `lastmod` atualizado de `2026-04-17` → `2026-08-06`
+- `changefreq: weekly` → `daily` (site é atualizado com frequência via admin)
+- Adicionado bloco `<image:image>` com a logo (Google indexa imagens do site)
+
+**robots.txt:**
+- Adicionado `Disallow: /api/` (evita bots baterem nos endpoints Vercel)
+
+### Parte 4 — Persistência completa do carrinho (localStorage)
+
+**Situação anterior:** carrinho e cupom **já eram** carregados/salvos do localStorage (chaves `caotelli_carrinho` e `caotelli_cupom`), mas:
+1. `salvarCarrinho()` só era chamada em `updateCart()` — cupom aplicado via `applyCoupon()` nunca era persistido
+2. `limparCarrinhoSalvo()` **nunca era chamada** — o carrinho ficava salvo indefinidamente mesmo após compra aprovada, e voltava fantasma no próximo acesso
+
+**Correções:**
+
+- **`applyCoupon()`** — adicionada chamada a `salvarCarrinho()` em ambos os ramos (cupom válido e cupom inválido/reset)
+- **`applyCouponDirectly()`** — mesmo tratamento
+- **`limparCarrinhoSalvo()`** agora é chamada em 4 pontos após checkout:
+  1. Tela de PIX aprovado (`exibirPagamentoAprovado`)
+  2. Cartão aprovado no `submitCard` (status `approved`)
+  3. `verificarRetornoMP()` (compatibilidade com fluxo antigo Checkout Pro)
+  4. `enviarComprovante()` (fluxo manual via WhatsApp)
+
+**Resultado:** carrinho e cupom sobrevivem ao reload, mas são limpos assim que a compra é finalizada.
+
+### Validação técnica
+
+Contagens após edições (via python + regex):
+- script open/close: 6/6 ✅
+- style open/close: 2/2 ✅
+- div open/close: 496/496 ✅
+- html tag: 1/1 ✅
+- meta tags: 25
+- CART_STORAGE_KEY: 4 refs, COUPON_STORAGE_KEY: 5 refs
+- salvarCarrinho(): 5 chamadas | limparCarrinhoSalvo(): 5 chamadas
+
+### Status ao encerrar (06/08/2026)
+
+**✅ Feito nesta sessão:**
+- Meta tags theme-color + apple-mobile-web-app-* adicionadas
+- Alt adicionado nas 3 logos base64 do header
+- sitemap.xml atualizado (lastmod + changefreq + image)
+- robots.txt com `Disallow: /api/`
+- Cupom agora persiste no localStorage ao aplicar
+- Carrinho é limpo do localStorage após pagamento aprovado (4 caminhos cobertos)
+
+**📋 Push sugerido:**
+```
+feat: pacote pré-lançamento (meta tags mobile + alt em logos + sitemap atualizado + persistência completa do carrinho)
+```
+
+**⏳ O que falta pro site rodar oficialmente (fora do controle do Liézer):**
+1. **Diogo cadastrar webhook MP:** `https://cao-telli.vercel.app/api/mp-webhook` no painel MP (Webhooks → evento Pagamentos)
+2. **Diogo confirmar se PIX foi destravado** (habilitação da chave para QR dinâmico) — cartão já foi validado dia 05/08
+3. **Diogo enviar lista de bairros de Canoas + região** — pra configurar frete por CEP
+4. **Diogo enviar fotos dos brinquedos** — alguns produtos ainda têm `imgUrl:""`
+
+**📋 Próximos passos técnicos (backlog):**
+1. Webhook + Firebase Admin SDK (belt and suspenders — depende de service account no Firebase + env var na Vercel)
+2. Auto-cadastro de cliente ao finalizar compra (aproveita form de endereço)
+3. Botão "Registrar pedido manual" no admin (pedidos por WhatsApp/telefone)
+4. Painel admin de gerenciamento de horários (feriados, dias da semana)
+5. Painel de métricas do admin (gráficos de vendas)
+6. Histórico de pedidos por cliente logado
+7. Descontos por produto (habilitar "Maior Desconto" no dropdown)
+8. PWA (manifest.json + service worker — hints mobile já estão prontos)
+9. Notificação e-mail pro Diogo em pedido novo (alternativa grátis ao WhatsApp Business API)
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
+
 **Data:** 05/08/2026 (SESSÃO NOITE — UX: BALÃO DE REVIEWS ROTATIVO + SUGESTÕES CONTEXTUAIS NO CARRINHO + ORDENAÇÃO GLOBAL DE PRODUTOS)
 
 ### Parte 1 — Balão de avaliações Google rotativo

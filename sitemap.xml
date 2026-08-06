@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://liezerlad21-commits.github.io/CaoTelli/</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://liezerlad21-commits.github.io/CaoTelli/logo_caotelli.png</image:loc>
+      <image:title>CãoTelli — Pet Shop em Canoas/RS</image:title>
+      <image:caption>Rações, medicamentos, brinquedos e acessórios para cães e gatos em Canoas/RS.</image:caption>
+    </image:image>
   </url>
 </urlset>
