@@ -228,6 +228,9 @@ Todos os itens das duas auditorias foram corrigidos no mesmo dia, a pedido do Li
 ## 8. HISTÓRICO DE COMMITS (últimos 20)
 
 ```
+080d89b fix: volta pra 5 colunas na grade de produtos (cards mais estreitos)                       ← 07/08
+ea70dc4 fix: seguranca (XSS) + LGPD + bugs de carrinho + ajustes de header e produtos               ← 07/08
+6527ee1 docs: atualiza historico com ajustes finais de espacamento do banner                        ← 07/08
 f6ae416 fix: reduz um pouco o espacamento T-elli (ponto intermediario)                             ← 07/08
 949a06b fix: dobra a aproximacao entre T e elli no banner                                           ← 07/08
 9868998 fix: diminui espaco entre T e elli no banner                                                ← 07/08
@@ -256,7 +259,7 @@ a230c3c feat: filtro de data + busca na aba Pedidos do admin                    
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
 
-**Data:** 07/08/2026 (CABEÇALHO — remoção/restauração, correção de espaçamento e alinhamento com o banner)
+**Data:** 07/08/2026 (CABEÇALHO + CARDS DE PRODUTO + BUGS + AUDITORIA DE SEGURANÇA/LGPD — sessão longa e iterativa)
 
 ### Contexto
 
@@ -280,11 +283,40 @@ Continuação da sessão do banner novo (mesmo dia). Liézer pediu pra tirar o c
 - **Lição da tentativa #4:** não vale a pena fazer o header como overlay (`position:absolute`) sobre o banner enquanto o `.header-container` empilhar em coluna no mobile (`@media max-width:768px`) — ele nunca vai caber sem cobrir a imagem inteira. Se Liézer pedir de novo, a solução seria uma versão separada e mais compacta do header *só* pro breakpoint mobile (esconder busca, por exemplo), não simplesmente herdar o layout empilhado atual.
 - `padding-top` da `.hero` (atualmente `55px`) é o dial principal pra descer/subir o banner+botão+carrossel juntos como bloco (eles se movem em conjunto porque as margens negativas internas — `-160px` na imagem, `-17%` no bloco de botão/carrossel — são relativas entre si, não ao topo da página).
 
-### Status ao encerrar (07/08/2026 — sessão do cabeçalho)
+### Continuação da sessão — ajustes finos + bugs + auditoria (mesmo dia)
 
-✅ Header de volta, enxuto (padding 8px, logo 60px) e não-sobreposto (funciona em mobile e desktop). Banner+botões descendo 55px juntos. Validado: sintaxe JS ok (`node --check` nos 4 blocos `<script>`), tags balanceadas, testado visualmente em 375px e 1440px, sem erros no console.
+8. **Refinamento do header:**
+   - Espaço logo↔texto "CãoTelli": `gap:10px` → `2px`
+   - Letras de "CãoTelli" mais unidas: `letter-spacing:1px` → `-2px`
+   - "CãoTelli" centralizado com a tagline "Rações · Acessórios · Medicamentos" embaixo (`transform-origin:left`→`center`, `text-align:center` nos dois, tagline trocou `justify` por `center`)
+9. **Categorias:** "Outros" → **"Outros Pets"** (movida pra depois de "Gatos" no carrossel); "Agendamento" → **"Tele-entrega"** (label no nav + carrossel + submenu hover). ⚠️ "Outros Pets" ainda aponta pra `showCategory('todos')` — não existe categoria de produto real pra outros pets no catálogo ainda (só ração/remédios/acessórios/brinquedos). Pendente: Liézer definir quais produtos são "outros pets".
+10. **"10% OFF"** destacado em amarelo/maior na faixa "Cadastre-se e garanta seu desconto".
+11. **Campo de telefone** adicionado no formulário de endereço de entrega (`endTelefone`, com máscara, obrigatório, salvo no pedido, exibido no admin).
+12. **Bug corrigido — carrinho com item sem nome/preço + duplicando linha:** `addToCartOffer()` (botão da seção "Ofertas Especiais", ex. Simparic em destaque) chamava `addToCart(itemOferta)` passando o objeto inteiro em vez do ID — `addToCart` esperava um ID, então o produto nunca era encontrado e um item vazio (`{quantity:1}`, sem nome/preço) era empurrado pro carrinho. Reescrita pra fazer o incremento/push direto com o item da oferta.
+13. **Cards de produto recompactados (referência: Cobasi)** — várias rodadas iterativas:
+    - Grid: 250px→190px→160px→140px→200px→**250px→200px (final: 5 colunas)** de minmax; `gap` 25px→10px; `max-width:1400px` adicionado
+    - Imagem do card: 208px→65px→**150px** de altura (várias idas e voltas)
+    - Descrição do produto **removida do card** (`display:none`) — só aparece no lightbox ao clicar
+    - Nome do produto travado em exatamente 2 linhas (`-webkit-line-clamp:2` + `height` fixo) — resolve desalinhamento da categoria entre cards com nomes de tamanhos diferentes
+    - Card de "Ofertas Especiais" (`.oferta-card`) recebeu o mesmo tratamento de tamanho pra ficar visualmente parecido com os cards normais
+14. **Auditoria de código + LGPD (ver seções 7.1, 7.2, 7.3 acima)** — revisão completa do `index.html`, achado e corrigido: XSS armazenado no admin (3 pontos), função `mascaraCPF` duplicada, `id="paymentIdText"` duplicado, `calculateTotal()` sem guarda de nulo, 32 pontos de `JSON.parse(localStorage)` sem try/catch (helper `_lsJSON` criado), Política de Privacidade reescrita pra LGPD, checkbox de consentimento no cadastro, botão de solicitar exclusão de dados no perfil.
+15. **Voltou pra 5 colunas** (era 4) a pedido do Liézer depois de ver o resultado ao vivo — cards mais estreitos (~224px).
 
-⚠️ **Nada commitado/pushado ainda** — mudanças só no `index.html` local. Rodar `PushCaoTelli.bat` quando Liézer quiser subir.
+### Pushes feitos hoje (2 commits nesta parte da sessão, via `PushCaoTelli.bat` e direto por pedido do Liézer)
+
+```
+ea70dc4  fix: seguranca (XSS) + LGPD + bugs de carrinho + ajustes de header e produtos
+080d89b  fix: volta pra 5 colunas na grade de produtos (cards mais estreitos)
+```
+
+### Status ao encerrar (07/08/2026 — fim da sessão)
+
+✅ Header enxuto, alinhado e centralizado. Categorias renomeadas/reordenadas. Bug do carrinho (Ofertas Especiais) corrigido. Cards de produto compactados em 5 colunas, estilo Cobasi. XSS armazenado no admin corrigido. Política de Privacidade e consentimento LGPD implementados. Tudo commitado e pushado (2 commits desta parte, `ea70dc4` e `080d89b`).
+
+📋 **Pendências pra próxima sessão:**
+- Definir produtos de "Outros Pets" (categoria ainda mostra "todos")
+- Considerar revisão do texto da Política de Privacidade por advogado
+- Resto do backlog inalterado (ver seção 7)
 
 📋 Próximos passos — sem mudança no backlog (ver seção 7).
 
