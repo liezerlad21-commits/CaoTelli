@@ -167,36 +167,26 @@ CaoTelli/
 ## 8. HISTÓRICO DE COMMITS (últimos 20)
 
 ```
-685f87a fix: re-renderiza texto Cao Telli em vetor (Dancing Script) - elimina sombras + cor viva  ← 07/08
-dc99647 fix: reduz sombra residual no texto do banner + aumenta saturacao da cor                  ← 07/08
-21ba141 fix: remove sombra/halo ao redor do texto ampliado do banner                               ← 07/08
-3b4f296 feat: novo banner da home (imagem custom, full-width, texto ampliado) + CLAUDE.md          ← 07/08
-349e4bd Atualizacao do site CaoTelli                                                               ← 06/08
-5e9a4d7 Atualizacao do site CaoTelli                                                               ← 06/08
+f6ae416 fix: reduz um pouco o espacamento T-elli (ponto intermediario)                             ← 07/08
+949a06b fix: dobra a aproximacao entre T e elli no banner                                           ← 07/08
+9868998 fix: diminui espaco entre T e elli no banner                                                ← 07/08
+eb8348c fix: reverte espacamento T-e para o padrao (mantem letra e posicao)                         ← 07/08
+9edaa47 fix: corrige regressao - diminui espaco T-e sem aumentar letra nem mudar posicao            ← 07/08
+a31dcf7 fix: reduz espaco entre T e e em Telli no banner                                            ← 07/08
+11440bf fix: uni ainda mais Cao e Telli no banner                                                   ← 07/08
+0e9d30e fix: aproxima ainda mais Cao e Telli no banner                                              ← 07/08
+07532d6 fix: aproxima as palavras Cao e Telli no banner (espacamento customizado)                   ← 07/08
+4c2bbc5 feat: adiciona patinhas extras perto do balao do Google + atualiza historico                ← 07/08
+685f87a fix: re-renderiza texto Cao Telli em vetor (Dancing Script) - elimina sombras + cor viva    ← 07/08
+dc99647 fix: reduz sombra residual no texto do banner + aumenta saturacao da cor                    ← 07/08
+21ba141 fix: remove sombra/halo ao redor do texto ampliado do banner                                ← 07/08
+3b4f296 feat: novo banner da home (imagem custom, full-width, texto ampliado) + CLAUDE.md           ← 07/08
+349e4bd Atualizacao do site CaoTelli                                                                ← 06/08
+5e9a4d7 Atualizacao do site CaoTelli                                                                ← 06/08
 caf1372 feat: SEO + carrinho persistente + botão voltar + fix mobile + fluxo dinheiro + auto-aba pgto + cobertura por área/dia/bairro + 11 imagens custom das categorias
 f7ac436 feat: pacote pré-lançamento + melhorias UX de checkout + validação de CEP por área
 c90106e feat: sugestões contextuais no carrinho + ordenação global de produtos   ← 05/08 noite
 a230c3c feat: filtro de data + busca na aba Pedidos do admin                     ← 05/08 manhã
-a5ec855 Atualizacao do site CaoTelli
-522f5b0 Atualizacao do site CaoTelli
-b2d20bd Atualizacao do site CaoTelli
-fd0cac7 Atualizacao do site CaoTelli
-188082d Atualizacao do site CaoTelli
-64af40d Atualizacao do site CaoTelli
-5e34579 Atualizacao do site CaoTelli
-27bdd53 Atualizacao do site CaoTelli
-f132b8b Atualizacao do site CaoTelli
-2411c75 Atualizacao do site CaoTelli
-c59c695 Atualizacao do site CaoTelli
-f64938a Atualizacao do site CaoTelli
-21c9df6 Atualizacao do site CaoTelli
-fe14587 Atualizacao do site CaoTelli
-20fb551 Atualizacao do site CaoTelli
-eb4115f Atualizacao do site CaoTelli
-279cab4 Atualizacao do site CaoTelli
-6c5b5d5 Atualizacao do site CaoTelli
-ae05318 Atualizacao do site CaoTelli
-9579aab Melhora botao cancelar no modal Pix   ← última alteração pontual
 ```
 
 **Sugestão futura:** usar mensagens de commit descritivas (ex.: `feat: adiciona login por e-mail`, `fix: corrige cálculo de frete quando subtotal = 59.90`).
@@ -249,9 +239,14 @@ dc99647 fix: reduz sombra residual no texto do banner + aumenta saturacao da cor
 
 10. **Patinhas extras perto do balão do Google** — Liézer pediu mais 2 patinhas azul-clarinho (mesmo estilo das que já existiam nos cantos da imagem) no canto inferior esquerdo, perto de onde o balão de review do Google flutua. Recortadas (cutout com alpha) de uma das patinhas já existentes na própria imagem e coladas em 2 posições/tamanhos/rotações diferentes, mantendo o estilo 100% consistente.
 
+11. **Espaçamento entre "Cão" e "Telli" refinado (várias rodadas)** — Liézer achou que as duas palavras ficaram "muito longe" no texto vetorial. Como o Pillow neste ambiente **não tem o motor Raqm** (sem kerning automático de fonte), o espaçamento padrão entre palavras/letras dessa fonte script fica largo demais por padrão. Solução: renderizar "Cão", "T" e "elli" como **3 blocos separados** com gaps manuais customizados entre eles, em vez de uma string única.
+    - **Armadilha e correção importante:** na primeira tentativa de apertar o espaço entre "T" e "e", o script recalculava a escala da fonte pra sempre preencher a mesma largura alvo (904px) — resultado: apertar o espaço fazia as letras **crescerem** pra compensar (bug sutil, pareceu que "só aumentou a imagem"). Corrigido fixando a escala (`FIXED_SCALE`) calibrada a partir da versão aprovada, então agora só o espaçamento muda, letra e posição ficam estáveis.
+    - Depois de bastante ida e volta ("uni mais", "foi muito, volta a metade", "diminui o T-e", "não quero mais", "afinal quero sim, o dobro", "agora foi de mais") chegou num valor intermediário aprovado ("agora sim está ótimo").
+    - **Valores finais de referência** (dentro do script de geração, no scratchpad da sessão, não versionado): `GAP1` (Cão→T) = `-30 * SS`, `GAP2` (T→elli) = `-85 * SS`, onde `SS=4` é o fator de supersampling. `FIXED_SCALE = 904/3639`.
+
 ### Status ao encerrar (07/08/2026)
 
-✅ Banner novo no ar, aprovado pelo Liézer ("ficou perfeito"). Tudo commitado e pushado.
+✅ Banner novo no ar, aprovado pelo Liézer ("agora sim está ótimo"). Tudo commitado e pushado (15 commits na sessão).
 
 📋 **Próximos passos** — sem mudança no backlog, sessão foi 100% visual/banner. Backlog continua o mesmo da sessão de 06/08 (ver abaixo).
 
