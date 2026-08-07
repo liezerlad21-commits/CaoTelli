@@ -167,6 +167,14 @@ CaoTelli/
 ## 8. HISTÓRICO DE COMMITS (últimos 20)
 
 ```
+685f87a fix: re-renderiza texto Cao Telli em vetor (Dancing Script) - elimina sombras + cor viva  ← 07/08
+dc99647 fix: reduz sombra residual no texto do banner + aumenta saturacao da cor                  ← 07/08
+21ba141 fix: remove sombra/halo ao redor do texto ampliado do banner                               ← 07/08
+3b4f296 feat: novo banner da home (imagem custom, full-width, texto ampliado) + CLAUDE.md          ← 07/08
+349e4bd Atualizacao do site CaoTelli                                                               ← 06/08
+5e9a4d7 Atualizacao do site CaoTelli                                                               ← 06/08
+caf1372 feat: SEO + carrinho persistente + botão voltar + fix mobile + fluxo dinheiro + auto-aba pgto + cobertura por área/dia/bairro + 11 imagens custom das categorias
+f7ac436 feat: pacote pré-lançamento + melhorias UX de checkout + validação de CEP por área
 c90106e feat: sugestões contextuais no carrinho + ordenação global de produtos   ← 05/08 noite
 a230c3c feat: filtro de data + busca na aba Pedidos do admin                     ← 05/08 manhã
 a5ec855 Atualizacao do site CaoTelli
@@ -196,6 +204,60 @@ ae05318 Atualizacao do site CaoTelli
 ---
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
+
+**Data:** 07/08/2026 (BANNER NOVO DA HOME — imagem custom full-width + texto vetorial)
+
+### Contexto
+
+Liézer mandou uma imagem nova (gerada no ChatGPT, `Downloads\ChatGPT Image 7 de ago. de 2026, 10_42_09.png`) pra virar o banner da home, no lugar do hero antigo recriado em HTML/CSS (H1 gigante "CãoTelli" em Dancing Script + 2 logos-marca-d'água desbotadas nos cantos + parágrafos de tagline). A sessão inteira foi a troca desse banner + refinamento iterativo de posição/tamanho/qualidade, guiado passo a passo pelo Liézer olhando prints do resultado.
+
+### O que foi feito
+
+1. **Troca do hero por imagem** — as ~12 linhas de `<h1>`/`<p>`/marca-d'água (linhas ~2075-2086 do `index.html`) viraram um único `<img src="img/banner_home.jpg">`. Botão "Ver Produtos →" e carrossel de categorias abaixo continuam iguais.
+
+2. **Full-width progressivo** — `max-width` do `.hero-container` (era 800px) e do `<img>` foram subindo em várias rodadas até **2100px / 2030px**, e o padding lateral do `.hero` caiu de 20px pra 4px. O banner passou a ocupar quase a largura total da tela.
+
+3. **Reposicionamento vertical** — como o `.hero` tem `overflow:hidden`, um `margin-top` negativo (até **-160px**) no wrapper "sobe" o banner cortando uma faixa do topo (área lisa da arte, sem perda de conteúdo importante).
+
+4. **Botão + carrossel sobrepostos no banner** — `margin-top` negativo em porcentagem (chegou a **-26%**, ajustado pra **-17%**) no wrapper do botão/categorias, pra eles ficarem dentro da faixa branca/onda do banner em vez de deixar espaço morto embaixo.
+
+5. **Logo duplicado removido** — a imagem já trazia o logo da casinha + "CãoTelli RAÇÕES E ACESSÓRIOS" pequeno no canto esquerdo, que ficava atrás do balão de review do Google (elemento flutuante do site). Apagado via inpainting com OpenCV.
+
+6. **Texto "Cão Telli" ampliado 30% e deslocado** pra mais perto do balão do Google (`margin-left` efetivo de -55px no crop).
+
+7. **Problema de sombra e solução final** — ampliar o texto recortado da imagem original trouxe sombra/halo ao redor das letras (várias rodadas de inpainting tentando limpar, sem sucesso total — o "fundo limpo" reconstruído tinha uma leve mancha residual difícil de eliminar sem comer parte das letras). **Solução definitiva, sugestão do Liézer:** em vez de tentar salvar o texto raster borrado, **recriar do zero em vetor** — baixada a fonte **Dancing Script Bold** do Google Fonts (que por coincidência é quase idêntica à fonte cursiva da arte original), renderizado "Cão Telli" com supersampling 4x (nitidez perfeita), cor vívida `rgb(12,172,235)`, zero sombra. Resultado aprovado ("ficou perfeito").
+
+8. **Resolução geral aumentada 35%** (1717×916 → 2318×1237) com Lanczos + leve `UnsharpMask` — o CSS já exibia o banner até 2030px de largura, então a imagem nativa menor estava sendo esticada/borrada pelo navegador. Agora a resolução nativa é maior que o espaço máximo de exibição.
+
+9. **Arquivo final:** `img/banner_home.jpg` (~350KB, 2318×1237px).
+
+### Pushes feitos hoje (4 commits, direto via `git` — Liézer pediu pra eu subir)
+
+```
+3b4f296 feat: novo banner da home (imagem custom, full-width, texto ampliado) + CLAUDE.md + backup categorias
+21ba141 fix: remove sombra/halo ao redor do texto ampliado do banner
+dc99647 fix: reduz sombra residual no texto do banner + aumenta saturacao da cor
+685f87a fix: re-renderiza texto Cao Telli em vetor (Dancing Script) - elimina sombras de vez, cor mais viva e nitida
+```
+
+### Detalhes técnicos pra lembrar
+
+- `img/banner_home.jpg` é referenciado 1x no `index.html` (dentro da `<section class="hero">`) — pra trocar a imagem no futuro, basta sobrescrever o arquivo, não precisa mexer no HTML.
+- Se precisar recriar/ajustar o texto "Cão Telli" de novo: fonte **Dancing Script Bold** (peso 700, variable font), cor `rgb(12,172,235)`, renderizar com supersample 4x + downscale Lanczos pra ficar nítido. O script usado ficou só no scratchpad da sessão (não versionado no repo).
+- `.hero h1` e `.hero p` no CSS (bloco de estilos, perto do topo do `<style>`) ficaram **órfãos** — sem elemento correspondente no HTML desde a troca pro banner-imagem. Código morto inofensivo, não removido (pode limpar numa faxina futura).
+- `CLAUDE.md` e `img/categorias_backup_ref/` (backup das imagens de categoria, ~2.4MB) que já estavam soltos no repo (untracked) desde antes desta sessão foram commitados junto no primeiro push de hoje.
+
+10. **Patinhas extras perto do balão do Google** — Liézer pediu mais 2 patinhas azul-clarinho (mesmo estilo das que já existiam nos cantos da imagem) no canto inferior esquerdo, perto de onde o balão de review do Google flutua. Recortadas (cutout com alpha) de uma das patinhas já existentes na própria imagem e coladas em 2 posições/tamanhos/rotações diferentes, mantendo o estilo 100% consistente.
+
+### Status ao encerrar (07/08/2026)
+
+✅ Banner novo no ar, aprovado pelo Liézer ("ficou perfeito"). Tudo commitado e pushado.
+
+📋 **Próximos passos** — sem mudança no backlog, sessão foi 100% visual/banner. Backlog continua o mesmo da sessão de 06/08 (ver abaixo).
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
 
 **Data:** 06/08/2026 (PACOTE DE PRÉ-LANÇAMENTO — SEO/PWA HINTS + PERSISTÊNCIA DO CARRINHO + ALT NAS LOGOS)
 
