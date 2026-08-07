@@ -164,6 +164,67 @@ CaoTelli/
 
 ---
 
+## 7.1 AUDITORIA DE CÓDIGO (07/08/2026) — bugs e riscos encontrados
+
+> Revisão completa do `index.html` (194 funções, ~8.100 linhas), passando por funcionalidades e depois por cada página/seção. **✅ Todos os 7 itens abaixo + a auditoria LGPD (seção 7.2) foram corrigidos no mesmo dia** — ver detalhes em 7.3.
+
+### 🔴 Prioridade alta — segurança (XSS armazenado no admin)
+
+Três lugares no painel admin pegam texto livre digitado pelo **cliente** no checkout/cadastro e jogam direto em `innerHTML` sem escapar. Um cliente mal-intencionado pode injetar um `<script>`/`<img onerror=...>` num campo de texto livre (nome, telefone, referência do endereço, nome do pet, e-mail de visitante) e o código roda **na sessão logada do admin** quando ele abre a tela:
+
+1. **`abrirDetalhePedido()` — index.html:6411** — nome, telefone, rua, bairro, referência do endereço de entrega, sem escapar.
+2. **`renderAdminClientes()` — index.html:6580** — nome, e-mail, telefone, endereço, nomes de pets, sem escapar.
+3. **Tabela de pedidos — index.html:6387** — coluna "Cliente" (`p.cliente`, pode vir do e-mail livre de checkout visitante), sem escapar.
+
+**Correção sugerida:** reaproveitar a função `_escAttr()` (já existe no código, linha ~7393, usada hoje só na aba Sugestões) nesses 3 pontos antes de interpolar no HTML.
+
+### 🟡 Prioridade média — código frágil / duplicado
+
+4. **`mascaraCPF` duplicada — index.html:4646 e 5508** — duas funções com o mesmo nome no escopo global; a segunda (5508) sobrescreve a primeira silenciosamente. A versão da linha 4646 é código morto — editar ela não tem nenhum efeito no site.
+5. **`id="paymentIdText"` duplicado — index.html:5066 e 5266** — duas telas de resultado de pagamento (PIX aprovado / Cartão aprovado) usam o mesmo id. Funciona hoje porque só uma tela existe no DOM por vez, mas é frágil — se isso mudar, o botão "Copiar" pode copiar o Payment ID errado sem erro visível.
+6. **`calculateTotal()` sem guarda de nulo — index.html:3950** — acessa `#subtotal`/`#frete`/`#total`/`#discountRow`/`#discountValue` sem checar se existem, mesmo padrão que já quebrou o carrinho nesta sessão quando o header foi removido (ver seção 9). Qualquer edição futura no HTML do modal do carrinho que remova/renomeie um desses ids trava essa função com erro.
+
+### 🟢 Prioridade baixa — risco futuro
+
+7. **`JSON.parse(localStorage...)` sem try/catch em 31 dos 34 pontos** — só tratam localStorage vazio (`null → '[]'`), não dado corrompido. Se algum valor salvo ficar malformado (extensão de navegador, escrita cortada, versão antiga incompatível), a leitura lança erro não tratado no meio da função que a contém.
+
+---
+
+## 7.2 AUDITORIA LGPD (07/08/2026) — pontos de atenção
+
+> Segunda varredura, focada em conformidade com a LGPD (Lei 13.709/2018). **Não é parecer jurídico** — recomenda-se revisão por advogado antes de tratar isso como conformidade garantida. **✅ Os 3 itens corrigíveis via código foram implementados** (ver 7.3).
+
+1. **Política de Privacidade incompleta** — não listava CPF entre os dados coletados, não citava Firebase/Mercado Pago como terceiros que recebem dados, não informava os direitos do titular (art. 18: acesso, correção, exclusão, portabilidade, revogação), não dizia por quanto tempo os dados ficam guardados.
+2. **Sem consentimento explícito no cadastro** — formulário de criar conta não tinha checkbox de aceite dos Termos/Política antes de enviar.
+3. **Cliente sem jeito de pedir exclusão dos próprios dados** — só o admin tinha botão de excluir cliente; o cliente não tinha nenhuma opção no perfil dele.
+4. **Ligação com a auditoria de código (7.1)** — o XSS armazenado do item 1-3 de lá também é uma falha de segurança relevante pra LGPD (art. 46 exige medidas técnicas de proteção de dados).
+5. Pontos que já estavam OK: sem rastreadores/analytics de terceiros ocultos; já existiam páginas de Política de Privacidade e Termos de Uso acessíveis.
+
+---
+
+## 7.3 CORREÇÕES APLICADAS (07/08/2026) — auditorias 7.1 e 7.2
+
+Todos os itens das duas auditorias foram corrigidos no mesmo dia, a pedido do Liézer ("corrija tudo o que você conseguir"). Validado com `node --check` nos 4 blocos `<script>`, tags HTML balanceadas, e testes funcionais no navegador (payload malicioso de teste confirmado que **não** executa mais).
+
+**Segurança (XSS armazenado):**
+- `abrirDetalhePedido()`, `renderAdminClientes()` e a tabela de pedidos do admin agora escapam todo campo de texto livre do cliente (nome, telefone, endereço, referência, e-mail, nome de pet) com `_escAttr()` antes de jogar em `innerHTML`.
+- Botão de excluir cliente também escapa aspas simples no e-mail (evitava quebrar o atributo `onclick`).
+
+**Código frágil / duplicado:**
+- Removida a `mascaraCPF` morta (a que nunca rodava); ficou só a versão realmente usada.
+- `id="paymentIdText"` duplicado — a tela de resultado do Cartão agora usa `id="paymentIdTextCard"`; `copiarPaymentId()` checa os dois.
+- `calculateTotal()` agora tem guarda de nulo em todos os elementos do resumo do carrinho (mesmo padrão do bug que já tinha quebrado o carrinho nesta sessão).
+- Criado helper `_lsJSON(key, fallback)` — leitura seguríssima do localStorage (nunca lança erro). Substituído em **32 pontos** que antes usavam `JSON.parse(localStorage.getItem(...) || '...')` sem try/catch.
+
+**LGPD:**
+- Política de Privacidade reescrita: lista CPF, endereço e dados de pet entre os dados coletados; cita Google Firebase e Mercado Pago como terceiros; lista os direitos do titular (art. 18); explica retenção e segurança.
+- Checkbox obrigatório de aceite dos Termos/Política adicionado no formulário de cadastro (`cadAceiteTermos`), com validação em `salvarCadastro()`.
+- Novo botão **"🔒 Solicitar exclusão ou acesso aos meus dados (LGPD)"** na tela de Perfil (cliente logado) — abre o WhatsApp com mensagem pronta identificando a conta.
+
+**⚠️ Nada commitado/pushado ainda** — mudanças só no `index.html` e `HISTORICO_PROJETO.md` locais. Rodar `PushCaoTelli.bat` quando o Liézer quiser subir.
+
+---
+
 ## 8. HISTÓRICO DE COMMITS (últimos 20)
 
 ```
@@ -194,6 +255,42 @@ a230c3c feat: filtro de data + busca na aba Pedidos do admin                    
 ---
 
 ## 9. ONDE PARAMOS — SESSÃO ATUAL
+
+**Data:** 07/08/2026 (CABEÇALHO — remoção/restauração, correção de espaçamento e alinhamento com o banner)
+
+### Contexto
+
+Continuação da sessão do banner novo (mesmo dia). Liézer pediu pra tirar o cabeçalho do topo do site, depois voltou atrás, testou uma variante com o header sobreposto à imagem do banner, e terminou ajustando o tamanho do cabeçalho original e o espaçamento entre ele e o banner. Sessão bem iterativa, guiada por prints.
+
+### O que foi feito (na ordem)
+
+1. **Header removido** — bloco `<header>...</header>` inteiro (logo, busca, ícones de carrinho/perfil/admin/whatsapp) tirado do `index.html`. Adicionadas checagens de nulo (`if (cartCount) {...}`, `if (searchInputEl) {...}`) em `updateCart()` e no listener de busca, porque essas funções acessavam `#cartCount`/`#searchInput` sem guarda e quebravam (carrinho parava de atualizar, `init()` não rodava) — os outros ids do header (`adminBtn`, `headerPerfilBtn`, `badgeHeaderAdmin`) já tinham guarda no código.
+2. **Banner descido pra compensar** o espaço do header removido — `padding-top` da `.hero` foi de 0 → 70px → 110px → 130px (ajuste incremental pedido pelo Liézer).
+3. **Header restaurado** (Liézer decidiu que precisava dele de volta) — código original recuperado do git (`git show HEAD:index.html`), reinserido na posição de origem, mantendo o `padding-top:130px` do banner.
+4. **Tentativa: header sobreposto ao banner** — Liézer pediu o header flutuando por cima da imagem do banner, alinhado no topo (`position:absolute` dentro da `.hero`, `.hero` padding revertido pra 0). Funcionou bem no desktop largo (1440px), mas **quebrou no mobile**: abaixo de 768px o `.header-container` empilha em coluna (logo + busca + ícones), o header fica com ~250px de altura e cobre o banner inteiro (imagem, texto e botão "Ver Produtos" somem atrás dele). Testado e confirmado o bug em 375px e 715px de largura.
+5. **Revertido pro header normal** (não sobreposto) — de volta à posição/posicionamento original (`position:sticky`, fora da `.hero`), testado em mobile (375px) e desktop (1440px) sem cobrir o banner.
+6. **Header enxugado:**
+   - Padding vertical do header: `15px` → `8px`
+   - Altura da logo: `96px` → `60px` (era a principal causa do espaço em branco — a logo era bem mais alta que o texto/ícones ao lado, esticando a barra toda)
+7. **Banner + botão + carrossel descendo juntos** — `.hero` voltou a ganhar `padding-top` (dessa vez com o header já enxuto): 0 → 40px → **55px (valor final aprovado)**.
+
+### Detalhes técnicos pra lembrar
+
+- A logo tem `height:96px` (agora `60px`) inline no `<img>`, com `mask-image` circular (`radial-gradient` 50%→78%) — isso deixa uma margem "fantasma" dentro da própria imagem, então reduzir a altura do `<img>` é o jeito certo de compactar, não dá pra resolver só com padding do header.
+- **Lição da tentativa #4:** não vale a pena fazer o header como overlay (`position:absolute`) sobre o banner enquanto o `.header-container` empilhar em coluna no mobile (`@media max-width:768px`) — ele nunca vai caber sem cobrir a imagem inteira. Se Liézer pedir de novo, a solução seria uma versão separada e mais compacta do header *só* pro breakpoint mobile (esconder busca, por exemplo), não simplesmente herdar o layout empilhado atual.
+- `padding-top` da `.hero` (atualmente `55px`) é o dial principal pra descer/subir o banner+botão+carrossel juntos como bloco (eles se movem em conjunto porque as margens negativas internas — `-160px` na imagem, `-17%` no bloco de botão/carrossel — são relativas entre si, não ao topo da página).
+
+### Status ao encerrar (07/08/2026 — sessão do cabeçalho)
+
+✅ Header de volta, enxuto (padding 8px, logo 60px) e não-sobreposto (funciona em mobile e desktop). Banner+botões descendo 55px juntos. Validado: sintaxe JS ok (`node --check` nos 4 blocos `<script>`), tags balanceadas, testado visualmente em 375px e 1440px, sem erros no console.
+
+⚠️ **Nada commitado/pushado ainda** — mudanças só no `index.html` local. Rodar `PushCaoTelli.bat` quando Liézer quiser subir.
+
+📋 Próximos passos — sem mudança no backlog (ver seção 7).
+
+---
+
+## 9. ONDE PARAMOS — SESSÃO ANTERIOR
 
 **Data:** 07/08/2026 (BANNER NOVO DA HOME — imagem custom full-width + texto vetorial)
 
